@@ -1,11 +1,17 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Quản trị</title><meta name="theme-color" content="#f6f1ec">
+<meta http-equiv="Cache-Control" content="no-cache"><title>Quản trị</title><meta name="theme-color" content="#f6f1ec">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Quản trị">
 <link rel="icon" href="https://fonts.gstatic.com/s/e/notoemoji/latest/1f3e2/72.png">
 <script>
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzIWPz00WSzB659piig0WYLBOOd_KWUFQa_sBJgrtHDQQ0Luq9hDHdyGJFVU0HtIWbo/exec";
+// Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
+var HMK_BAN = "20261030185553";
+fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
+  var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
+  try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
+  location.reload(); }).catch(function(){});
 (function(){
   function goiMay(fn, args, ok, loi){
     fetch(HMK_API, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ fn: fn, args: args }), redirect: "follow" })
@@ -1601,7 +1607,7 @@ function veMPL(){
 }
 // Luôn lấy dữ liệu mới từ Main pay list file ADMIN: khi mở trang + 5 phút/lần (im lặng; số dòng đổi thì tải lại bảng)
 var MPL_SODONG=-1, MPL_DBLUC=0;
-function mplDongBoNgam(){ if(!D.lienKet||TAB!=="MPL"||document.hidden||Date.now()-MPL_DBLUC<60000) return; MPL_DBLUC=Date.now();
+function mplDongBoNgam(){ if(!D||!D.lienKet||TAB!=="MPL"||document.hidden||Date.now()-MPL_DBLUC<60000) return; MPL_DBLUC=Date.now();
   goi("dongBoAdmin").then(function(r){ var n=r&&r.admin; if(TAB==="MPL"&&n!==MPL_SODONG){ if(MPL_SODONG>=0) toast("🔄 Main pay list ADMIN có thay đổi – đã cập nhật",3000); MPL_SODONG=n; taiMPL(); } }).catch(function(){}); }
 setInterval(mplDongBoNgam,300000); document.addEventListener("visibilitychange",function(){ if(!document.hidden) mplDongBoNgam(); });
 function dongBoAD(b){ b.disabled=true; goi("dongBoAdmin").then(function(r){ b.disabled=false; toast("🔄 Đã đồng bộ "+r.admin+" dòng từ ADMIN",6000); taiMPL(); }).catch(function(e){ b.disabled=false; loi(e); }); }
