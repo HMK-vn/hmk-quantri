@@ -658,7 +658,7 @@ function moSheet(){ moHop(gaTai("Đang lấy danh sách sheet…")); goi("dsShee
       '<div class="shNhom">📁 File liên quan</div>'+r.files.filter(function(x){ return !x.lq; }).map(function(x){ return dong(x,"f"); }).join("")+
       '<p style="text-align:right;margin-top:10px"><button onclick="dongMo()">Đóng</button></p></div>'); var o=$("shLoc"); if(o&&innerWidth>640) o.focus(); }).catch(function(e){ moHop('<p class="do">⚠️ '+esc(e.message)+'</p><p style="text-align:right"><button onclick="dongMo()">Đóng</button></p>'); }); }
 function locSheet(q){ q=String(q||"").toLowerCase().trim(); [].forEach.call(document.querySelectorAll(".shDong"),function(a){ a.style.display=!q||a.dataset.t.indexOf(q)>=0?"":"none"; }); }
-function veKhung(){ if(D.chu) hien("nutSheet");
+function veKhung(){ if(D.chu) $("nutSheet").classList.remove("an"); /* veKhung có biến cục bộ tên hien – không gọi hien() ở đây */
   $("nguoi").textContent = D.ten==="Chủ"?"👑 "+D.email:D.email;
   var qs = D.quan.slice(); if(D.quan.indexOf(Q)<0) Q = D.quan[0];
   QS = qs; veChonQuan();
