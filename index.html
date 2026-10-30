@@ -24,6 +24,7 @@ html,body{margin:0;height:100%;background:#e7ded3;font-family:-apple-system,Blin
 #dn .hop{background:rgba(255,255,255,.92);border:1px solid #f0e2d6;border-radius:16px;box-shadow:0 18px 50px rgba(90,52,32,.18);padding:26px 24px;width:min(360px,calc(100vw - 32px));text-align:center;color:#3b2417}
 #dn h2{margin:4px 0 4px;font-size:18px}#dn p{margin:0 0 16px;color:#8a6f5e;font-size:13px}#nutGG{display:flex;justify-content:center;min-height:44px}#dnLoi{color:#b42318;font-size:12.5px;margin-top:10px}
 .gaMini{position:relative;display:inline-block;width:30px;height:30px;vertical-align:middle;margin-right:6px}.gaMini i{transform:scaleX(-1);animation:buoc .64s steps(8) infinite}#dnLoi{display:flex;align-items:center;justify-content:center}
+#loiMo{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;background:rgba(246,241,236,.96)}#loiMo .hop{max-width:420px;background:#fff;border-radius:16px;padding:22px;box-shadow:0 10px 30px rgba(0,0,0,.12);text-align:center;font-family:-apple-system,system-ui,sans-serif}#loiMo button{background:#d9763c;color:#fff;border:0;border-radius:10px;padding:10px 18px;font-size:15px;cursor:pointer}
 </style><script src="https://accounts.google.com/gsi/client" async defer></script></head><body>
 <div id="dn"><div class="hop"><div style="font-size:28px">🗂</div><h2>HOÀNG MINH KHIÊM</h2><p>Đăng nhập bằng tài khoản Google đã được chủ cấp quyền</p><div id="nutGG"></div><div id="dnLoi"></div></div></div><div id="cho"><div id="duong"><div id="ga"><i></i></div></div><div>Gà đang mở Quản trị…</div></div>
 <script>
@@ -49,12 +50,19 @@ function dnMo(){ var d = document.getElementById("dn"); d.style.display = "flex"
   if (!ggSan) { ggSan = true; google.accounts.id.initialize({ client_id: GG_ID, ux_mode: "popup", callback: function(r){ document.getElementById("dnLoi").innerHTML = '<span class="gaMini"><i></i></span>Gà đang mở cửa…'; guiXuong(f.contentWindow, { hmk: "googleToken", token: r.credential }, 3); } });
     google.accounts.id.renderButton(document.getElementById("nutGG"), { theme: "outline", size: "large", shape: "pill", text: "signin_with", locale: "vi", width: 280 }); } }
 
-f.onload = function(){ setTimeout(an, 25000); };
+var LAN_TAI = 0;
+// Khung tải xong mà web không lên tiếng trong 20 giây (Google trả trang lỗi "không thể mở tệp") => tự mở lại; 2 lần vẫn lỗi => hiện hộp hướng dẫn
+f.onload = function(){ setTimeout(an, 25000); var lan = ++LAN_TAI; setTimeout(function(){ if (SONG || lan !== LAN_TAI) return;
+  if (LAN_TAI < 3) moLaiWeb(); else hienLoi(); }, 20000); };
+function moLaiWeb(){ MOLAI = Date.now(); SONG = 0; f.src = WEB + location.search + (location.search ? "&" : "?") + "t=" + MOLAI; }
+function hienLoi(){ var d = document.getElementById("loiMo"); if (d) { d.style.display = "flex"; return; } d = document.createElement("div"); d.id = "loiMo";
+  d.innerHTML = '<div class="hop"><h2>Google chưa mở được web</h2><p>Thường do trình duyệt đang đăng nhập <b>nhiều tài khoản Google</b> cùng lúc.</p><p style="text-align:left;font-size:14px">• Bấm <b>Mở lại</b> bên dưới<br>• Hoặc mở trang này trong <b>cửa sổ ẩn danh</b> / trình duyệt khác<br>• Hoặc đăng xuất bớt tài khoản Google, chỉ giữ tài khoản dùng cho quán</p><button onclick="document.getElementById(\'loiMo\').style.display=\'none\';LAN_TAI=0;moLaiWeb()">🔄 Mở lại</button></div>';
+  document.body.appendChild(d); }
 // 💓 Web quản trị báo "còn sống" mỗi 5 giây. Mất tín hiệu > 20 giây khi trang đang mở (khung bị Google đổi sang trang lỗi Drive
 // "không thể mở tệp") => tự mở lại web, tối đa 1 lần / 30 giây. Chỉ theo dõi sau khi đã nhận tín hiệu đầu tiên.
-var SONG = 0, MOLAI = 0;
+var SONG = 0, MOLAI = 0; // (LAN_TAI khai báo ở trên)
 setInterval(function(){ if (!SONG || document.hidden) return; var nay = Date.now();
-  if (nay - SONG > 20000 && nay - MOLAI > 30000) { MOLAI = nay; SONG = 0; f.src = WEB + location.search + (location.search ? "&" : "?") + "t=" + nay; } }, 4000);
+  if (nay - SONG > 20000 && nay - MOLAI > 30000) { LAN_TAI = 0; moLaiWeb(); } }, 4000);
 document.addEventListener("visibilitychange", function(){ if (!document.hidden && SONG) SONG = Math.max(SONG, Date.now() - 12000); });
 document.body.appendChild(f);
 </script></body></html>
