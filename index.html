@@ -38,7 +38,7 @@ var deTrung = setInterval(function(){ var d = document.getElementById("duong"), 
   var rd = d.getBoundingClientRect(), rg = g.getBoundingClientRect(), t = document.createElement("i"), x = rg.left - rd.left, sangPhai = x >= (deTrung.x0 == null ? x : deTrung.x0); deTrung.x0 = x; t.className = "trung";
   // trứng nằm SAU đuôi gà (đang chạy sang phải thì đuôi bên trái, ngược lại) và nằm dưới gà
   t.style.left = (x + (sangPhai ? rg.width * .18 : rg.width * .82) - 6) + "px"; t.style.top = (rd.height - 18) + "px"; d.insertBefore(t, g); setTimeout(function(){ t.remove(); }, 2500); }, 900);
-addEventListener("message", function(e){ if (e.data === "hmkSanSang") { an(); dnAn(); } var d = e.data || {};
+addEventListener("message", function(e){ if (e.data === "hmkSanSang") { an(); dnAn(); } var d = e.data || {}; SONG = Date.now();
   if (d.hmk === "canDangNhap" || d.hmk === "moGoogle") { an(); dnMo(); } if (d.hmk === "daDangNhap") dnAn(); });
 // 🔐 Đăng nhập bằng Google: lấy ID token rồi gửi xuống web (Apps Script) để máy chủ kiểm tra quyền
 var GG_ID = "153403688896-hv372ha4ce3rppp7skeco3d4ca4i5ud3.apps.googleusercontent.com", ggSan = false;
@@ -50,5 +50,11 @@ function dnMo(){ var d = document.getElementById("dn"); d.style.display = "flex"
     google.accounts.id.renderButton(document.getElementById("nutGG"), { theme: "outline", size: "large", shape: "pill", text: "signin_with", locale: "vi", width: 280 }); } }
 
 f.onload = function(){ setTimeout(an, 25000); };
+// 💓 Web quản trị báo "còn sống" mỗi 5 giây. Mất tín hiệu > 20 giây khi trang đang mở (khung bị Google đổi sang trang lỗi Drive
+// "không thể mở tệp") => tự mở lại web, tối đa 1 lần / 30 giây. Chỉ theo dõi sau khi đã nhận tín hiệu đầu tiên.
+var SONG = 0, MOLAI = 0;
+setInterval(function(){ if (!SONG || document.hidden) return; var nay = Date.now();
+  if (nay - SONG > 20000 && nay - MOLAI > 30000) { MOLAI = nay; SONG = 0; f.src = WEB + location.search + (location.search ? "&" : "?") + "t=" + nay; } }, 4000);
+document.addEventListener("visibilitychange", function(){ if (!document.hidden && SONG) SONG = Math.max(SONG, Date.now() - 12000); });
 document.body.appendChild(f);
 </script></body></html>
