@@ -31,6 +31,9 @@ html,body{margin:0;height:100%;background:#e7ded3;font-family:-apple-system,Blin
 // Trang GitHub Pages chỉ là khung: mở web quản trị (Apps Script) toàn màn hình, chuyển tiếp ?tab=…&quan=…&ngay=…
 var WEB = "https://script.google.com/macros/s/AKfycbzIWPz00WSzB659piig0WYLBOOd_KWUFQa_sBJgrtHDQQ0Luq9hDHdyGJFVU0HtIWbo/exec";
 var f = document.createElement("iframe"); f.id = "web";
+// Khung chạy như cửa sổ ẩn danh (không gửi kèm tài khoản Google của trình duyệt): trình duyệt đăng nhập nhiều tài khoản Google
+// làm Google trả trang lỗi "không thể mở tệp". Web chạy quyền chủ cho mọi người nên không cần tài khoản Google ở đây.
+f.setAttribute("credentialless", "");
 f.src = WEB + location.search; f.allow = "clipboard-write; camera";
 // màn chờ có gà nằm trên cùng, chỉ ẩn khi web quản trị báo "sẵn sàng" (hoặc sau 25 giây kể từ khi khung tải xong)
 var an = function(){ var c = document.getElementById("cho"); if (!c) return; c.style.opacity = 0; setTimeout(function(){ c.remove(); }, 450); };
@@ -40,7 +43,14 @@ var deTrung = setInterval(function(){ var d = document.getElementById("duong"), 
   // trứng nằm SAU đuôi gà (đang chạy sang phải thì đuôi bên trái, ngược lại) và nằm dưới gà
   t.style.left = (x + (sangPhai ? rg.width * .18 : rg.width * .82) - 6) + "px"; t.style.top = (rd.height - 18) + "px"; d.insertBefore(t, g); setTimeout(function(){ t.remove(); }, 2500); }, 900);
 addEventListener("message", function(e){ if (e.data === "hmkSanSang") { an(); dnAn(); } var d = e.data || {}; SONG = Date.now();
+  var tuWeb = /\.googleusercontent\.com$/.test(e.origin || "");
+  // Khung ẩn danh không giữ được phiên đăng nhập => trang này giữ hộ (chỉ nhận lệnh từ chính web quản trị)
+  if (tuWeb && d.hmk === "luuToken" && d.token) { try { localStorage.setItem("hmk_tk", d.token); } catch (x) {} DA_THU = 0; }
+  if (tuWeb && d.hmk === "xoaToken") { try { localStorage.removeItem("hmk_tk"); } catch (x) {} }
+  if (d.hmk === "canDangNhap") { var tk = ""; try { tk = localStorage.getItem("hmk_tk") || ""; } catch (x) {}
+    if (tk && !DA_THU) { DA_THU = 1; guiXuong(f.contentWindow, { hmk: "dungToken", token: tk }, 3); return; } }
   if (d.hmk === "canDangNhap" || d.hmk === "moGoogle") { an(); dnMo(); } if (d.hmk === "daDangNhap") dnAn(); });
+var DA_THU = 0;
 // 🔐 Đăng nhập bằng Google: lấy ID token rồi gửi xuống web (Apps Script) để máy chủ kiểm tra quyền
 var GG_ID = "153403688896-hv372ha4ce3rppp7skeco3d4ca4i5ud3.apps.googleusercontent.com", ggSan = false;
 function dnAn(){ document.getElementById("dn").style.display = "none"; }
@@ -54,7 +64,7 @@ var LAN_TAI = 0;
 // Khung tải xong mà web không lên tiếng trong 20 giây (Google trả trang lỗi "không thể mở tệp") => tự mở lại; 2 lần vẫn lỗi => hiện hộp hướng dẫn
 f.onload = function(){ setTimeout(an, 25000); var lan = ++LAN_TAI; setTimeout(function(){ if (SONG || lan !== LAN_TAI) return;
   if (LAN_TAI < 3) moLaiWeb(); else hienLoi(); }, 20000); };
-function moLaiWeb(){ MOLAI = Date.now(); SONG = 0; f.src = WEB + location.search + (location.search ? "&" : "?") + "t=" + MOLAI; }
+function moLaiWeb(){ MOLAI = Date.now(); SONG = 0; if (LAN_TAI >= 2) f.removeAttribute("credentialless"); /* 2 lần ẩn danh không được thì thử kiểu thường */ f.src = WEB + location.search + (location.search ? "&" : "?") + "t=" + MOLAI; }
 function hienLoi(){ var d = document.getElementById("loiMo"); if (d) { d.style.display = "flex"; return; } d = document.createElement("div"); d.id = "loiMo";
   d.innerHTML = '<div class="hop"><h2>Google chưa mở được web</h2><p>Thường do trình duyệt đang đăng nhập <b>nhiều tài khoản Google</b> cùng lúc.</p><p style="text-align:left;font-size:14px">• Bấm <b>Mở lại</b> bên dưới<br>• Hoặc mở trang này trong <b>cửa sổ ẩn danh</b> / trình duyệt khác<br>• Hoặc đăng xuất bớt tài khoản Google, chỉ giữ tài khoản dùng cho quán</p><button onclick="document.getElementById(\'loiMo\').style.display=\'none\';LAN_TAI=0;moLaiWeb()">🔄 Mở lại</button></div>';
   document.body.appendChild(d); }
