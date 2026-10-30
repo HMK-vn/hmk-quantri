@@ -19,8 +19,12 @@ html,body{margin:0;height:100%;background:#e7ded3;font-family:-apple-system,Blin
 @keyframes buoc{to{background-position:114.2857% 0}}
 @keyframes quaLai{0%{transform:translateX(-80px) scaleX(1)}49.9%{transform:translateX(80px) scaleX(1)}50%{transform:translateX(80px) scaleX(-1)}99.9%{transform:translateX(-80px) scaleX(-1)}100%{transform:translateX(-80px) scaleX(1)}}
 @media (prefers-reduced-motion:reduce){#ga,#ga i{animation:none}}
-</style></head><body>
-<div id="cho"><div id="duong"><div id="ga"><i></i></div></div><div>Gà đang mở Quản trị…</div></div>
+/* 🔐 hộp Đăng nhập bằng Google (Google Identity) – hiện khi web báo cần đăng nhập */
+#dn{position:fixed;inset:0;z-index:6;display:none;align-items:center;justify-content:center;background:rgba(246,241,236,.55);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+#dn .hop{background:rgba(255,255,255,.92);border:1px solid #f0e2d6;border-radius:16px;box-shadow:0 18px 50px rgba(90,52,32,.18);padding:26px 24px;width:min(360px,calc(100vw - 32px));text-align:center;color:#3b2417}
+#dn h2{margin:4px 0 4px;font-size:18px}#dn p{margin:0 0 16px;color:#8a6f5e;font-size:13px}#nutGG{display:flex;justify-content:center;min-height:44px}#dnLoi{color:#b42318;font-size:12.5px;margin-top:10px}
+</style><script src="https://accounts.google.com/gsi/client" async defer></script></head><body>
+<div id="dn"><div class="hop"><div style="font-size:28px">🗂</div><h2>HOÀNG MINH KHIÊM</h2><p>Đăng nhập bằng tài khoản Google đã được chủ cấp quyền</p><div id="nutGG"></div><div id="dnLoi"></div></div></div><div id="cho"><div id="duong"><div id="ga"><i></i></div></div><div>Gà đang mở Quản trị…</div></div>
 <script>
 // Trang GitHub Pages chỉ là khung: mở web quản trị (Apps Script) toàn màn hình, chuyển tiếp ?tab=…&quan=…&ngay=…
 var WEB = "https://script.google.com/macros/s/AKfycbzIWPz00WSzB659piig0WYLBOOd_KWUFQa_sBJgrtHDQQ0Luq9hDHdyGJFVU0HtIWbo/exec";
@@ -33,7 +37,17 @@ var deTrung = setInterval(function(){ var d = document.getElementById("duong"), 
   var rd = d.getBoundingClientRect(), rg = g.getBoundingClientRect(), t = document.createElement("i"), x = rg.left - rd.left, sangPhai = x >= (deTrung.x0 == null ? x : deTrung.x0); deTrung.x0 = x; t.className = "trung";
   // trứng nằm SAU đuôi gà (đang chạy sang phải thì đuôi bên trái, ngược lại) và nằm dưới gà
   t.style.left = (x + (sangPhai ? rg.width * .18 : rg.width * .82) - 6) + "px"; t.style.top = (rd.height - 18) + "px"; d.insertBefore(t, g); setTimeout(function(){ t.remove(); }, 2500); }, 900);
-addEventListener("message", function(e){ if (e.data === "hmkSanSang") an(); });
+addEventListener("message", function(e){ if (e.data === "hmkSanSang") { an(); dnAn(); } var d = e.data || {};
+  if (d.hmk === "canDangNhap" || d.hmk === "moGoogle") { an(); dnMo(); } if (d.hmk === "daDangNhap") dnAn(); });
+// 🔐 Đăng nhập bằng Google: lấy ID token rồi gửi xuống web (Apps Script) để máy chủ kiểm tra quyền
+var GG_ID = "153403688896-hv372ha4ce3rppp7skeco3d4ca4i5ud3.apps.googleusercontent.com", ggSan = false;
+function dnAn(){ document.getElementById("dn").style.display = "none"; }
+function guiXuong(w, msg, sau){ try { w.postMessage(msg, "*"); for (var i = 0; i < w.frames.length && sau > 0; i++) guiXuong(w.frames[i], msg, sau - 1); } catch (x) {} }
+function dnMo(){ var d = document.getElementById("dn"); d.style.display = "flex";
+  if (!window.google || !google.accounts) { setTimeout(dnMo, 300); return; }
+  if (!ggSan) { ggSan = true; google.accounts.id.initialize({ client_id: GG_ID, ux_mode: "popup", callback: function(r){ document.getElementById("dnLoi").textContent = "⏳ Đang vào…"; guiXuong(f.contentWindow, { hmk: "googleToken", token: r.credential }, 3); } });
+    google.accounts.id.renderButton(document.getElementById("nutGG"), { theme: "outline", size: "large", shape: "pill", text: "signin_with", locale: "vi", width: 280 }); } }
+
 f.onload = function(){ setTimeout(an, 25000); };
 document.body.appendChild(f);
 </script></body></html>
