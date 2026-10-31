@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzIWPz00WSzB659piig0WYLBOOd_KWUFQa_sBJgrtHDQQ0Luq9hDHdyGJFVU0HtIWbo/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261031145429";
+var HMK_BAN = "20261031155637";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -1953,7 +1953,8 @@ var KC_LUOT=0;
 function moKetCa(){ var q=KCQ, ng=KCNGAY, ca=KCCA, luot=++KC_LUOT; $("kcForm").innerHTML='<div class="the">'+gaTai("Đang mở báo cáo kết ca…")+'</div>';
   goi("ttKetCa",q,ng,ca).then(function(t){ if(luot!==KC_LUOT) return; KCTT=t; var c=t.cu;
     KCF={ id:c?c.ID:"", quan:q, ngay:ng, ca:ca, doanhThu:c?c["Doanh thu máy"]:"", dauCa:c?c["Tiền đầu ca"]:t.dauCa, demThu:c?(c["Đếm thu (JSON)"]||{}):{}, demGiu:c?(c["Đếm giữ két (JSON)"]||{}):{},
-      ngoaiMay:c?(c["Bán ngoài máy (JSON)"]||[]):t.mauNgoaiMay, ghiChu:c?c["Ghi chú"]:"" }; veFormKC(); }).catch(loi); }
+      ngoaiMay:c?(c["Bán ngoài máy (JSON)"]||[]):t.mauNgoaiMay, ghiChu:c?c["Ghi chú"]:"" }; veFormKC();
+    if(t.gop&&t.gop.length) $("kcForm").insertAdjacentHTML("afterbegin",'<div class="bao vàng">🔗 <b>Cả ngày</b> được gộp tự động từ <b>'+esc(t.gop.join(" + "))+'</b> (doanh thu, tiền đếm, giữ két, hàng ngoài máy cộng lại; Bank và chi két tính cả ngày). Muốn sửa thì chọn từng ca.</div>'); }).catch(loi); }
 // Gộp 2 bảng đếm (thu vào két + giữ lại két) thành 1 bảng gọn: mỗi mệnh giá 1 dòng, 2 ô số tờ cạnh nhau
 function bangDem2(){ var o=function(key,m){ var v=KCF[key][m]||""; return '<td class="kcO"><input type="number" min="0" inputmode="numeric" value="'+v+'" oninput="KCF.'+key+'['+m+']=this.value;tinhKC()"><span class="nho" id="'+key+m+'"></span></td>'; };
   return '<table class="kcDem"><tr><th class="so">Mệnh giá</th><th>💵 Thu vào két<br><span class="nho">số tờ · tiền</span></th><th>🔐 Để lại két<br><span class="nho">số tờ · tiền</span></th></tr>'+
