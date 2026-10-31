@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzIWPz00WSzB659piig0WYLBOOd_KWUFQa_sBJgrtHDQQ0Luq9hDHdyGJFVU0HtIWbo/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261031155637";
+var HMK_BAN = "20261031211932";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -962,7 +962,7 @@ function gopTheTay(i,j){ j=+j; if(isNaN(j)||i===j||!F.dsAI[j]) return; var a=F.d
 // 🔤 Đoán chữ + kiểm tra chính tả tên hàng: so với danh mục hàng + lịch sử mua (ưu tiên đúng NCC). Tên lạ → tô đỏ nhạt; có tên gần giống → nút "→ tên đúng?"
 var LSN=null, LSN_Q="";
 function napLSN(){ var q=quanHT(); if(LSN&&LSN_Q===q) return; LSN_Q=q; goi("lichSuNCC",q).then(function(r){ LSN=r||{}; if(TAB==="NHAP"){ veDsAI(); if(typeof veNT==="function") veNT(); } else if(TAB==="DOICHIEU"&&NT) veNT(); }).catch(function(){ LSN={}; }); }
-function dsTenHang(ncc){ var t={}, n=String(ncc||"").toUpperCase(); if(LSN){ (LSN[n]||[]).forEach(function(x){ t[x[0]]=1e6+x[2]; }); Object.keys(LSN).forEach(function(k){ LSN[k].forEach(function(x){ t[x[0]]=(t[x[0]]||0)+x[2]; }); }); }
+function dsTenHang(ncc){ var t={}, n=String(ncc||"").toUpperCase(); if(LSN){ (Array.isArray(LSN[n])?LSN[n]:[]).forEach(function(x){ t[x[0]]=1e6+x[2]; }); Object.keys(LSN).forEach(function(k){ if(!Array.isArray(LSN[k])) return; /* bỏ __HD__ (hoá đơn đã nhập) */ LSN[k].forEach(function(x){ t[x[0]]=(t[x[0]]||0)+x[2]; }); }); }
   (D.dm.hang||[]).forEach(function(h){ if(h.ten) t[h.ten]=t[h.ten]||1; }); return Object.keys(t).sort(function(a,b){ return t[b]-t[a]; }); }
 function giongTen(a,b){ a=bo(a); b=bo(b); if(!a||!b) return 0; if(a===b) return 1; if(b.indexOf(a)===0||a.indexOf(b)===0) return .9; var p=[],i,j; for(j=0;j<=b.length;j++) p[j]=j;
   for(i=1;i<=a.length;i++){ var c=[i]; for(j=1;j<=b.length;j++) c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1)); p=c; } return 1-p[b.length]/Math.max(a.length,b.length); }
