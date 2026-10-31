@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzIWPz00WSzB659piig0WYLBOOd_KWUFQa_sBJgrtHDQQ0Luq9hDHdyGJFVU0HtIWbo/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261030185553";
+var HMK_BAN = "20261031145429";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -550,6 +550,10 @@ body .ntBang td,body.misa .ntBang td{display:table-cell!important;padding:2px 1p
 @media(max-width:640px){.tgLuoi{grid-template-columns:1fr}#tgLoc{width:100%}}
 /* gà ở tiêu đề h3/nút: không để style chung (background) làm mất kích thước khung sprite */
 .gaDong .gaKhung{background-size:800% 100%!important;background-repeat:no-repeat!important}.tgDau .gaGhiI>.gaTaiH{width:44px!important;height:44px!important}.tgDau .gaGhiI{margin:-10px 0}
+#caBanner{display:none;position:fixed;left:0;right:0;top:0;z-index:40;background:#c62828;color:#fff;font-size:14px;box-shadow:0 2px 10px rgba(0,0,0,.2)}#caBanner>div{padding:8px 14px;cursor:pointer;text-align:center}#caBanner>div+div{border-top:1px solid rgba(255,255,255,.25)}
+body.coCaBanner{padding-top:38px}.caTN{display:flex;flex-direction:column;gap:6px}.caTNDau{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.caChip{background:#fcefe6;color:#b8612f;border-radius:10px;padding:1px 8px;font-weight:600}
+.caTNNut{flex-wrap:wrap;gap:6px}.caChuyen{display:inline-flex;gap:6px;flex-wrap:wrap}.caPhan summary{cursor:pointer;font-weight:600;margin-top:4px}#caBang{width:100%}#caBang input{width:100%;box-sizing:border-box}#caBang td:nth-child(2),#caBang td:nth-child(3){width:110px}
+@media(max-width:640px){#caBang th:nth-child(4){display:none}#caBang tr{display:grid;grid-template-columns:1fr 1fr 1fr 28px;gap:4px}#caBang td:nth-child(4){grid-column:1/-1;grid-row:2}#caBang th{display:none}}
 </style></head><body class="misa"><script>try{ window.top.postMessage({ hmk:"song" },"*"); }catch(e){}</script>
 <div id="dangNhap" class="login an">
   <div style="font-size:30px">🗂</div><h2>HOÀNG MINH KHIÊM</h2><div class="nho" style="margin-bottom:8px">🍲 Lẩu Gà Rau Lỗ Bình · 🔥 Túi Nướng Lavender</div>
@@ -676,7 +680,8 @@ function veKhung(){ if(D.chu) $("nutSheet").classList.remove("an"); /* veKhung c
   capNhatChuong(D.canhBao||[]);
   moTab(MO.tab || location.hash.slice(1) || "NHAP");
   try { window.top.postMessage("hmkSanSang","*"); } catch(e) {}
-  goi("canhBao","").then(capNhatChuong).catch(function(){}); // cảnh báo tải sau, không bắt chờ // báo trang khung (GitHub/Netlify) ẩn màn chờ có gà
+  goi("canhBao","").then(capNhatChuong).catch(function(){}); // cảnh báo tải sau, không bắt chờ
+  batCaTN(); // báo trang khung (GitHub/Netlify) ẩn màn chờ có gà
 }
 // Menu trái: nhóm theo công việc; ☰ thu gọn còn icon (máy tính) / mở ngăn kéo (điện thoại)
 // Menu theo trình tự vận hành (giống luồng file ADMIN): ① nhập liệu & tiền vào hằng ngày → ② chi phí NCC (Main pay list → phân loại → đối chiếu → công nợ) → ③ bếp & kho → ④ khách & nhân sự → ⑤ hệ thống
@@ -1898,9 +1903,40 @@ function xoaBankNhanh(i){ var x=BKDS[i]; if(!x) return; hoiOK("Xoá giao dịch 
 var KCF=null, KCTT=null;
 // Kết ca: mở sẵn BÁO CÁO của NGÀY HÔM NAY ở trên cùng (◀ ▶ đổi ngày, đổi quán/ca là tự mở); báo cáo đã lưu gập ở dưới
 var KCNGAY="", KCQ="", KCCA="Cả ngày";
+// 👤 Phân ca thu ngân theo email: ai đang trực, nhận / chuyển ca, chủ đặt giờ + email từng ca. Quá giờ đổi ca mà chưa chuyển => dải đỏ trên cùng (không tắt được) tới khi có người nhận ca sau
+var CATN=null, CATN_HEN=0;
+function batCaTN(){ if(!D||!D.tab||D.tab.KETCA==="Ẩn") return; taiCaTN(); clearInterval(CATN_HEN); CATN_HEN=setInterval(function(){ veBannerCa(); if(Date.now()-(CATN&&CATN._luc||0)>300000) taiCaTN(); },60000); }
+function taiCaTN(){ goi("caThuNgan","").then(function(r){ r._luc=Date.now(); CATN=r; veBannerCa(); if(TAB==="KETCA") veCaTN(); }).catch(function(){}); }
+function gioNay(){ var d=new Date(); return ("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2); }
+// Tính lại theo đồng hồ máy để báo đúng phút đổi ca (không chờ tải lại)
+function quaGioTN(t){ var g=gioNay(), ten=t.phan.map(function(c){ return c.ca; }), caGio=t.phan.filter(function(c){ return c.bd&&g>=c.bd&&(!c.kt||g<c.kt||c.kt<=c.bd); }).pop();
+  if(!caGio||!t.dangTruc) return null; var iG=ten.indexOf(caGio.ca), iT=ten.indexOf(t.dangTruc.ca); return iG>0&&iT>=0&&iT<iG?{ caGio:caGio.ca, gioDoi:caGio.bd, caTruoc:t.dangTruc.ca }:null; }
+function veBannerCa(){ var b=$("caBanner"); if(!b.id){ b=document.createElement("div"); b.id="caBanner"; b.className="khongIn"; document.body.appendChild(b); }
+  var ds=(CATN&&CATN.ds||[]).filter(function(t){ return !Q||t.quan===Q; }).map(function(t){ var q=quaGioTN(t); return q?{t:t,q:q}:null; }).filter(Boolean);
+  b.innerHTML=ds.map(function(x){ return '<div onclick="moTab(\'KETCA\')">⏰ <b>Đã quá '+esc(x.q.gioDoi)+'</b> – '+esc(x.t.quan)+': '+esc(x.q.caTruoc)+' ('+esc(x.t.dangTruc.email)+') chưa chuyển sang <b>'+esc(x.q.caGio)+'</b>. Bấm để chuyển ca.</div>'; }).join("");
+  b.style.display=ds.length?"block":"none"; document.body.classList.toggle("coCaBanner",!!ds.length); }
+function caTNCua(q){ return (CATN&&CATN.ds||[]).filter(function(t){ return t.quan===q; })[0]; }
+function veCaTN(){ var k=$("kcCa"); if(!k.id) return; var t=caTNCua(KCQ)||(CATN&&CATN.ds&&CATN.ds[0]); if(!t){ k.innerHTML=gaTai("Đang tải ca thu ngân…"); return; }
+  var me=CATN.email, dt=t.dangTruc, q=quaGioTN(t), laTruc=dt&&dt.email===me;
+  var nhan=t.phan.filter(function(c){ return (CATN.chu||!c.emails.length||c.emails.indexOf(me)>=0)&&!(dt&&dt.ca===c.ca&&laTruc); }).map(function(c){ return '<button onclick="nhanCaTN(\''+esc(c.ca)+'\',\''+esc(me)+'\',this)">✋ Nhận '+esc(c.ca)+'</button>'; }).join("");
+  var chuyen=(laTruc||CATN.chu)?t.phan.filter(function(c){ return !dt||c.ca!==dt.ca; }).map(function(c){ return c.emails.map(function(e){ return '<option value="'+esc(c.ca+"|"+e)+'">'+esc(c.ca)+' · '+esc(e)+'</option>'; }).join(""); }).join(""):"";
+  k.innerHTML='<div class="caTN"><div class="caTNDau"><b>👤 Thu ngân đang trực ('+esc(t.quan)+'):</b> '+(dt?'<span class="caChip">'+esc(dt.ca)+'</span> '+esc(dt.email)+' <span class="nho">· nhận lúc '+esc(dt.luc)+'</span>':'<span class="nho">chưa ai nhận ca hôm nay</span>')+'<span class="nho"> · Theo giờ: '+esc(t.caGio||"ngoài giờ ca")+'</span></div>'+
+    (q?'<div class="bao đỏ">⏰ Đã quá <b>'+esc(q.gioDoi)+'</b> – '+esc(q.caTruoc)+' chưa chuyển sang <b>'+esc(q.caGio)+'</b>. Thông báo hiện tới khi '+esc(q.caGio)+' nhận ca.</div>':'')+
+    '<div class="hang caTNNut">'+nhan+(chuyen?'<span class="caChuyen"><select id="caChuyenO"><option value="">➡️ Chuyển ca cho…</option>'+chuyen+'</select><button class="c" onclick="chuyenCaTN(this)">Chuyển ca</button></span>':'')+'</div>'+
+    '<div class="nho">'+t.phan.map(function(c){ return '<b>'+esc(c.ca)+'</b> '+esc(c.bd)+'–'+esc(c.kt||"…")+': '+(c.emails.length?esc(c.emails.join(", ")):'<i>chưa phân email (ai có quyền Kết ca cũng lập được)</i>'); }).join(" · ")+'</div>'+
+    (t.lichSu.length?'<div class="nho">Hôm nay: '+t.lichSu.map(function(h){ return esc(h.luc)+' '+esc(h.ca)+' → '+esc(h.email); }).join(" · ")+'</div>':'')+
+    (CATN.chu?'<details class="caPhan"><summary>⚙️ Phân ca thu ngân (chủ)</summary><datalist id="dlEmailCa">'+(CATN.goiY||[]).map(function(e){ return '<option value="'+esc(e)+'">'; }).join("")+'</datalist><table id="caBang"><tr><th>Ca</th><th>Bắt đầu</th><th>Kết thúc</th><th>Email thu ngân (cách nhau dấu phẩy)</th><th></th></tr>'+
+      t.phan.map(dongCaTN).join("")+'</table><p class="hang"><button onclick="themDongCaTN()">＋ Thêm ca</button><span style="flex:1"></span><button class="c" onclick="luuPhanCaTN(this)">💾 Lưu phân ca</button></p></details>':'')+'</div>'; }
+function dongCaTN(c){ c=c||{ca:"",bd:"",kt:"",emails:[]}; return '<tr><td><input class="caTen" value="'+esc(c.ca)+'" placeholder="Ca trưa"></td><td><input type="time" class="caBd" value="'+esc(c.bd)+'"></td><td><input type="time" class="caKt" value="'+esc(c.kt)+'"></td><td><input class="caEm" list="dlEmailCa" value="'+esc((c.emails||[]).join(", "))+'" placeholder="a@gmail.com, b@gmail.com"></td><td><button class="xoaChu" onclick="this.closest(\'tr\').remove()">✕</button></td></tr>'; }
+function themDongCaTN(){ $("caBang").insertAdjacentHTML("beforeend",dongCaTN()); }
+function luuPhanCaTN(btn){ var ds=[].map.call(document.querySelectorAll("#caBang tr"),function(tr){ var g=function(c){ var o=tr.querySelector(c); return o?o.value.trim():""; }; return { ca:g(".caTen"), bd:g(".caBd"), kt:g(".caKt"), emails:g(".caEm") }; }).filter(function(c){ return c.ca; });
+  btn.disabled=true; btn.innerHTML=gaTai("Đang lưu…"); goi("luuPhanCa",KCQ,ds).then(function(r){ r._luc=Date.now(); CATN=r; veCaTN(); veBannerCa(); toast("✅ Đã lưu phân ca thu ngân "+KCQ); }).catch(function(e){ btn.disabled=false; btn.textContent="💾 Lưu phân ca"; toast("⚠️ "+e.message,5000); }); }
+function nhanCaTN(ca,email,btn){ btn.disabled=true; btn.innerHTML=gaTai("Đang nhận…"); goi("nhanCa",KCQ,ca,email).then(function(r){ r._luc=Date.now(); CATN=r; veCaTN(); veBannerCa(); KCCA=ca; moKetCa(); toast("✅ Đã nhận "+ca); gaMung(); }).catch(function(e){ btn.disabled=false; btn.textContent="✋ Nhận "+ca; toast("⚠️ "+e.message,5000); }); }
+function chuyenCaTN(btn){ var v=$("caChuyenO").value; if(!v) return toast("Chọn người nhận ca"); var p=v.split("|");
+  hoiMo("Chuyển ca cho <b>"+esc(p[1])+"</b> ("+esc(p[0])+")?",function(){ btn.disabled=true; btn.innerHTML=gaTai("Đang chuyển…"); goi("nhanCa",KCQ,p[0],p[1]).then(function(r){ r._luc=Date.now(); CATN=r; veCaTN(); veBannerCa(); toast("✅ Đã chuyển ca cho "+p[1]); gaMung(); }).catch(function(e){ btn.disabled=false; btn.textContent="Chuyển ca"; toast("⚠️ "+e.message,5000); }); }); }
 function veKetCa(){ KCQ=quanHT(); KCNGAY=KCNGAY||homNay();
-  $("noiDung").innerHTML='<div id="kcForm"></div><details class="the khongIn" id="kcLuu"><summary><b>🗂 Báo cáo đã lưu</b> <span class="nho">(bấm để xem)</span></summary><div id="kcDS" class="bang">'+gaTai("Đang tải…")+'</div></details>';
-  moKetCa(); taiDSKetCa(); }
+  $("noiDung").innerHTML='<div id="kcCa" class="the khongIn"></div><div id="kcForm"></div><details class="the khongIn" id="kcLuu"><summary><b>🗂 Báo cáo đã lưu</b> <span class="nho">(bấm để xem)</span></summary><div id="kcDS" class="bang">'+gaTai("Đang tải…")+'</div></details>';
+  moKetCa(); taiDSKetCa(); veCaTN(); taiCaTN(); }
 function kcLui(n){ var d=new Date(KCNGAY+"T12:00:00"); d.setDate(d.getDate()+n); if(homNay(d)>homNay()) return; KCNGAY=homNay(d); moKetCa(); }
 // Chọn quán / ngày / ca ngay trên dòng tiêu đề báo cáo
 function kcTieuDe(){ var nay=KCNGAY===homNay();
