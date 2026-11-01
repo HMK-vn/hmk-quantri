@@ -7,17 +7,23 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzIWPz00WSzB659piig0WYLBOOd_KWUFQa_sBJgrtHDQQ0Luq9hDHdyGJFVU0HtIWbo/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261031211932";
+var HMK_BAN = "20261101101011";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
   location.reload(); }).catch(function(){});
 (function(){
-  function goiMay(fn, args, ok, loi){
-    fetch(HMK_API, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ fn: fn, args: args }), redirect: "follow" })
+  // Lệnh CHỈ ĐỌC (xem, tải, đọc ảnh) mất mạng / quá 150 giây thì tự gửi lại 1 lần; lệnh ghi không gửi lại (tránh ghi trùng)
+  var CHI_DOC = /^(khoiDong|canhBao|ds|tt|xem|lichSu|hoaDon|anh|doc|timTo|gopTheDoc|caThuNgan|quetTenGan|dcZalo|xnt|tlKho|moKK|moKT|moBep|doiSoat|hdNgay|dsSheet)/;
+  function goiMay(fn, args, ok, loi, lan){
+    var ten = fn === "api" ? String(args[1] || "") : fn, ac = window.AbortController ? new AbortController() : null, hen = setTimeout(function(){ if (ac) ac.abort(); }, 150000);
+    fetch(HMK_API, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ fn: fn, args: args }), redirect: "follow", signal: ac ? ac.signal : undefined })
       .then(function(r){ if (!r.ok) throw new Error("Máy chủ trả lỗi " + r.status + " – thử lại"); return r.json(); })
-      .then(function(v){ if (ok) ok(v); })
-      .catch(function(e){ if (loi) loi(e instanceof Error ? e : new Error(String(e))); else console.error(e); });
+      .then(function(v){ clearTimeout(hen); if (ok) ok(v); })
+      .catch(function(e){ clearTimeout(hen);
+        if (!lan && (fn !== "api" || CHI_DOC.test(ten))) return goiMay(fn, args, ok, loi, 1);
+        var m = e && e.name === "AbortError" ? "Quá 150 giây máy chủ chưa trả lời (mạng chậm hoặc Google bận) – bấm thử lại" : (e && e.message) || String(e);
+        if (loi) loi(new Error(m)); else console.error(e); });
   }
   function run(ok, loi){ return new Proxy({}, { get: function(_, k){
     if (k === "withSuccessHandler") return function(f){ return run(f, loi); };
@@ -63,7 +69,7 @@ th{background:#f9fafb;font-size:12px;color:#4b5563;position:sticky;top:0}td.so,t
 nav#tabs button{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bkLm{width:34px;height:30px;padding:0;font-size:15px;margin-left:auto}.tieuDeTrang{white-space:nowrap}#nhanQuan,#nhanQuan *{white-space:nowrap}@media(max-width:1100px){#nhanQuan{font-size:13px}}/* ===== Gọn trên mọi màn hình: không tràn ngang, nút xoá/đóng nhỏ tinh tế ===== */
 button.d,.bang button.d,.xL,button[title="Xoá"],button[title="Xoá dòng"],button[title="Bỏ ảnh"]{min-width:0;width:28px;height:28px;padding:0;border-radius:8px;font-size:12px;line-height:1;display:inline-flex;align-items:center;justify-content:center;background:transparent;border:1px solid #ecd9cf;color:#b5543c;box-shadow:none}
 button.d:hover,.xL:hover{background:#fde8e4}
-@media(max-width:700px){html,body{overflow-x:hidden;max-width:100vw}main,#noiDung,.the{min-width:0;max-width:100%}
+@media(max-width:700px){html,body{overflow-x:hidden;overflow-x:clip;max-width:100vw}main,#noiDung,.the{min-width:0;max-width:100%}
   .hang,.mplHang,.oClaude,.act{flex-wrap:wrap!important;min-width:0}.hang>*,.mplHang>*{min-width:0;max-width:100%}
   input,select,textarea{max-width:100%;min-width:0}.the{padding:12px}
   .bang{overflow-x:visible}.bang table,.the table{width:100%;table-layout:auto;font-size:12.5px}.bang td,.bang th,.the td,.the th{padding:5px 4px}
@@ -554,6 +560,7 @@ body .ntBang td,body.misa .ntBang td{display:table-cell!important;padding:2px 1p
 body.coCaBanner{padding-top:38px}.caTN{display:flex;flex-direction:column;gap:6px}.caTNDau{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.caChip{background:#fcefe6;color:#b8612f;border-radius:10px;padding:1px 8px;font-weight:600}
 .caTNNut{flex-wrap:wrap;gap:6px}.caChuyen{display:inline-flex;gap:6px;flex-wrap:wrap}.caPhan summary{cursor:pointer;font-weight:600;margin-top:4px}#caBang{width:100%}#caBang input{width:100%;box-sizing:border-box}#caBang td:nth-child(2),#caBang td:nth-child(3){width:110px}
 @media(max-width:640px){#caBang th:nth-child(4){display:none}#caBang tr{display:grid;grid-template-columns:1fr 1fr 1fr 28px;gap:4px}#caBang td:nth-child(4){grid-column:1/-1;grid-row:2}#caBang th{display:none}}
+html.coHop,html.coHop body{overflow:hidden!important;overscroll-behavior:none}.mo{-webkit-overflow-scrolling:touch;padding-top:max(30px,env(safe-area-inset-top))}
 </style></head><body class="misa"><script>try{ window.top.postMessage({ hmk:"song" },"*"); }catch(e){}</script>
 <div id="dangNhap" class="login an">
   <div style="font-size:30px">🗂</div><h2>HOÀNG MINH KHIÊM</h2><div class="nho" style="margin-bottom:8px">🍲 Lẩu Gà Rau Lỗ Bình · 🔥 Túi Nướng Lavender</div>
@@ -589,7 +596,8 @@ function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){retu
 function toast(t, ms){ var e=$("toast"); e.textContent=t; hien("toast"); clearTimeout(e._t); e._t=setTimeout(function(){an("toast");}, ms||3500); }
 function goi(ten){ var a=[].slice.call(arguments,1), ghi=/^(luu|sua|xoa|them|ghi|doiNCC|duyet|tuChoi|nhap|cap|hangLoat|quet|docAnh|gop|chuyen|upload|keo|dangXuat|thuHoi|danhGia|hoc)/.test(ten), loai=ghi?"ghi":"doc", xong=false;
   var tre=setTimeout(function(){ if(!xong){ GA_VIEC[loai]++; xong="dem"; gaCapNhat(); } },350);
-  var het=function(tot){ clearTimeout(tre); if(xong==="dem"){ GA_VIEC[loai]--; } xong=true; gaCapNhat(); if(tot&&ghi) gaMung(); };
+  var het=function(tot){ clearTimeout(tre); if(xong==="dem"){ GA_VIEC[loai]--; } xong=true; gaCapNhat(); if(tot&&ghi) gaMung();
+    if(tot&&/^(luuHoaDon|duyetTam|suaDong|themDongHD|themZalo|suaZalo|doiTenHang|doiNCCHD|hocDocAnh)/.test(ten)){ LSN_Q=null; setTimeout(napLSN,800); } }; // tự học: nạp lại lịch sử hàng ngay sau khi nhập
   return new Promise(function(ok0,loi0){ var ok=function(v){ het(true); ok0(v); }, loi=function(e){ het(false); loi0(e); };
   google.script.run.withSuccessHandler(function(r){ if(r&&r.ok) ok(r.data); else { var m=(r&&r.loi)||"Lỗi"; if(m==="PHIEN_HET_HAN"){ veDangNhap(); return; } loi(new Error(m)); } })
   .withFailureHandler(loi).api({ token:S.token, key:KEY }, ten, a); }); }
@@ -768,7 +776,8 @@ function moTagMenu(t){ var ds=cbCuaMenu(t), ten=(D.tabs.filter(function(x){ retu
     '<p class="hdNut" style="justify-content:flex-end"><button onclick="dongMo()">Đóng</button></p>'); }
 function boQuaMot(k,t){ var bq=boQuaCB(); bq[k]=1; try{ localStorage.setItem("hmkBoQuaCB",JSON.stringify(bq)); }catch(e){} veTagMenu(); moTagMenu(t); }
 function diToiCB(i){ var c=D.canhBao[i]; dongMo(); if(c.tab){ moTab(c.tab); return; } MPLLOC = Object.assign({ tu:"", den:"" }, c.loc); moTab("MPL"); }
-function moHop(html){ $("moND").classList.remove("tgRong"); $("moND").innerHTML=html; hien("mo"); } function dongMo(){ an("mo"); }
+// Hộp nổi luôn hiện ngay tại màn hình đang xem (điện thoại không phải cuộn lên đầu trang): cuộn hộp về đầu + khoá cuộn trang nền
+function moHop(html){ $("moND").classList.remove("tgRong"); $("moND").innerHTML=html; hien("mo"); $("mo").scrollTop=0; document.documentElement.classList.add("coHop"); } function dongMo(){ an("mo"); document.documentElement.classList.remove("coHop"); }
 
 // ---------- 🧾 NHẬP HOÁ ĐƠN: xem trước 2 cột ----------
 var F = null;
