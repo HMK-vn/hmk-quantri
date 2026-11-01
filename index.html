@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzIWPz00WSzB659piig0WYLBOOd_KWUFQa_sBJgrtHDQQ0Luq9hDHdyGJFVU0HtIWbo/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261101102934";
+var HMK_BAN = "20261101103148";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -1194,7 +1194,7 @@ function dongNT(){ NT=null; ntSan(); }
 function ntLs(){ if(!NT) return; goi("lichSuNCC",quanHT()).then(function(r){ if(NT){ NT.ls=r||{}; if(NT.tl) veNT(); } }).catch(function(){}); }
 function bo(x){ return boDau(String(x||"")).toLowerCase().trim(); }
 function ntTT(d){ return Math.round((Number(d.sl)||0)*(Number(d.dg)||0)); }
-function ntTenChuan(){ var t={}, ncc=(NT.ncc||"").toUpperCase(); if(NT.ls){ (NT.ls[ncc]||[]).forEach(function(x){ t[x[0]]=x[2]+1000; }); Object.keys(NT.ls).forEach(function(k){ NT.ls[k].forEach(function(x){ t[x[0]]=(t[x[0]]||0)+x[2]; }); }); }
+function ntTenChuan(){ var t={}, ncc=(NT.ncc||"").toUpperCase(); if(NT.ls){ (Array.isArray(NT.ls[ncc])?NT.ls[ncc]:[]).forEach(function(x){ t[x[0]]=x[2]+1000; }); Object.keys(NT.ls).forEach(function(k){ if(!Array.isArray(NT.ls[k])) return; NT.ls[k].forEach(function(x){ t[x[0]]=(t[x[0]]||0)+x[2]; }); }); }
   (D.dm.hang||[]).forEach(function(h){ t[h.ten]=t[h.ten]||1; }); return Object.keys(t).sort(function(a,b){ return t[b]-t[a]; }); }
 function veNT(){ if(!NT||!document.getElementById("ntND")) return; var tong=NT.dong.reduce(function(a,d){ return a+ntTT(d); },0), ten=NT.tl?ntTenChuan():[];
   var tlTen=NT.tlDong>=0&&NT.dong[NT.tlDong]?NT.dong[NT.tlDong].nd:"", q=bo(NT.tlTim||""), ds=ten.filter(function(t){ return !q||bo(t).indexOf(q)>=0; }).slice(0,40);
