@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261102191424";
+var HMK_BAN = "20261102191932";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -579,7 +579,7 @@ html.coHop,html.coHop body{overflow:hidden!important;overscroll-behavior:none}.m
 .thanhDCZ{gap:6px;margin:6px 0;flex-wrap:wrap;align-items:center}.segDCZ{display:inline-flex;border:1px solid #e5ddd2;border-radius:10px;overflow:hidden;background:#fff}.segDCZ button{border:0;border-radius:0;padding:4px 9px;font-size:12px;background:transparent;min-width:0}.segDCZ button+button{border-left:1px solid #efe8df}.segDCZ button.on{background:#1e3a5f;color:#fff}
 .icCot span{display:inline-flex;gap:2px;height:13px;vertical-align:middle}.icCot i{display:block;width:4px;height:13px;border-radius:1.5px;background:currentColor;opacity:.75}
 .lwBang .lwTd:not(.trong){width:var(--lwW);min-width:var(--lwW)!important;max-width:var(--lwW)}.lwGon .lwO{font-size:9.5px}.lwGon .lwNut,.lwGon .lwSo,.lwGon .lwBa i:not(.on){display:none!important}.lwGon .lwKC{min-width:34px}.lwGon .lwDT{font-size:8px}
-.lwBang .lwDai{display:flex;align-items:center;gap:4px}.lwBang .lwGiong{display:inline-flex;cursor:pointer}.lwBang .lwGiong input{margin:0;width:12px;height:12px;cursor:pointer}
+.lwBang .lwDai{display:flex;align-items:center;gap:4px}.lwBang .lwGiong{display:inline-flex;cursor:pointer;transform:rotate(180deg)} /* dải dọc xoay 180° → xoay ngược ô tích cho dấu ✓ đứng thẳng */.lwBang .lwGiong input{margin:0;width:12px;height:12px;cursor:pointer}
 .lwBang .lwTTTT{display:flex;justify-content:center;gap:6px;align-items:center}.lwBang .lwTTTT .lwDT{margin:0;font-size:9px;text-transform:none}
 #hvHD{position:fixed;z-index:9999;display:none;width:340px;max-width:calc(100vw - 16px);box-sizing:border-box;max-height:70vh;overflow:auto;background:#fff;border:1.5px solid #1e3a5f;border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.22);padding:8px;font-size:12px}
 .hvDau{display:flex;justify-content:space-between;gap:8px;margin-bottom:4px}.hvDau span{color:#6b7280;font-size:11px;white-space:nowrap}.hvBang{width:100%;border-collapse:collapse;table-layout:fixed}.hvBang th:first-child,.hvBang td:first-child{width:48%;word-break:break-word}.hvBang th{font-size:10.5px;color:#6b7280;text-align:left;border-bottom:1px solid #e5ddd2;padding:2px 3px}.hvBang td{padding:2px 3px;border-bottom:1px dashed #f0ebe4}.hvBang .so{text-align:right;white-space:nowrap}
