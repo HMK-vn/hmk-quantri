@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261102203215";
+var HMK_BAN = "20261102203426";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -568,6 +568,7 @@ html.coHop,html.coHop body{overflow:hidden!important;overscroll-behavior:none}.m
 .tlKy{display:inline-flex;align-items:center;gap:4px}.tlKy select{font-weight:700;padding:6px 8px}.tlChip{font-size:13px;padding:6px 10px}.tlNCCBoc select{max-width:220px;padding:6px 8px}
 .kpi.kpiGon{display:flex!important;flex-wrap:nowrap;overflow-x:auto}.kpi.kpiGon div{flex:1 0 118px;padding:8px 12px!important}.kpi.kpiGon small{font-size:10.5px;white-space:nowrap}.kpi.kpiGon b{font-size:22px!important}
 </style><style>/* 🧾 Hoá đơn – NCC · lưới đối chiếu */
+.dauTrang .mplMenu summary{padding:5px 10px;font-size:14px;line-height:1}.dauTrang .mplMenu summary::-webkit-details-marker{display:none}
 #kyCho{display:contents}#kyCho .thanhKy{flex-basis:auto;margin:0;order:0}.dauTrang .hang{flex-wrap:wrap;row-gap:6px}.dauDCZ{row-gap:6px}.canhNho{border-color:#f5d48a!important;background:#fff8e1!important}
 .lwBang .lwNut{display:inline-flex;margin:0 0 0 4px;vertical-align:middle}.lwBang .lwNut button{padding:0 5px;font-size:11px;line-height:16px;border-radius:8px}
 #tipHD{position:fixed;z-index:10000;display:none;max-width:min(320px,calc(100vw - 12px));background:#1f2937;color:#fff;font-size:12px;line-height:1.35;padding:5px 9px;border-radius:7px;box-shadow:0 4px 14px rgba(0,0,0,.25);pointer-events:none;white-space:pre-line}
@@ -1625,7 +1626,7 @@ var DCZ=null, DCZLOC=null, DCZTT="";
 var DCZ_TT={khop:["🟢","Khớp"],lech:["🔴","Lệch tiền"],lechMon:["🟡","Lệch món"],chiTN:["🧾","Chỉ thu ngân nhập"],chiZL:["📲","Chỉ NCC gửi"]};
 function veDoiChieu(){ var d=new Date(); DCZLOC=DCZLOC||{ tu:homNay(new Date(d.getFullYear(),d.getMonth(),d.getDate()-6)), den:homNay() }; var sua=suaDuoc("DOICHIEU");
   $("noiDung").innerHTML='<div class="the khongIn dauTrang"><div class="hang"><span class="ngayDCZ">📅 <input type="date" id="dzTu" value="'+DCZLOC.tu+'" title="Từ ngày"> → <input type="date" id="dzDen" value="'+DCZLOC.den+'" title="Đến ngày"></span>'+
-  '<button class="c icNut" onclick="taiDCZ()" title="Đối chiếu">🔍</button><span id="kyCho"></span><span style="flex:1"></span>'+(sua?'<button class="c icNut" onclick="moDocHD()" title="Đọc HĐ NCC – dán ảnh (⌘V ở trang này cũng được)">🐔 Đọc HĐ</button><button class="icNut" onclick="denNT()" title="Nhập tay hoá đơn NCC">✍️</button><button class="icNut" onclick="quetDCZ(this)" title="Đọc ảnh mới trong thư mục Zalo">🔄</button>':"")+'<button class="icNut" onclick="moTMZalo(this)" title="Thư mục ảnh Zalo">📁</button>'+(D.chu?'<button class="icNut" onclick="nhomZalo()" title="Nhóm Zalo">⚙️</button>':"")+'<button class="icNut" onclick="window.print()" title="In">🖨</button>'+
+  '<button class="c icNut" onclick="taiDCZ()" title="Đối chiếu">🔍</button><span id="kyCho"></span><span style="flex:1"></span>'+(sua?'<button class="c icNut" onclick="moDocHD()" title="Đọc HĐ NCC – dán ảnh (⌘V ở trang này cũng được)">🐔 Đọc HĐ</button><button class="icNut" onclick="denNT()" title="Nhập tay hoá đơn NCC">✍️</button><button class="icNut" onclick="quetDCZ(this)" title="Đọc ảnh mới trong thư mục Zalo">🔄</button>':"")+'<details class="mplMenu"><summary class="icNut" title="Thêm">⋯</summary><div><button onclick="moTMZalo(this)">📁 Thư mục ảnh Zalo</button>'+(D.chu?'<button onclick="nhomZalo()">⚙️ Nhóm Zalo</button>':"")+'<button onclick="window.print()">🖨 In</button></div></details>'+
   '<span class="icNut" title="Chép ảnh hoá đơn trong Zalo rồi ⌘V / Ctrl+V ở trang này → Gà tự đọc NCC, ngày, quán, cắt từng tờ và xếp vào đúng ô. Hoặc lưu ảnh vào thư mục Drive đúng tên nhóm → tự đọc mỗi 30 phút (🔄 để đọc ngay). Ghép theo NCC + ngày (±1) + số tiền gần nhất.">ⓘ</span></div></div>'+'<div id="dzKQ">'+gaChoHTML()+'</div>'+
   (sua?'<section class="ntInline khongIn" id="ntKhung"><div class="ntDau"><b>'+gaGhi()+' NHẬP HÓA ĐƠN NCC (ZALO) CHI TIẾT</b><span class="nho" id="ntNguon">· nhập tay hoá đơn NCC gửi, hệ thống tự ghép với hoá đơn thu ngân</span></div><div id="ntND"></div></section>':""); taiDCZ(); if(sua){ NT=null; napLSN(); ntSan(); } }
 function taiDCZ(){ DCZLOC={tu:$("dzTu").value,den:$("dzDen").value}; goi("dcZalo",DCZLOC.tu,DCZLOC.den,Q).then(function(r){ DCZ=r; veDCZ(); }).catch(loi); }
