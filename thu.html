@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261102185308";
+var HMK_BAN = "20261102185714";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -570,8 +570,8 @@ html.coHop,html.coHop body{overflow:hidden!important;overscroll-behavior:none}.m
 </style><style>/* 🧾 Hoá đơn – NCC · lưới đối chiếu */
 .lwBang .lwDai{display:flex;align-items:center;gap:4px}.lwBang .lwGiong{display:inline-flex;cursor:pointer}.lwBang .lwGiong input{margin:0;width:12px;height:12px;cursor:pointer}
 .lwBang .lwTTTT{display:flex;justify-content:center;gap:6px;align-items:center}.lwBang .lwTTTT .lwDT{margin:0;font-size:9px;text-transform:none}
-#hvHD{position:fixed;z-index:9999;display:none;width:330px;max-height:70vh;overflow:auto;background:#fff;border:1.5px solid #1e3a5f;border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.22);padding:8px;font-size:12px}
-.hvDau{display:flex;justify-content:space-between;gap:8px;margin-bottom:4px}.hvDau span{color:#6b7280;font-size:11px;white-space:nowrap}.hvBang{width:100%;border-collapse:collapse}.hvBang th{font-size:10.5px;color:#6b7280;text-align:left;border-bottom:1px solid #e5ddd2;padding:2px 3px}.hvBang td{padding:2px 3px;border-bottom:1px dashed #f0ebe4}.hvBang .so{text-align:right;white-space:nowrap}
+#hvHD{position:fixed;z-index:9999;display:none;width:340px;max-width:calc(100vw - 16px);box-sizing:border-box;max-height:70vh;overflow:auto;background:#fff;border:1.5px solid #1e3a5f;border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.22);padding:8px;font-size:12px}
+.hvDau{display:flex;justify-content:space-between;gap:8px;margin-bottom:4px}.hvDau span{color:#6b7280;font-size:11px;white-space:nowrap}.hvBang{width:100%;border-collapse:collapse;table-layout:fixed}.hvBang th:first-child,.hvBang td:first-child{width:48%;word-break:break-word}.hvBang th{font-size:10.5px;color:#6b7280;text-align:left;border-bottom:1px solid #e5ddd2;padding:2px 3px}.hvBang td{padding:2px 3px;border-bottom:1px dashed #f0ebe4}.hvBang .so{text-align:right;white-space:nowrap}
 .hvTong td{font-weight:700;background:#f8f5f0}.hvChan{margin-top:4px;font-size:11px;color:#1e3a5f}
 .ssDau{display:flex;flex-wrap:wrap;gap:6px 14px;margin:2px 0 8px;font-size:13px}.ssBang table{font-size:12.5px}.ssBang th{text-align:center}.ssT{background:#fff7ed}.ssZ{background:#eff6ff}.ssLech td{background:#fee2e2}.ssThieu td{background:#fef3c7}
 .lwBang .lwDau{display:flex;gap:6px;align-items:baseline;padding:2px 5px;border-bottom:1.5px solid #1e3a5f;white-space:nowrap;overflow:hidden}.lwBang .lwDau b{overflow:hidden;text-overflow:ellipsis}.lwBang .lwDau .lwSo{margin-left:auto;color:#6b7280;font-size:10px}
@@ -1643,7 +1643,7 @@ function zGiong(d){ var tn=d.tn; return tn&&!d.zl&&DCZ&&DCZ.danhDau&&DCZ.danhDau
 function theHD(h,loai){ if(!h) return '<div class="nho">'+(loai==="t"?"Quầy chưa nhập hoá đơn này":"NCC chưa gửi hoá đơn qua Zalo")+'</div>';
   var cong=(h.dong||[]).reduce(function(a,x){ return a+(Number(x.tt)||0); },0), giay=loai==="t"?h.giay:h.tong;
   return '<div class="hvDau"><b>'+(loai==="t"?"🧾 Quầy":"📲 Zalo")+' · '+esc(h.ncc)+'</b><span>'+esc(h.so||"")+' · '+esc(h.ngay)+'</span></div>'+
-    '<table class="hvBang"><tr><th>Mặt hàng</th><th class="so">SL</th><th class="so">Đơn giá</th><th class="so">Tiền</th></tr>'+(h.dong||[]).map(function(x){ return '<tr><td>'+esc(x.nd)+'</td><td class="so">'+(x.sl||"")+'</td><td class="so">'+tienVN(x.dg)+'</td><td class="so">'+tienVN(x.tt)+'</td></tr>'; }).join("")+
+    '<table class="hvBang"><tr><th>Mặt hàng</th><th class="so">SL</th><th class="so">Đơn giá</th><th class="so">Tiền</th></tr>'+(h.dong||[]).map(function(x){ return '<tr><td>'+esc(x.nd)+'</td><td class="so">'+(x.sl?Math.round(x.sl*100)/100:"")+'</td><td class="so">'+tienVN(x.dg)+'</td><td class="so">'+tienVN(x.tt)+'</td></tr>'; }).join("")+
     (!(h.dong||[]).length?'<tr><td colspan="4" class="nho">Chưa có dòng hàng (chưa đọc / chưa nhập chi tiết)</td></tr>':'')+
     '<tr class="hvTong"><td colspan="3">Cộng các dòng</td><td class="so">'+tienVN(cong)+'</td></tr>'+(giay!==""&&giay!=null?'<tr class="hvTong"><td colspan="3">Tổng trên hoá đơn</td><td class="so'+(Math.abs(giay-cong)>=1000?' do':'')+'">'+tienVN(giay)+'</td></tr>':'')+'</table>'+
     '<div class="hvChan">'+(loai==="t"?'💳 '+esc(h.ec||"—")+' · ⚡ '+esc(h.hddt||"Chưa HĐĐT"):'📁 '+esc(h.nguon||"")+(h.ghiChu?' · '+esc(h.ghiChu):''))+'</div>'; }
