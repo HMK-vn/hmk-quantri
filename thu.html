@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261102183354";
+var HMK_BAN = "20261102184637";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -568,6 +568,11 @@ html.coHop,html.coHop body{overflow:hidden!important;overscroll-behavior:none}.m
 .tlKy{display:inline-flex;align-items:center;gap:4px}.tlKy select{font-weight:700;padding:6px 8px}.tlChip{font-size:13px;padding:6px 10px}.tlNCCBoc select{max-width:220px;padding:6px 8px}
 .kpi.kpiGon{display:flex!important;flex-wrap:nowrap;overflow-x:auto}.kpi.kpiGon div{flex:1 0 118px;padding:8px 12px!important}.kpi.kpiGon small{font-size:10.5px;white-space:nowrap}.kpi.kpiGon b{font-size:22px!important}
 </style><style>/* 🧾 Hoá đơn – NCC · lưới đối chiếu */
+.lwBang .lwTTTT{display:flex;justify-content:center;gap:6px;align-items:center}.lwBang .lwTTTT .lwDT{margin:0;font-size:9px;text-transform:none}
+#hvHD{position:fixed;z-index:9999;display:none;width:330px;max-height:70vh;overflow:auto;background:#fff;border:1.5px solid #1e3a5f;border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.22);padding:8px;font-size:12px}
+.hvDau{display:flex;justify-content:space-between;gap:8px;margin-bottom:4px}.hvDau span{color:#6b7280;font-size:11px;white-space:nowrap}.hvBang{width:100%;border-collapse:collapse}.hvBang th{font-size:10.5px;color:#6b7280;text-align:left;border-bottom:1px solid #e5ddd2;padding:2px 3px}.hvBang td{padding:2px 3px;border-bottom:1px dashed #f0ebe4}.hvBang .so{text-align:right;white-space:nowrap}
+.hvTong td{font-weight:700;background:#f8f5f0}.hvChan{margin-top:4px;font-size:11px;color:#1e3a5f}
+.ssDau{display:flex;flex-wrap:wrap;gap:6px 14px;margin:2px 0 8px;font-size:13px}.ssBang table{font-size:12.5px}.ssBang th{text-align:center}.ssT{background:#fff7ed}.ssZ{background:#eff6ff}.ssLech td{background:#fee2e2}.ssThieu td{background:#fef3c7}
 .lwBang .lwDau{display:flex;gap:6px;align-items:baseline;padding:2px 5px;border-bottom:1.5px solid #1e3a5f;white-space:nowrap;overflow:hidden}.lwBang .lwDau b{overflow:hidden;text-overflow:ellipsis}.lwBang .lwDau .lwSo{margin-left:auto;color:#6b7280;font-size:10px}
 .lwBang .lwZalo{display:inline-block;background:#0068ff;color:#fff;font-size:8.5px;font-weight:800;border-radius:6px;padding:0 4px;vertical-align:1px}.lwBang .lwChu a{font-size:12px}
 #dzKQ>.kpi{display:flex!important;flex-wrap:wrap;gap:6px}#dzKQ>.kpi>div{flex:0 0 auto;padding:4px 10px!important;min-height:0!important;display:flex;gap:6px;align-items:baseline;border-radius:10px}#dzKQ>.kpi>div b{font-size:15px!important}#dzKQ>.kpi>div b br{display:none}
@@ -1632,6 +1637,35 @@ document.addEventListener("paste",function(e){ if(TAB!=="DOICHIEU") return; var 
   if(!fs.length) return; e.preventDefault(); danFiles(fs); });
 // Ô lưới chưa có HĐ NCC: 🐔 Đọc HĐ → mở cửa sổ dán, gợi ý sẵn NCC của ô
 function danChoO(ncc){ moDocHD(ncc); }
+// 🔍 Rê chuột vào nửa trên (quầy) / nửa dưới (Zalo) của ô lưới → thẻ nổi chi tiết hoá đơn số hoá
+function theHD(h,loai){ if(!h) return '<div class="nho">'+(loai==="t"?"Quầy chưa nhập hoá đơn này":"NCC chưa gửi hoá đơn qua Zalo")+'</div>';
+  var cong=(h.dong||[]).reduce(function(a,x){ return a+(Number(x.tt)||0); },0), giay=loai==="t"?h.giay:h.tong;
+  return '<div class="hvDau"><b>'+(loai==="t"?"🧾 Quầy":"📲 Zalo")+' · '+esc(h.ncc)+'</b><span>'+esc(h.so||"")+' · '+esc(h.ngay)+'</span></div>'+
+    '<table class="hvBang"><tr><th>Mặt hàng</th><th class="so">SL</th><th class="so">Đơn giá</th><th class="so">Tiền</th></tr>'+(h.dong||[]).map(function(x){ return '<tr><td>'+esc(x.nd)+'</td><td class="so">'+(x.sl||"")+'</td><td class="so">'+tienVN(x.dg)+'</td><td class="so">'+tienVN(x.tt)+'</td></tr>'; }).join("")+
+    (!(h.dong||[]).length?'<tr><td colspan="4" class="nho">Chưa có dòng hàng (chưa đọc / chưa nhập chi tiết)</td></tr>':'')+
+    '<tr class="hvTong"><td colspan="3">Cộng các dòng</td><td class="so">'+tienVN(cong)+'</td></tr>'+(giay!==""&&giay!=null?'<tr class="hvTong"><td colspan="3">Tổng trên hoá đơn</td><td class="so'+(Math.abs(giay-cong)>=1000?' do':'')+'">'+tienVN(giay)+'</td></tr>':'')+'</table>'+
+    '<div class="hvChan">'+(loai==="t"?'💳 '+esc(h.ec||"—")+' · ⚡ '+esc(h.hddt||"Chưa HĐĐT"):'📁 '+esc(h.nguon||"")+(h.ghiChu?' · '+esc(h.ghiChu):''))+'</div>'; }
+var HV_HEN=null;
+document.addEventListener("mouseover",function(e){ var el=e.target.closest&&e.target.closest("[data-hv]"), p=$("hvHD");
+  if(!el){ if(p&&!(e.target.closest&&e.target.closest("#hvHD"))){ clearTimeout(HV_HEN); HV_HEN=setTimeout(function(){ p.style.display="none"; },150); } return; }
+  clearTimeout(HV_HEN); var k=el.dataset.hv, d=DCZ&&DCZ._ds&&DCZ._ds[+k.slice(1)]; if(!d) return;
+  if(!p){ p=document.createElement("div"); p.id="hvHD"; document.body.appendChild(p); }
+  p.innerHTML=theHD(k[0]==="t"?d.tn:d.zl,k[0]); p.style.display="block";
+  var r=el.getBoundingClientRect(), w=p.offsetWidth, h=p.offsetHeight, x=r.right+8, y=r.top;
+  if(x+w>innerWidth-8) x=Math.max(8,r.left-w-8); if(y+h>innerHeight-8) y=Math.max(8,innerHeight-h-8); p.style.left=x+"px"; p.style.top=y+"px"; });
+// ⚖️ Bấm dải dọc Khớp/Chênh → so sánh từng dòng 2 bên (dòng lệch tô màu); dùng kết quả máy chủ đã so (d.mon), thiếu thì tự ghép theo tên
+function soSanhDCZ(i){ var d=DCZ._ds[i], tn=d.tn, z=d.zl, bo=function(s){ return String(s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/đ/g,"d").replace(/[^a-z0-9]/g,""); };
+  var mon=d.mon; if(!mon){ var mz={}; ((z&&z.dong)||[]).forEach(function(x){ mz[bo(x.nd)]=x; });
+    mon=((tn&&tn.dong)||[]).map(function(x){ var y=mz[bo(x.nd)]; if(y) delete mz[bo(x.nd)]; return { nd:x.nd, tn:[x.sl,x.dg,x.tt], zl:y?[y.sl,y.dg,y.tt]:null, lech:!y||Math.abs((y.tt||0)-(x.tt||0))>=1000, lyDo:!y?(z?"NCC không ghi món này":"Chưa có HĐ Zalo"):"" }; })
+      .concat(Object.keys(mz).map(function(k){ var y=mz[k]; return { nd:y.nd, tn:null, zl:[y.sl,y.dg,y.tt], lech:true, lyDo:"Quầy không nhập món này" }; })); }
+  var f=function(a){ return a?'<td class="so">'+(a[0]||"")+'</td><td class="so">'+tienVN(a[1])+'</td><td class="so"><b>'+tienVN(a[2])+'</b></td>':'<td colspan="3" class="nho" style="text-align:center">—</td>'; };
+  var tT=mon.reduce(function(a,m){ return a+(m.tn?Number(m.tn[2])||0:0); },0), tZ=mon.reduce(function(a,m){ return a+(m.zl?Number(m.zl[2])||0:0); },0), nL=mon.filter(function(m){ return m.lech; }).length;
+  moHop('<h3>⚖️ So sánh hoá đơn – '+esc((tn||z).ncc)+'</h3><div class="ssDau"><span>🧾 Quầy <b>'+esc(tn&&tn.so||"—")+'</b> · '+tienVN(tn?tn.tong:0)+' đ</span><span>📲 Zalo · '+tienVN(z?z.tong:0)+' đ</span><span class="'+(d.tt==="khop"?"lwOk":"do")+'"><b>'+(d.tt==="khop"?"✓ Khớp":"Chênh "+tienVN(d.chenh)+" đ")+'</b> · '+nL+'/'+mon.length+' dòng lệch</span></div>'+
+    '<div class="bang ssBang"><table><tr><th rowspan="2">Mặt hàng</th><th colspan="3" class="ssT">🧾 Quầy</th><th colspan="3" class="ssZ">📲 Zalo</th><th rowspan="2">Sai ở đâu</th></tr><tr><th class="so ssT">SL</th><th class="so ssT">Giá</th><th class="so ssT">Tiền</th><th class="so ssZ">SL</th><th class="so ssZ">Giá</th><th class="so ssZ">Tiền</th></tr>'+
+    mon.map(function(m){ return '<tr class="'+(m.lech?(m.tn&&m.zl?"ssLech":"ssThieu"):"")+'"><td>'+esc(m.nd)+'</td>'+f(m.tn)+f(m.zl)+'<td>'+(m.lech?'<b class="do">'+esc(m.lyDo||"Lệch tiền")+'</b>':'✅')+'</td></tr>'; }).join("")+
+    (!mon.length?'<tr><td colspan="8" class="nho">Chưa có dòng hàng nào để so – nhập chi tiết hoá đơn hoặc bấm 🐔 Đọc HĐ.</td></tr>':'')+
+    '<tr class="hvTong"><td>Cộng</td><td colspan="3" class="so">'+tienVN(tT)+'</td><td colspan="3" class="so">'+tienVN(tZ)+'</td><td class="'+(Math.abs(tT-tZ)>=1000?"do":"lwOk")+'">'+(Math.abs(tT-tZ)>=1000?"Chênh "+tienVN(tT-tZ):"Khớp")+'</td></tr></table></div>'+
+    '<p class="hdNut" style="text-align:right">'+(tn?'<button onclick="moHD(\''+esc(tn.so)+'\')">🧾 Mở HĐ quầy</button>':'')+(z&&z.anh?'<button onclick="anhDCZ(\''+z.anh+'\')">🖼 Ảnh Zalo</button>':'')+'<button onclick="dongMo()">Đóng</button></p>'); }
 function danhDauDCZ(k,bat){ goi("luuDanhDau",k,bat).then(function(ds){ DCZ.danhDau=ds; veDCZ(); toast(bat?"❗ Đã đánh dấu":"Đã bỏ dấu"); }).catch(loi); }
 function thanhDCZ(){ return '<div class="hang khongIn" style="gap:6px;margin:6px 0"><button class="chip'+(DCZXEM==="luoi"?' on':'')+'" onclick="DCZXEM=\'luoi\';veDCZ()">🗓 Lưới NCC × ngày</button>'; }
 // 🗓 Lưới đối chiếu: hàng = NCC, cột = ngày. Mỗi ô = 1 hoá đơn: trên 🧾 thu ngân nhập (quầy / quét ảnh), dưới 📲 NCC gửi Zalo (Gà đọc);
@@ -1649,13 +1683,15 @@ function veLuoiDCZ(r,ds,sua){ var a=new Date(DCZLOC.tu+"T12:00:00"), b=new Date(
   var dt=function(tn){ return tn?'<div class="lwDT '+(tn.hddt?'co':'')+'" title="Hoá đơn điện tử'+(tn.hddt?': '+esc(tn.hddt):' – chưa có')+'">⚡ '+(tn.hddt?'HĐĐT':'Chưa HĐĐT')+'</div>':''; };
   var o1=function(d){ var i=ds.indexOf(d), tn=d.tn, z=d.zl;
     var sumZ=z&&z.dong&&z.dong.length?z.dong.reduce(function(a,x){ return a+(Number(x.tt)||0); },0):"", cTN=tn&&tn.giay!==""&&tn.giay!=null?tn.giay-tn.tong:"", cZ=z&&sumZ!==""?z.tong-sumZ:"";
-    return '<div class="lwO" style="--lw:'+mau[d.tt]+'"><div class="lwDai"'+(d.mon?' onclick="monDCZ('+i+')" title="So từng món 2 bên"':'')+'>'+(d.tt==="khop"?"Khớp":"Chênh "+(d.chenh>0?"+":"")+tienVN(d.chenh))+'</div><div class="lwThan">'+
+    // Dải dưới cùng (gộp 1 chỗ): trạng thái thanh toán · ⚡ hoá đơn điện tử
+    var duoi='<div class="lwTTTT"><span>'+esc(tn&&tn.ec||z&&z.ghiChu||"Chưa rõ thanh toán")+'</span>'+(tn?'<span class="lwDT '+(tn.hddt?'co':'')+'" title="Hoá đơn điện tử'+(tn.hddt?': '+esc(tn.hddt):' – chưa có')+'">⚡ '+(tn.hddt?'HĐĐT':'Chưa HĐĐT')+'</span>':'')+'</div>';
+    return '<div class="lwO" style="--lw:'+mau[d.tt]+'"><div class="lwDai" onclick="soSanhDCZ('+i+')" title="Bấm xem so sánh từng dòng 2 bên">'+(d.tt==="khop"?"Khớp":"Chênh "+(d.chenh>0?"+":"")+tienVN(d.chenh))+'</div><div class="lwThan">'+
       '<div class="lwDau"><b>'+esc((tn||z).ncc)+'</b><span class="lwSo">'+esc((tn&&tn.so)||(z&&z.so)||"")+'</span></div>'+
-      '<div class="lwNua"><div class="lwHang"><div class="lwChu">'+(tn?'<a href="#" onclick="moHD(\''+esc(tn.so)+'\');return false" title="Mặt hàng chi tiết trong hoá đơn">'+tienVN(tn.tong)+'</a>':'<span class="nho">Quầy chưa nhập</span>')+'</div>'+
-        (tn?ba(cTN===""?null:Math.abs(cTN)<(r.lech||1000),"TN|"+tn.so):'')+'<div class="lwKC" title="Tổng các mặt hàng so với tổng tiền trên hoá đơn"><div>'+(tn?kc(cTN):'')+dt(tn)+'</div></div></div><div class="lwTTTT">'+esc(tn&&tn.ec||"Trạng thái thanh toán")+'</div></div>'+
-      '<div class="lwNua"><div class="lwHang"><div class="lwChu"><span class="lwZalo">Zalo</span> '+(z?(z.anh?'<a href="#" onclick="anhDCZ(\''+z.anh+'\');return false" title="Ảnh hoá đơn NCC">'+tienVN(z.tong)+'</a>':tienVN(z.tong)):'<span class="nho">chưa gửi</span>')+
+      '<div class="lwNua" data-hv="t'+i+'"><div class="lwHang"><div class="lwChu">'+(tn?'<a href="#" onclick="moHD(\''+esc(tn.so)+'\');return false">'+tienVN(tn.tong)+'</a>':'<span class="nho">Quầy chưa nhập</span>')+'</div>'+
+        (tn?ba(cTN===""?null:Math.abs(cTN)<(r.lech||1000),"TN|"+tn.so):'')+'<div class="lwKC">'+(tn?kc(cTN):'')+'</div></div></div>'+
+      '<div class="lwNua" data-hv="z'+i+'"><div class="lwHang"><div class="lwChu"><span class="lwZalo">Zalo</span> '+(z?(z.anh?'<a href="#" onclick="anhDCZ(\''+z.anh+'\');return false">'+tienVN(z.tong)+'</a>':tienVN(z.tong)):'<span class="nho">chưa gửi</span>')+
         (sua?'<div class="lwNut">'+(z?'<button onclick="gemDCZ(\''+z.id+'\')" title="Gà Trợ Lý đọc hoá đơn">🐔 Đọc HĐ</button>':'<button onclick="danChoO(\''+esc((tn||{}).ncc||"").replace(/'/g,"")+'\')" title="Dán ảnh hoá đơn NCC – Gà tự đọc">🐔 Đọc HĐ</button>')+'</div>':'')+'</div>'+
-        (z?ba(cZ===""?null:Math.abs(cZ)<(r.lech||1000),"ZL|"+z.id):'')+'<div class="lwKC"'+(d.mon?' onclick="monDCZ('+i+')" title="Mặt hàng chi tiết (NCC) trong hoá đơn"':'')+'><div>'+(z?kc(cZ):'')+(z||tn?dt(tn):'')+'</div></div></div><div class="lwTTTT">'+esc(z&&z.ghiChu||tn&&tn.ec||"Trạng thái thanh toán")+'</div></div></div></div>'; };
+        (z?ba(cZ===""?null:Math.abs(cZ)<(r.lech||1000),"ZL|"+z.id):'')+'<div class="lwKC">'+(z?kc(cZ):'')+'</div></div></div>'+duoi+'</div></div>'; };
   $("dzKQ").innerHTML='<div class="kpi">'+Object.keys(DCZ_TT).map(function(k){ return '<div style="cursor:pointer'+(DCZTT===k?';outline:2px solid var(--g-xanh)':"")+'" onclick="DCZTT=DCZTT===\''+k+'\'?\'\':\''+k+'\';veDCZ()"><small>'+DCZ_TT[k][0]+' '+DCZ_TT[k][1]+'</small><b>'+r.dem[k]+'</b></div>'; }).join("")+
     '<div><small>🧾 Tổng thu ngân / 📲 NCC</small><b style="font-size:15px">'+tienVN(r.tongTN)+'<br>'+tienVN(r.tongZL)+'</b></div></div>'+
     thanhDCZ()+'<button class="chip" onclick="DCZXEM=\'ncc\';veDCZ()">🏪 Theo nhà cung cấp</button><button class="chip" onclick="DCZXEM=\'ds\';veDCZ()">📃 Từng hoá đơn</button><span style="flex:1"></span><span class="nho">✅ khớp · ❌ lệch tiền · ❗ lệch món / thiếu 1 bên · bấm số tiền xem mặt hàng · bấm chênh so từng món</span></div>'+
