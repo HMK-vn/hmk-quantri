@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzIWPz00WSzB659piig0WYLBOOd_KWUFQa_sBJgrtHDQQ0Luq9hDHdyGJFVU0HtIWbo/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261101103148";
+var HMK_BAN = "20261101121842";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -1779,8 +1779,37 @@ function luuNCC(){ goi("luuNCC",NCCDS).then(function(){ toast("✅ Đã lưu dan
 // ---------- 🔐 PHÂN QUYỀN ----------
 var PQ=null;
 function vePQ(){ $("noiDung").innerHTML='<div class="the"><h3>🔐 Phân quyền theo tab</h3><p class="nho">✏️ Sửa · 👁 Xem · 🚫 Ẩn. Email trong Cài đặt EMAIL_ADMIN luôn có toàn quyền. Nhân viên chỉ có quyền "Sửa" ở 🧾 Nhập hoá đơn (không có quyền sửa Main pay list) thì phiếu sẽ vào 📥 Chờ duyệt.</p><div class="bang" id="bPQ">'+gaTai("Đang tải…")+'</div>'+
-  '<p><button onclick="themPQ()">➕ Thêm email</button> <button class="c" onclick="moMaDN()">🔐 Quản lý mã đăng nhập</button> <button class="c" onclick="luuPQ()">💾 Lưu phân quyền</button></p></div>';
-  goi("dsPQ").then(function(d){ PQ=d; veBangPQ(); }).catch(loi); }
+  '<p><button onclick="themPQ()">➕ Thêm email</button> <button onclick="moThemNhieuPQ()">📋 Thêm nhiều email</button> <button class="c" onclick="moMaDN()">🔐 Quản lý mã đăng nhập</button> <button class="c" onclick="luuPQ()">💾 Lưu phân quyền</button></p></div>'+
+  '<div class="the"><h3>👑 Chủ (toàn quyền mọi tab, mọi quán)</h3><div id="bChu">'+gaTai("Đang tải…")+'</div></div>';
+  goi("dsPQ").then(function(d){ PQ=d; PQ.chon={}; veBangPQ(); veChu(); }).catch(loi); }
+// 👑 Danh sách chủ = Cài đặt EMAIL_ADMIN (chỉ chủ sửa được; không bỏ được chính mình)
+function veChu(){ var la=PQ.laChu; $("bChu").innerHTML='<div class="hang">'+(PQ.chu||[]).map(function(e){ return '<span class="tag" style="padding:5px 9px">👑 '+esc(e)+(la&&e!==D.email?' <a href="#" style="color:#c0392b;text-decoration:none" onclick="boChu(\''+esc(e)+'\');return false" title="Bỏ quyền chủ">✖</a>':"")+'</span>'; }).join("")+'</div>'+
+  (la?'<div class="hang" style="margin-top:6px"><label style="flex:1">📧 Email chủ mới<input id="chuMoi" placeholder="ten@gmail.com" onkeydown="if(event.key===\'Enter\')themChu()"></label><button class="c" onclick="themChu()">👑 Thêm chủ</button></div><div class="nho">Chủ có toàn quyền, không cần tick từng tab. Người này đăng nhập bằng Google hoặc mã như bình thường.</div>':'<div class="nho">Chỉ chủ được thêm / bỏ chủ.</div>'); }
+function themChu(){ var e=String($("chuMoi").value||"").trim().toLowerCase(); if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)) return toast("Email chưa đúng");
+  if((PQ.chu||[]).indexOf(e)>=0) return toast("Email này đã là chủ");
+  hoiOK("Cho "+e+" làm CHỦ (toàn quyền)?",function(){ goi("luuChu",(PQ.chu||[]).concat([e])).then(function(ds){ PQ.chu=ds; veChu(); toast("👑 Đã thêm chủ "+e); }).catch(loi); },"👑 Thêm chủ"); }
+function boChu(e){ hoiOK("Bỏ quyền chủ của "+e+"?",function(){ goi("luuChu",(PQ.chu||[]).filter(function(x){ return x!==e; })).then(function(ds){ PQ.chu=ds; veChu(); toast("Đã bỏ quyền chủ "+e); }).catch(loi); },"✖ Bỏ chủ"); }
+// ⚡ Mẫu quyền gán nhanh: mã tab → Sửa/Xem; tab không có trong mẫu = Ẩn
+var MAU_PQ=[["👔 Quản lý","*:Sửa,PHANQUYEN:Ẩn"],["🧾 Thu ngân","NHAP:Sửa,KETCA:Sửa,BANK:Sửa,CASH:Sửa,HDNGAY:Xem,DATBAN:Xem"],["👩‍🍳 Bếp","NHAP:Sửa,KHO:Sửa,KIEMTHUC:Sửa"],["📊 Kế toán","NHAP:Sửa,DUYET:Sửa,MPL:Sửa,HDNGAY:Sửa,PLHD:Sửa,TIMELINE:Sửa,DOICHIEU:Sửa,CONGNO:Sửa,BANK:Sửa,CASH:Sửa,KETCA:Xem"],["👁 Chỉ xem","*:Xem,PHANQUYEN:Ẩn"],["🚫 Ẩn hết","*:Ẩn"]];
+function apMau(r,mau){ var m={}; mau.split(",").forEach(function(p){ var k=p.split(":"); m[k[0]]=k[1]; }); for(var j=4;j<PQ.cot.length;j++){ var c=PQ.cot[j]; r[j]=m[c]||m["*"]||"Ẩn"; } }
+// Dòng đang tick; chưa tick dòng nào = áp cho mọi người
+function dongChonPQ(){ var ds=PQ.dong.filter(function(r,i){ return PQ.chon[i]; }); return ds.length?ds:PQ.dong; }
+function ganNhanh(fn,ten){ var ds=dongChonPQ(), n=ds.length, tat=!Object.keys(PQ.chon).some(function(k){ return PQ.chon[k]; });
+  if(!n) return toast("Chưa có email nào");
+  var lam=function(){ ds.forEach(fn); veBangPQ(); goi("luuPQ",PQ.dong).then(function(){ toast("✅ "+ten+" · "+n+" người · đã lưu"); }).catch(loi); };
+  tat&&n>1?hoiOK("Chưa tick ai – áp \""+ten+"\" cho TẤT CẢ "+n+" người?",lam,"⚡ Áp dụng"):lam(); }
+function chonHetPQ(b){ PQ.chon={}; if(b) PQ.dong.forEach(function(r,i){ PQ.chon[i]=true; }); veBangPQ(); }
+function moThemNhieuPQ(){ moHop('<h3>📋 Thêm nhiều email</h3><p class="nho">Mỗi dòng 1 người: <b>email</b> hoặc <b>email, Họ tên</b>. Email đã có thì chỉ cập nhật quyền.</p><textarea id="tnEm" rows="7" style="width:100%" placeholder="a@gmail.com, Nguyễn Văn A&#10;b@gmail.com"></textarea>'+
+  '<div class="hang"><label>🏢 Quán<select id="tnQ"><option>Tất cả</option><option>LẨU</option><option>TÚI</option></select></label><label>⚡ Mẫu quyền<select id="tnM">'+MAU_PQ.map(function(m,k){ return '<option value="'+k+'">'+m[0]+'</option>'; }).join("")+'</select></label></div>'+
+  '<p style="text-align:right"><button onclick="dongMo()">Huỷ</button> <button class="c" onclick="themNhieuPQ()">➕ Thêm & lưu</button></p>'); }
+function themNhieuPQ(){ var mau=MAU_PQ[$("tnM").value][1], q=$("tnQ").value, them=0, sua=0, sai=[];
+  $("tnEm").value.split(/\n/).forEach(function(l){ l=l.trim(); if(!l) return; var p=l.split(/[,;\t]/), e=p[0].trim().toLowerCase(), t=(p[1]||"").trim();
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)) return sai.push(l);
+    var r=PQ.dong.filter(function(x){ return String(x[0]).trim().toLowerCase()===e; })[0];
+    if(r) sua++; else { r=[e,t,q,"Đang dùng"]; PQ.dong.push(r); them++; }
+    if(t) r[1]=t; r[2]=q; apMau(r,mau); });
+  if(!them&&!sua) return toast("Chưa có email hợp lệ");
+  dongMo(); veBangPQ(); goi("luuPQ",PQ.dong).then(function(){ toast("✅ Thêm "+them+" · cập nhật "+sua+(sai.length?" · bỏ qua "+sai.length+" dòng sai":"")+" · đã lưu"); }).catch(loi); }
 // 🔐 Quản lý mã đăng nhập (chủ): cấp / đổi, duyệt yêu cầu, thu hồi, đăng xuất mọi máy, theo dõi đăng nhập
 function moMaDN(){ moHop(''+gaChoHTML()+''); goi("dsMaDN").then(veMaDN).catch(loi); }
 var MADN=null, MADNLOC="";
@@ -2267,14 +2296,20 @@ function datHang(i,v){ for(var j=4;j<PQ.cot.length;j++) PQ.dong[i][j]=v; veBangP
 function datCot(j){ var v=PQ.dong.length&&PQ.dong[0][j]==="Sửa"?"Xem":PQ.dong.length&&PQ.dong[0][j]==="Xem"?"Ẩn":"Sửa"; PQ.dong.forEach(function(r){ r[j]=v; }); veBangPQ(); }
 function datTatCa(v){ PQ.dong.forEach(function(r,i){ for(var j=4;j<PQ.cot.length;j++) r[j]=v; }); veBangPQ(); }
 function veBangPQ(){ var ten={}; D.tabs.forEach(function(t){ ten[t[0]]=t[1]+"<br>"+t[2]; });
-  $("bPQ").innerHTML='<div class="hang" style="padding:6px"><b>⚡ Chọn hết cho mọi người:</b>'+["Sửa","Xem","Ẩn"].map(function(v){ return '<button onclick="datTatCa(\''+v+'\')">'+VQ[v][0]+' Tất cả '+v+'</button>'; }).join("")+'<span class="nho">· Bấm tiêu đề cột để đổi cả cột · Bấm ô để đổi Sửa → Xem → Ẩn</span></div>'+
-  '<table><thead><tr>'+PQ.cot.map(function(c,j){ return j<4?'<th>'+esc(c)+'</th>':'<th style="text-align:center;cursor:pointer;font-size:11px" title="Bấm để đổi cả cột" onclick="datCot('+j+')">'+(ten[c]||c)+'</th>'; }).join("")+'<th>Cả dòng</th></tr></thead><tbody>'+
-  PQ.dong.map(function(r,i){ return '<tr>'+PQ.cot.map(function(c,j){ var v=r[j];
+  PQ.chon=PQ.chon||{}; var soChon=Object.keys(PQ.chon).filter(function(k){ return PQ.chon[k]; }).length, coCot={}; PQ.cot.forEach(function(c,j){ if(j>=4) coCot[c]=j; });
+  $("bPQ").innerHTML='<div class="the" style="margin:4px 0 8px;background:var(--vang2,#fff8e1)"><div class="hang"><b>⚡ Gán nhanh</b><span class="tag">'+(soChon?"☑️ "+soChon+" người đã tick":"Chưa tick ai = áp cho tất cả")+'</span>'+(soChon?'<button style="padding:3px 8px" onclick="chonHetPQ(false)">✖ Bỏ tick</button>':"")+'</div>'+
+  '<div class="hang"><span class="nho" style="min-width:70px">Mẫu quyền:</span>'+MAU_PQ.map(function(m){ return '<button onclick="ganNhanh(function(r){apMau(r,\''+m[1]+'\');},\''+m[0]+'\')">'+m[0]+'</button>'; }).join("")+'</div>'+
+  '<div class="hang"><span class="nho" style="min-width:70px">Theo nhóm:</span>'+MENU_NHOM.map(function(g){ var cs=g[1].filter(function(c){ return coCot[c]!=null; }); if(!cs.length) return ""; return '<span class="tag" style="padding:3px 6px">'+esc(g[0])+' '+["Sửa","Xem","Ẩn"].map(function(v){ return '<button style="padding:2px 6px" title="'+esc(g[0])+': '+v+'" onclick="ganNhanh(function(r){'+cs.map(function(c){ return 'r['+coCot[c]+']=\''+v+'\';'; }).join("")+'},\''+esc(g[0])+' → '+v+'\')">'+VQ[v][0]+'</button>'; }).join("")+'</span>'; }).join("")+'</div>'+
+  '<div class="hang"><span class="nho" style="min-width:70px">Quán:</span>'+[["Tất cả","🏢 Cả 2 quán"],["LẨU","🍲 LẨU"],["TÚI","🔥 TÚI"]].map(function(o){ return '<button onclick="ganNhanh(function(r){r[2]=\''+o[0]+'\';},\'Quán: '+o[1]+'\')">'+o[1]+'</button>'; }).join("")+
+  '<button onclick="ganNhanh(function(r){r[3]=\'Đang dùng\';},\'Mở khoá\')">✅ Mở khoá</button><button onclick="ganNhanh(function(r){r[3]=\'Tạm khoá\';},\'Tạm khoá\')">🔒 Tạm khoá</button></div>'+
+  '<div class="nho">Tick người ở cột ☑️ rồi bấm 1 nút – tự lưu ngay. Vẫn có thể bấm tiêu đề cột để đổi cả cột, bấm ô để đổi Sửa → Xem → Ẩn (nhớ 💾 Lưu).</div></div>'+
+  '<table><thead><tr><th><input type="checkbox" title="Chọn hết" '+(soChon&&soChon===PQ.dong.length?"checked":"")+' onchange="chonHetPQ(this.checked)"></th>'+PQ.cot.map(function(c,j){ return j<4?'<th>'+esc(c)+'</th>':'<th style="text-align:center;cursor:pointer;font-size:11px" title="Bấm để đổi cả cột" onclick="datCot('+j+')">'+(ten[c]||c)+'</th>'; }).join("")+'<th>Cả dòng</th></tr></thead><tbody>'+
+  PQ.dong.map(function(r,i){ return '<tr'+(PQ.chon[i]?' style="background:#fff3c4"':"")+'><td><input type="checkbox" '+(PQ.chon[i]?"checked":"")+' onchange="PQ.chon['+i+']=this.checked;veBangPQ()"></td>'+PQ.cot.map(function(c,j){ var v=r[j];
     if(j<2) return '<td><input value="'+esc(v)+'" onchange="PQ.dong['+i+']['+j+']=this.value" style="min-width:'+(j?110:190)+'px" placeholder="'+(j?"Họ tên":"email@gmail.com")+'"></td>';
     if(j===2) return '<td>'+["Tất cả","LẨU","TÚI"].map(function(o){ return '<button style="padding:3px 7px" class="'+(o===v?"c":"")+'" onclick="PQ.dong['+i+'][2]=\''+o+'\';veBangPQ()">'+(o==="LẨU"?"🍲":o==="TÚI"?"🔥":"🏢")+'</button>'; }).join("")+'</td>';
     if(j===3) return '<td><button style="padding:3px 7px" onclick="PQ.dong['+i+'][3]=PQ.dong['+i+'][3]===\'Tạm khoá\'?\'Đang dùng\':\'Tạm khoá\';veBangPQ()">'+(v==="Tạm khoá"?"🔒 Tạm khoá":"✅ Đang dùng")+'</button></td>';
     return '<td style="text-align:center">'+nutQ(v,i,j)+'</td>'; }).join("")+
-    '<td style="white-space:nowrap">'+["Sửa","Xem","Ẩn"].map(function(v){ return '<button style="padding:3px 6px" title="Cả dòng: '+v+'" onclick="datHang('+i+',\''+v+'\')">'+VQ[v][0]+'</button>'; }).join("")+' <button class="d" style="padding:3px 6px" onclick="PQ.dong.splice('+i+',1);veBangPQ()">🗑</button></td></tr>'; }).join("")+'</tbody></table>'; }
+    '<td style="white-space:nowrap">'+["Sửa","Xem","Ẩn"].map(function(v){ return '<button style="padding:3px 6px" title="Cả dòng: '+v+'" onclick="datHang('+i+',\''+v+'\')">'+VQ[v][0]+'</button>'; }).join("")+' <button class="d" style="padding:3px 6px" onclick="PQ.dong.splice('+i+',1);PQ.chon={};veBangPQ()">🗑</button></td></tr>'; }).join("")+'</tbody></table>'; }
 
 
 // --- 👩‍🍳 Báo bếp hằng ngày (ghi thẳng 3 cột bếp S, D, TB vào tab Nhập/Tồn/Loss file Định lượng + đặt hàng) ---
