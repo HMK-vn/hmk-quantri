@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261102190816";
+var HMK_BAN = "20261102191211";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -568,7 +568,7 @@ html.coHop,html.coHop body{overflow:hidden!important;overscroll-behavior:none}.m
 .tlKy{display:inline-flex;align-items:center;gap:4px}.tlKy select{font-weight:700;padding:6px 8px}.tlChip{font-size:13px;padding:6px 10px}.tlNCCBoc select{max-width:220px;padding:6px 8px}
 .kpi.kpiGon{display:flex!important;flex-wrap:nowrap;overflow-x:auto}.kpi.kpiGon div{flex:1 0 118px;padding:8px 12px!important}.kpi.kpiGon small{font-size:10.5px;white-space:nowrap}.kpi.kpiGon b{font-size:22px!important}
 </style><style>/* 🧾 Hoá đơn – NCC · lưới đối chiếu */
-.thanhKy{display:inline-flex;gap:6px;margin-left:10px;vertical-align:middle;flex-wrap:wrap;font-family:system-ui,sans-serif}
+#tieuDeTrang{flex-wrap:wrap}.thanhKy{display:flex;gap:6px;flex-basis:100%;order:5;margin:6px 0 0;flex-wrap:wrap;font-family:system-ui,sans-serif;font-size:13px}.thanhKy .segDCZ button{white-space:nowrap}
 .luoi2 .mplBang table,.luoi3 .mplBang table,.luoi5 .mplBang table,.luoi2 .hnLuoi>.the:first-child table,.luoi3 .hnLuoi>.the:first-child table,.luoi5 .hnLuoi>.the:first-child table{display:block}
 .luoi2 .mplBang thead,.luoi3 .mplBang thead,.luoi5 .mplBang thead,.luoi2 .hnLuoi>.the:first-child thead,.luoi3 .hnLuoi>.the:first-child thead,.luoi5 .hnLuoi>.the:first-child thead{display:none}
 .luoi2 .mplBang tbody,.luoi3 .mplBang tbody,.luoi5 .mplBang tbody,.luoi2 .hnLuoi>.the:first-child tbody,.luoi3 .hnLuoi>.the:first-child tbody,.luoi5 .hnLuoi>.the:first-child tbody{display:grid;gap:6px}
