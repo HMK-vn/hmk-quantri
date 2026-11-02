@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261102181907";
+var HMK_BAN = "20261102182349";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -574,7 +574,7 @@ html.coHop,html.coHop body{overflow:hidden!important;overscroll-behavior:none}.m
 .lwBang .lwDai{writing-mode:vertical-rl;transform:rotate(180deg);background:var(--lw);color:#fff;font-weight:700;font-size:10px;padding:3px 2px;text-align:center;border-left:1.5px solid #1e3a5f;cursor:pointer;white-space:nowrap}
 .lwBang .lwThan{flex:1;min-width:0}.lwBang .lwNua+.lwNua{border-top:1.5px solid #1e3a5f}.lwBang .lwHang{display:flex;align-items:stretch}.lwBang .lwChu{flex:1;min-width:0;padding:3px 4px;word-break:break-word}.lwBang .lwChu a{font-weight:700}
 .lwBang .lwBa{display:flex;gap:2px;padding:3px 2px;align-items:flex-start}.lwBang .lwBa i{font-style:normal;width:15px;height:15px;border:1.3px solid #1e3a5f;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#c9c2b8}
-.lwBang .lwBa i.on.v{background:#1f8a4c;color:#fff;border-color:#1f8a4c}.lwBang .lwBa i.on.x{background:#c0392b;color:#fff;border-color:#c0392b}.lwBang .lwBa i.on.c{background:#d69e2e;color:#fff;border-color:#d69e2e}
+.lwBang .lwBa i.on.v{background:#22c55e;color:#fff;border-color:#16a34a;box-shadow:0 0 0 2px #bbf7d0}.lwBang .lwBa i.on.x{background:#f43f5e;color:#fff;border-color:#e11d48;box-shadow:0 0 0 2px #fecdd3}.lwBang .lwBa i.on.c{background:#f59e0b;color:#fff;border-color:#d97706;box-shadow:0 0 0 2px #fde68a}.lwBang .lwBa i.tay{cursor:pointer}
 .lwBang .lwKC{min-width:52px;border-left:1.5px solid #1e3a5f;padding:3px;text-align:center;font-size:10px;display:flex;align-items:center;justify-content:center;cursor:pointer}.lwBang .lwOk{color:#1f8a4c}
 .lwBang .lwTTTT{background:#cfe3f7;color:#1e3a5f;text-align:center;font-weight:700;font-size:9.5px;padding:1px 4px;text-transform:uppercase;border-top:1.5px solid #1e3a5f}.lwBang .lwNut{margin-top:2px}.lwBang .lwNut button{font-size:10px;padding:1px 7px;border-radius:10px;border:1.3px solid #1e3a5f;background:#eef5fc}
 .danAnh{padding:8px 10px!important}.danAnh .hang{margin:0}.vungDan{padding:8px!important;margin-top:4px!important}.vungDan>div:first-child{display:none}
@@ -1614,6 +1614,7 @@ document.addEventListener("paste",function(e){ if(TAB!=="DOICHIEU"||!$("vungDan"
   if(!fs.length) return; e.preventDefault(); danFiles(fs); });
 // Ô lưới chưa có HĐ NCC: bấm 📋 → điền sẵn NCC + cuộn tới ô dán
 function danChoO(ncc){ var e=$("daNCC"); if(!e) return; e.value=ncc; $("vungDan").scrollIntoView({behavior:"smooth",block:"center"}); $("vungDan").focus(); toast("📋 Đã chọn "+ncc+" – nhấn ⌘V / Ctrl+V để dán ảnh"); }
+function danhDauDCZ(k,bat){ goi("luuDanhDau",k,bat).then(function(ds){ DCZ.danhDau=ds; veDCZ(); toast(bat?"❗ Đã đánh dấu":"Đã bỏ dấu"); }).catch(loi); }
 function thanhDCZ(){ return '<div class="hang khongIn" style="gap:6px;margin:6px 0"><button class="chip'+(DCZXEM==="luoi"?' on':'')+'" onclick="DCZXEM=\'luoi\';veDCZ()">🗓 Lưới NCC × ngày</button>'; }
 // 🗓 Lưới đối chiếu: hàng = NCC, cột = ngày. Mỗi ô = 1 hoá đơn: trên 🧾 thu ngân nhập (quầy / quét ảnh), dưới 📲 NCC gửi Zalo (Gà đọc);
 // dải trái = khớp / chênh bao nhiêu; dải xanh = trạng thái thanh toán. Bấm số tiền trên → mặt hàng trong HĐ; bấm chênh → so từng món 2 bên
@@ -1624,15 +1625,16 @@ function veLuoiDCZ(r,ds,sua){ var a=new Date(DCZLOC.tu+"T12:00:00"), b=new Date(
   var IC={khop:"✅",lech:"❌",lechMon:"❗",chiTN:"❗",chiZL:"❗"}, mau={khop:"#1f8a4c",lech:"#c0392b",lechMon:"#b7791f",chiTN:"#b7791f",chiZL:"#b7791f"};
   // Ô theo hình chủ vẽ: dải dọc trái = khớp / chênh 2 bên; mỗi nửa = [Tên NCC · Số HĐ · Số tiền] [✗ ✓ !] [Khớp/Chênh] + dải TRẠNG THÁI THANH TOÁN
   var kc=function(c){ return c===""||c==null?'<span class="nho">—</span>':Math.abs(c)<(r.lech||1000)?'<b class="lwOk">Khớp</b>':'<b class="do">Chênh<br>'+(c>0?"+":"")+tienVN(c)+'</b>'; };
-  var ba=function(m){ return '<span class="lwBa"><i class="'+(m==="x"?"on x":"")+'">✗</i><i class="'+(m==="v"?"on v":"")+'">✓</i><i class="'+(m==="!"?"on c":"")+'">!</i></span>'; };
+  // ✗ sáng khi chưa khớp · ✓ sáng khi khớp (tự động) · ! do người dùng tự bấm đánh dấu (lưu chung, ai xem cũng thấy)
+  var dd=r.danhDau||{}, ba=function(khop,k){ var cd=!!dd[k]; return '<span class="lwBa"><i class="'+(khop?"":"on x")+'" title="Chưa khớp">✗</i><i class="'+(khop?"on v":"")+'" title="Khớp">✓</i><i class="tay'+(cd?" on c":"")+'" title="'+(cd?"Đã đánh dấu bởi "+esc(dd[k])+" – bấm để bỏ":"Bấm để tự đánh dấu cần xem lại")+'"'+(sua?' onclick="danhDauDCZ(\''+esc(k).replace(/'/g,"")+'\','+(!cd)+')"':'')+'>!</i></span>'; };
   var o1=function(d){ var i=ds.indexOf(d), tn=d.tn, z=d.zl, mk=d.tt==="khop"?"v":d.tt==="lech"?"x":"!";
     var sumZ=z&&z.dong&&z.dong.length?z.dong.reduce(function(a,x){ return a+(Number(x.tt)||0); },0):"", cTN=tn&&tn.giay!==""&&tn.giay!=null?tn.giay-tn.tong:"", cZ=z&&sumZ!==""?z.tong-sumZ:"";
     return '<div class="lwO" style="--lw:'+mau[d.tt]+'"><div class="lwDai"'+(d.mon?' onclick="monDCZ('+i+')" title="So từng món 2 bên"':'')+'>'+(d.tt==="khop"?"Khớp":"Chênh "+(d.chenh>0?"+":"")+tienVN(d.chenh))+'</div><div class="lwThan">'+
       '<div class="lwNua"><div class="lwHang"><div class="lwChu"><b>'+esc((tn||z).ncc)+'</b><br>'+(tn?esc(tn.so)+'<br><a href="#" onclick="moHD(\''+esc(tn.so)+'\');return false" title="Mặt hàng chi tiết trong hoá đơn">'+tienVN(tn.tong)+'</a>':'<span class="nho">🧾 Thu ngân chưa nhập</span>')+'</div>'+
-        (tn?ba(mk):'')+'<div class="lwKC" title="Tổng các mặt hàng so với tổng tiền trên hoá đơn">'+(tn?kc(cTN):'')+'</div></div><div class="lwTTTT">'+esc(tn&&tn.ec||"Trạng thái thanh toán")+'</div></div>'+
+        (tn?ba(cTN===""||Math.abs(cTN)<(r.lech||1000),"TN|"+tn.so):'')+'<div class="lwKC" title="Tổng các mặt hàng so với tổng tiền trên hoá đơn">'+(tn?kc(cTN):'')+'</div></div><div class="lwTTTT">'+esc(tn&&tn.ec||"Trạng thái thanh toán")+'</div></div>'+
       '<div class="lwNua"><div class="lwHang"><div class="lwChu"><b>'+esc((z||tn).ncc)+'</b><br>'+esc((z&&z.so)||(tn&&tn.so)||"")+(z?'<br>'+(z.anh?'<a href="#" onclick="anhDCZ(\''+z.anh+'\');return false" title="Ảnh hoá đơn NCC">'+tienVN(z.tong)+'</a>':tienVN(z.tong)):'<br><span class="nho">📲 NCC chưa gửi</span>')+
         (sua?'<div class="lwNut">'+(z?'<button onclick="gemDCZ(\''+z.id+'\')" title="Gà Trợ Lý đọc hoá đơn">🐔 Đọc HĐ</button>':'<button onclick="danChoO(\''+esc((tn||{}).ncc||"").replace(/'/g,"")+'\')" title="Dán ảnh hoá đơn NCC – Gà tự đọc">🐔 Đọc HĐ</button>')+'</div>':'')+'</div>'+
-        (z?ba(mk):'')+'<div class="lwKC"'+(d.mon?' onclick="monDCZ('+i+')" title="Mặt hàng chi tiết (NCC) trong hoá đơn"':'')+'>'+(z?kc(cZ):'')+'</div></div><div class="lwTTTT">'+esc(z&&z.ghiChu||tn&&tn.ec||"Trạng thái thanh toán")+'</div></div></div></div>'; };
+        (z?ba(d.tt==="khop","ZL|"+z.id):'')+'<div class="lwKC"'+(d.mon?' onclick="monDCZ('+i+')" title="Mặt hàng chi tiết (NCC) trong hoá đơn"':'')+'>'+(z?kc(cZ):'')+'</div></div><div class="lwTTTT">'+esc(z&&z.ghiChu||tn&&tn.ec||"Trạng thái thanh toán")+'</div></div></div></div>'; };
   $("dzKQ").innerHTML='<div class="kpi">'+Object.keys(DCZ_TT).map(function(k){ return '<div style="cursor:pointer'+(DCZTT===k?';outline:2px solid var(--g-xanh)':"")+'" onclick="DCZTT=DCZTT===\''+k+'\'?\'\':\''+k+'\';veDCZ()"><small>'+DCZ_TT[k][0]+' '+DCZ_TT[k][1]+'</small><b>'+r.dem[k]+'</b></div>'; }).join("")+
     '<div><small>🧾 Tổng thu ngân / 📲 NCC</small><b style="font-size:15px">'+tienVN(r.tongTN)+'<br>'+tienVN(r.tongZL)+'</b></div></div>'+
     thanhDCZ()+'<button class="chip" onclick="DCZXEM=\'ncc\';veDCZ()">🏪 Theo nhà cung cấp</button><button class="chip" onclick="DCZXEM=\'ds\';veDCZ()">📃 Từng hoá đơn</button><span style="flex:1"></span><span class="nho">✅ khớp · ❌ lệch tiền · ❗ lệch món / thiếu 1 bên · bấm số tiền xem mặt hàng · bấm chênh so từng món</span></div>'+
