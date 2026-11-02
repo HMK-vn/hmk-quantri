@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261102192253";
+var HMK_BAN = "20261102192621";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -568,7 +568,7 @@ html.coHop,html.coHop body{overflow:hidden!important;overscroll-behavior:none}.m
 .tlKy{display:inline-flex;align-items:center;gap:4px}.tlKy select{font-weight:700;padding:6px 8px}.tlChip{font-size:13px;padding:6px 10px}.tlNCCBoc select{max-width:220px;padding:6px 8px}
 .kpi.kpiGon{display:flex!important;flex-wrap:nowrap;overflow-x:auto}.kpi.kpiGon div{flex:1 0 118px;padding:8px 12px!important}.kpi.kpiGon small{font-size:10.5px;white-space:nowrap}.kpi.kpiGon b{font-size:22px!important}
 </style><style>/* 🧾 Hoá đơn – NCC · lưới đối chiếu */
-#tieuDeTrang{flex-wrap:wrap}.thanhKy{display:flex;gap:6px;flex-basis:100%;order:5;margin:6px 0 0;flex-wrap:wrap;font-family:system-ui,sans-serif;font-size:13px}.thanhKy .segDCZ button{white-space:nowrap}
+#tieuDeTrang{flex-wrap:wrap}.thanhKy{display:flex;gap:6px;flex-basis:100%;order:5;margin:6px 0;flex-wrap:wrap;font-family:system-ui,sans-serif;font-size:13px}.thanhKy .segDCZ button{white-space:nowrap}
 .luoi2 .mplBang table,.luoi3 .mplBang table,.luoi5 .mplBang table,.luoi2 .hnLuoi>.the:first-child table,.luoi3 .hnLuoi>.the:first-child table,.luoi5 .hnLuoi>.the:first-child table{display:block}
 .luoi2 .mplBang thead,.luoi3 .mplBang thead,.luoi5 .mplBang thead,.luoi2 .hnLuoi>.the:first-child thead,.luoi3 .hnLuoi>.the:first-child thead,.luoi5 .hnLuoi>.the:first-child thead{display:none}
 .luoi2 .mplBang tbody,.luoi3 .mplBang tbody,.luoi5 .mplBang tbody,.luoi2 .hnLuoi>.the:first-child tbody,.luoi3 .hnLuoi>.the:first-child tbody,.luoi5 .hnLuoi>.the:first-child tbody{display:grid;gap:6px}
@@ -821,6 +821,10 @@ function apSoCot(){ var nd=document.getElementById("noiDung"); if(!nd) return; n
 function veThanhKy(){ var e=document.getElementById("thanhKy"); if(!e) return; var nut=function(k,t){ return '<button class="'+(KYXEM===k?"on":"")+'" onclick="kyXem(\''+k+'\')">'+t+'</button>'; };
   e.innerHTML='<span class="segDCZ"><button onclick="kyXem(KYXEM,-1)" title="Kỳ trước">◀</button>'+nut("ngay","📅 Ngày")+nut("tuan","🗓 Tuần")+nut("thang","📆 Tháng")+'<button onclick="kyXem(KYXEM,1)" title="Kỳ sau">▶</button></span>'+
     '<span class="segDCZ" title="Bố cục lưới">'+[1,2,3,5].map(function(n){ return '<button class="icCot'+(SOCOT===n?" on":"")+'" onclick="soCot('+n+')" title="Lưới '+n+' cột"><span>'+new Array(n+1).join("<i></i>")+'</span></button>'; }).join("")+'</span>'; }
+// Thanh kỳ + bố cục: tự dời xuống ngay trên đầu lưới / bảng của trang (mỗi lần trang vẽ lại)
+function datThanhKy(){ if(!KY_TAB[TAB]) return; var k=document.getElementById("thanhKy"); if(!k){ k=document.createElement("div"); k.id="thanhKy"; k.className="thanhKy khongIn"; document.getElementById("noiDung").prepend(k); veThanhKy(); } var g=document.querySelector("#noiDung .lwBang")||document.getElementById("tlLuoi")||document.querySelector("#noiDung .mplBang")||document.querySelector("#noiDung .hnLuoi")||document.getElementById("plND")||document.getElementById("dzKQ");
+  if(!g) return; var h=g.closest(".the")&&g.closest("#noiDung")?g.closest(".the"):g; if(h.previousElementSibling!==k) h.parentNode.insertBefore(k,h); }
+var HEN_KY=null; new MutationObserver(function(){ clearTimeout(HEN_KY); HEN_KY=setTimeout(datThanhKy,40); }).observe(document.getElementById("noiDung"),{childList:true,subtree:true});
 function moTab(t){
   if(t==="HDNCC") t=hdXemCuoi(); if(HD_GOP.indexOf(t)>=0){ try{ localStorage.setItem("hmk_hdXem",t); }catch(e){} }
   if(!D.tab[t] || D.tab[t]==="Ẩn") t = D.tabs.filter(function(x){ return D.tab[x[0]]!=="Ẩn"; })[0][0];
@@ -1629,7 +1633,7 @@ function veDCZ(){ var r=DCZ, sua=suaDuoc("DOICHIEU"), ds=r.dong.filter(function(
         (mo?con.map(function(d){ return dongHD(d,ds.indexOf(d),1); }).join(""):""); }).join("");
   } else than=ds.map(function(d,i){ return dongHD(d,i); }).join("");
   $("dzKQ").innerHTML='<div class="kpi">'+Object.keys(DCZ_TT).map(function(k){ return '<div style="cursor:pointer'+(DCZTT===k?';outline:2px solid var(--g-xanh)':"")+'" onclick="DCZTT=DCZTT===\''+k+'\'?\'\':\''+k+'\';veDCZ()"><small>'+DCZ_TT[k][0]+' '+DCZ_TT[k][1]+'</small><b>'+r.dem[k]+'</b></div>'; }).join("")+
-    '<div><small>🧾 Tổng thu ngân / 📲 NCC</small><b style="font-size:15px">'+tienVN(r.tongTN)+'<br>'+tienVN(r.tongZL)+'</b></div></div>'+
+    '<div><small>🧾 Tổng thu ngân / 📲 NCC</small><b style="font-size:15px">'+tienVN(r.tongTN)+' / '+tienVN(r.tongZL)+'</b></div></div>'+
   (!r.nhom.length?'<div class="bao vàng">Chưa có danh sách nhóm Zalo – '+(D.chu?'bấm ⚙️ Nhóm Zalo để nhập.':'nhờ chủ nhập.')+'</div>':"")+
   thanhDCZ()+'<button class="chip'+(DCZXEM==="ncc"?' on':'')+'" onclick="DCZXEM=\'ncc\';veDCZ()">🏪 Theo nhà cung cấp</button><button class="chip'+(DCZXEM==="ds"?' on':'')+'" onclick="DCZXEM=\'ds\';veDCZ()">📃 Từng hoá đơn</button><span style="flex:1"></span>'+((r.theoNCC||[]).some(function(g){ return g.tt!=="khop"; })?'<button onclick="gaDCZ()">'+gaHTML("gaMini")+'Gà phân tích chênh lệch</button>':'')+'</div>'+
   '<div class="the"><div class="bang" style="max-height:none"><table><tr><th>Trạng thái</th><th>🧾 Thu ngân nhập</th><th class="so">Tổng</th><th>📲 NCC gửi (Zalo)</th><th class="so">Tổng</th><th class="so">Chênh</th><th class="khongIn"></th></tr>'+
@@ -1735,7 +1739,7 @@ function veLuoiDCZ(r,ds,sua){ var a=new Date(DCZLOC.tu+"T12:00:00"), b=new Date(
         (sua&&!giong?'<div class="lwNut">'+(z?'<button onclick="gemDCZ(\''+z.id+'\')" title="Gà Trợ Lý đọc hoá đơn">🐔 Đọc HĐ</button>':'<button onclick="danChoO(\''+esc((tn||{}).ncc||"").replace(/'/g,"")+'\')" title="Dán ảnh hoá đơn NCC – Gà tự đọc">🐔 Đọc HĐ</button>')+'</div>':'')+'</div>'+
         (z?ba(cZ===""?null:Math.abs(cZ)<(r.lech||1000),"ZL|"+z.id):'')+'<div class="lwKC">'+(z?kc(cZ):'')+'</div></div></div>'+duoi+'</div></div>'; };
   $("dzKQ").innerHTML='<div class="kpi">'+Object.keys(DCZ_TT).map(function(k){ return '<div style="cursor:pointer'+(DCZTT===k?';outline:2px solid var(--g-xanh)':"")+'" onclick="DCZTT=DCZTT===\''+k+'\'?\'\':\''+k+'\';veDCZ()"><small>'+DCZ_TT[k][0]+' '+DCZ_TT[k][1]+'</small><b>'+r.dem[k]+'</b></div>'; }).join("")+
-    '<div><small>🧾 Tổng thu ngân / 📲 NCC</small><b style="font-size:15px">'+tienVN(r.tongTN)+'<br>'+tienVN(r.tongZL)+'</b></div></div>'+
+    '<div><small>🧾 Tổng thu ngân / 📲 NCC</small><b style="font-size:15px">'+tienVN(r.tongTN)+' / '+tienVN(r.tongZL)+'</b></div></div>'+
     thanhDCZ()+'<button class="chip" onclick="DCZXEM=\'ncc\';veDCZ()">🏪 Theo nhà cung cấp</button><button class="chip" onclick="DCZXEM=\'ds\';veDCZ()">📃 Từng hoá đơn</button><span style="flex:1"></span><span class="nho">✅ khớp · ❌ lệch tiền · ❗ lệch món / thiếu 1 bên · bấm số tiền xem mặt hàng · bấm chênh so từng món</span></div>'+
     '<div class="the"><div class="bang lwBang'+(wCot<190?' lwGon':'')+'" style="--lwW:'+wCot+'px"><table><tr><th class="lwNCC">Nhà cung cấp</th>'+ngay.map(function(n){ return '<th'+(coNgay[n]?'':' class="trong" title="Không có hoá đơn"')+'>'+n+'</th>'; }).join("")+'</tr>'+
     nccs.map(function(g){ return '<tr><td class="lwNCC"><b title="'+esc(g.ncc)+'">'+esc(tenGon(g.ncc))+'</b>'+(Q?'':'<div class="nho">'+esc(g.quan)+'</div>')+'<div class="nho">🧾 '+tienVN(g.tn)+'<br>📲 '+tienVN(g.zl)+'<br><b class="'+(g.tt==="khop"?"":"do")+'">'+(g.tt==="khop"?"✓ Khớp":"Chênh "+tienVN(g.chenh))+'</b></div></td>'+
