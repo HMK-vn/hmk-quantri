@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261102191211";
+var HMK_BAN = "20261102191424";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -1668,6 +1668,9 @@ document.addEventListener("paste",function(e){ if(TAB!=="DOICHIEU") return; var 
   if(!fs.length) return; e.preventDefault(); danFiles(fs); });
 // Ô lưới chưa có HĐ NCC: 🐔 Đọc HĐ → mở cửa sổ dán, gợi ý sẵn NCC của ô
 function danChoO(ncc){ moDocHD(ncc); }
+// ✂️ Tên NCC dài → viết tắt loại hình (Hộ kinh doanh → HKD …); tên đầy đủ vẫn có ở title khi rê chuột
+var TAT_NCC=[[/HỘ KINH DOANH( CÁ THỂ)?/g,"HKD"],[/CÔNG TY TRÁCH NHIỆM HỮU HẠN/g,"CTY TNHH"],[/CÔNG TY CỔ PHẦN/g,"CTCP"],[/CÔNG TY TNHH/g,"CTY TNHH"],[/DOANH NGHIỆP TƯ NHÂN/g,"DNTN"],[/CÔNG TY/g,"CTY"],[/CỬA HÀNG/g,"CH"],[/THƯƠNG MẠI/g,"TM"],[/DỊCH VỤ/g,"DV"],[/SẢN XUẤT/g,"SX"],[/XUẤT NHẬP KHẨU/g,"XNK"],[/MỘT THÀNH VIÊN/g,"MTV"],[/ĐẦU TƯ/g,"ĐT"],[/PHÁT TRIỂN/g,"PT"]];
+function tenGon(s){ var t=String(s||"").toUpperCase(); if(t.length<=16) return String(s||""); TAT_NCC.forEach(function(r){ t=t.replace(r[0],r[1]); }); return t.replace(/\s+/g," ").trim(); }
 function zGiong(d){ var tn=d.tn; return tn&&!d.zl&&DCZ&&DCZ.danhDau&&DCZ.danhDau["GIONG|"+tn.so]?{ id:"", so:tn.so, quan:tn.quan, ncc:tn.ncc, ngay:tn.ngay, tong:tn.tong, dong:tn.dong, anh:"", nguon:"☑ Giống HĐ quầy (xác nhận bởi "+DCZ.danhDau["GIONG|"+tn.so]+")", ghiChu:"" }:null; }
 // 🔍 Rê chuột vào nửa trên (quầy) / nửa dưới (Zalo) của ô lưới → thẻ nổi chi tiết hoá đơn số hoá
 function theHD(h,loai){ if(!h) return '<div class="nho">'+(loai==="t"?"Quầy chưa nhập hoá đơn này":"NCC chưa gửi hoá đơn qua Zalo")+'</div>';
@@ -1721,8 +1724,8 @@ function veLuoiDCZ(r,ds,sua){ var a=new Date(DCZLOC.tu+"T12:00:00"), b=new Date(
     var sumZ=z&&z.dong&&z.dong.length?z.dong.reduce(function(a,x){ return a+(Number(x.tt)||0); },0):"", cTN=tn&&tn.giay!==""&&tn.giay!=null?tn.giay-tn.tong:"", cZ=z&&sumZ!==""?z.tong-sumZ:"";
     // Dải dưới cùng (gộp 1 chỗ): trạng thái thanh toán · ⚡ hoá đơn điện tử
     var duoi='<div class="lwTTTT"><span>'+esc(tn&&tn.ec||z&&z.ghiChu||"Chưa rõ thanh toán")+'</span>'+(tn?'<span class="lwDT '+(tn.hddt?'co':'')+'" title="Hoá đơn điện tử'+(tn.hddt?': '+esc(tn.hddt):' – chưa có')+'">⚡ '+(tn.hddt?'HĐĐT':'Chưa HĐĐT')+'</span>':'')+'</div>';
-    return '<div class="lwO" style="--lw:'+mau[tt]+'"><div class="lwDai" onclick="soSanhDCZ('+i+')" title="Bấm xem so sánh từng dòng 2 bên">'+'<span>'+(tt==="khop"?"Khớp":"Chênh "+(ch>0?"+":"")+tienVN(ch))+'</span>'+(tn&&(!d.zl||giong)?'<label class="lwGiong" title="Hoá đơn Zalo giống hoá đơn nhập hằng ngày" onclick="event.stopPropagation()"><input type="checkbox"'+(giong?' checked':'')+(sua?'':' disabled')+' onchange="danhDauDCZ(\'GIONG|'+esc(tn.so).replace(/'/g,"")+'\',this.checked)"></label>':'')+'</div><div class="lwThan">'+
-      '<div class="lwDau"><b>'+esc((tn||z).ncc)+'</b><span class="lwSo">'+esc((tn&&tn.so)||(z&&z.so)||"")+'</span></div>'+
+    return '<div class="lwO" style="--lw:'+mau[tt]+'"><div class="lwDai" onclick="soSanhDCZ('+i+')" title="Bấm xem so sánh từng dòng 2 bên">'+(tn&&(!d.zl||giong)?'<label class="lwGiong" title="Hoá đơn Zalo giống hoá đơn nhập hằng ngày" onclick="event.stopPropagation()"><input type="checkbox"'+(giong?' checked':'')+(sua?'':' disabled')+' onchange="danhDauDCZ(\'GIONG|'+esc(tn.so).replace(/'/g,"")+'\',this.checked)"></label>':'')+'<span>'+(tt==="khop"?"Khớp":"Chênh "+(ch>0?"+":"")+tienVN(ch))+'</span>'+'</div><div class="lwThan">'+
+      '<div class="lwDau"><b title="'+esc((tn||z).ncc)+'">'+esc(tenGon((tn||z).ncc))+'</b><span class="lwSo">'+esc((tn&&tn.so)||(z&&z.so)||"")+'</span></div>'+
       '<div class="lwNua" data-hv="t'+i+'"><div class="lwHang"><div class="lwChu">'+(tn?'<a href="#" onclick="moHD(\''+esc(tn.so)+'\');return false">'+tienVN(tn.tong)+'</a>':'<span class="nho">Quầy chưa nhập</span>')+'</div>'+
         (tn?ba(cTN===""?null:Math.abs(cTN)<(r.lech||1000),"TN|"+tn.so):'')+'<div class="lwKC">'+(tn?kc(cTN):'')+'</div></div></div>'+
       '<div class="lwNua" data-hv="z'+i+'"><div class="lwHang"><div class="lwChu"><span class="lwZalo">Zalo</span> '+(z?(z.anh?'<a href="#" onclick="anhDCZ(\''+z.anh+'\');return false">'+tienVN(z.tong)+'</a>':tienVN(z.tong)):'<span class="nho">chưa gửi</span>')+
@@ -1732,7 +1735,7 @@ function veLuoiDCZ(r,ds,sua){ var a=new Date(DCZLOC.tu+"T12:00:00"), b=new Date(
     '<div><small>🧾 Tổng thu ngân / 📲 NCC</small><b style="font-size:15px">'+tienVN(r.tongTN)+'<br>'+tienVN(r.tongZL)+'</b></div></div>'+
     thanhDCZ()+'<button class="chip" onclick="DCZXEM=\'ncc\';veDCZ()">🏪 Theo nhà cung cấp</button><button class="chip" onclick="DCZXEM=\'ds\';veDCZ()">📃 Từng hoá đơn</button><span style="flex:1"></span><span class="nho">✅ khớp · ❌ lệch tiền · ❗ lệch món / thiếu 1 bên · bấm số tiền xem mặt hàng · bấm chênh so từng món</span></div>'+
     '<div class="the"><div class="bang lwBang'+(wCot<190?' lwGon':'')+'" style="--lwW:'+wCot+'px"><table><tr><th class="lwNCC">Nhà cung cấp</th>'+ngay.map(function(n){ return '<th'+(coNgay[n]?'':' class="trong" title="Không có hoá đơn"')+'>'+n+'</th>'; }).join("")+'</tr>'+
-    nccs.map(function(g){ return '<tr><td class="lwNCC"><b>'+esc(g.ncc)+'</b>'+(Q?'':'<div class="nho">'+esc(g.quan)+'</div>')+'<div class="nho">🧾 '+tienVN(g.tn)+'<br>📲 '+tienVN(g.zl)+'<br><b class="'+(g.tt==="khop"?"":"do")+'">'+(g.tt==="khop"?"✓ Khớp":"Chênh "+tienVN(g.chenh))+'</b></div></td>'+
+    nccs.map(function(g){ return '<tr><td class="lwNCC"><b title="'+esc(g.ncc)+'">'+esc(tenGon(g.ncc))+'</b>'+(Q?'':'<div class="nho">'+esc(g.quan)+'</div>')+'<div class="nho">🧾 '+tienVN(g.tn)+'<br>📲 '+tienVN(g.zl)+'<br><b class="'+(g.tt==="khop"?"":"do")+'">'+(g.tt==="khop"?"✓ Khớp":"Chênh "+tienVN(g.chenh))+'</b></div></td>'+
       ngay.map(function(n){ var c=o[g.quan+"|"+g.ncc+"|"+n]||[]; return '<td class="lwTd'+(coNgay[n]?'':' trong')+'">'+c.map(o1).join("")+'</td>'; }).join("")+'</tr>'; }).join("")+
     (nccs.length?"":'<tr><td colspan="'+(ngay.length+1)+'" class="nho">Không có hoá đơn trong khoảng này.</td></tr>')+'</table></div></div>'; }
 // 🐔 Nhờ Gà phân tích chênh lệch (1 NCC hoặc tất cả NCC lệch) – gửi bản tóm tắt hệ thống đã tự so
