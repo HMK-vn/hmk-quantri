@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261102184637";
+var HMK_BAN = "20261102185047";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -1646,7 +1646,7 @@ function theHD(h,loai){ if(!h) return '<div class="nho">'+(loai==="t"?"Quầy ch
     '<tr class="hvTong"><td colspan="3">Cộng các dòng</td><td class="so">'+tienVN(cong)+'</td></tr>'+(giay!==""&&giay!=null?'<tr class="hvTong"><td colspan="3">Tổng trên hoá đơn</td><td class="so'+(Math.abs(giay-cong)>=1000?' do':'')+'">'+tienVN(giay)+'</td></tr>':'')+'</table>'+
     '<div class="hvChan">'+(loai==="t"?'💳 '+esc(h.ec||"—")+' · ⚡ '+esc(h.hddt||"Chưa HĐĐT"):'📁 '+esc(h.nguon||"")+(h.ghiChu?' · '+esc(h.ghiChu):''))+'</div>'; }
 var HV_HEN=null;
-document.addEventListener("mouseover",function(e){ var el=e.target.closest&&e.target.closest("[data-hv]"), p=$("hvHD");
+document.addEventListener("mouseover",function(e){ var el=e.target.closest&&e.target.closest("[data-hv]"), p=document.getElementById("hvHD"); // không dùng $(): $ trả khối rỗng khi chưa có
   if(!el){ if(p&&!(e.target.closest&&e.target.closest("#hvHD"))){ clearTimeout(HV_HEN); HV_HEN=setTimeout(function(){ p.style.display="none"; },150); } return; }
   clearTimeout(HV_HEN); var k=el.dataset.hv, d=DCZ&&DCZ._ds&&DCZ._ds[+k.slice(1)]; if(!d) return;
   if(!p){ p=document.createElement("div"); p.id="hvHD"; document.body.appendChild(p); }
