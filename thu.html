@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261102203426";
+var HMK_BAN = "20261102203859";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -580,13 +580,13 @@ html.coHop,html.coHop body{overflow:hidden!important;overscroll-behavior:none}.m
 .lwBang .lwZalo{font-size:8px;padding:0 3px;border-radius:4px;line-height:12px}.lwBang .lwTTTT{font-size:9px;padding:1px 4px;gap:4px;letter-spacing:.2px}.lwBang .lwTTTT .lwDT{font-size:8.5px;padding:0 4px;line-height:13px}
 .lwBang .lwDau{padding:2px 4px;gap:4px}.lwBang .lwDau .lwSo{font-size:9.5px}.thanhDCZ .chip{padding:3px 10px;font-size:12px}#dzKQ>.kpi>div small{font-size:11px}
 #tieuDeTrang{flex-wrap:wrap}.thanhKy{display:flex;gap:6px;flex-basis:100%;order:5;margin:6px 0;flex-wrap:wrap;font-family:system-ui,sans-serif;font-size:13px}.thanhKy .segDCZ button{white-space:nowrap}
-.luoi2 .mplBang table,.luoi3 .mplBang table,.luoi5 .mplBang table,.luoi2 .hnLuoi>.the:first-child table,.luoi3 .hnLuoi>.the:first-child table,.luoi5 .hnLuoi>.the:first-child table{display:block}
-.luoi2 .mplBang thead,.luoi3 .mplBang thead,.luoi5 .mplBang thead,.luoi2 .hnLuoi>.the:first-child thead,.luoi3 .hnLuoi>.the:first-child thead,.luoi5 .hnLuoi>.the:first-child thead{display:none}
-.luoi2 .mplBang tbody,.luoi3 .mplBang tbody,.luoi5 .mplBang tbody,.luoi2 .hnLuoi>.the:first-child tbody,.luoi3 .hnLuoi>.the:first-child tbody,.luoi5 .hnLuoi>.the:first-child tbody{display:grid;gap:6px}
-.luoi2 .mplBang tbody,.luoi2 .hnLuoi>.the:first-child tbody{grid-template-columns:repeat(2,minmax(0,1fr))}.luoi3 .mplBang tbody,.luoi3 .hnLuoi>.the:first-child tbody{grid-template-columns:repeat(3,minmax(0,1fr))}.luoi5 .mplBang tbody,.luoi5 .hnLuoi>.the:first-child tbody{grid-template-columns:repeat(5,minmax(0,1fr))}
-.luoi2 .mplBang tr,.luoi3 .mplBang tr,.luoi5 .mplBang tr,.luoi2 .hnLuoi>.the:first-child tr,.luoi3 .hnLuoi>.the:first-child tr,.luoi5 .hnLuoi>.the:first-child tr{display:flex;flex-wrap:wrap;align-items:center;gap:2px 6px;border:1px solid #e5ddd2;border-radius:10px;padding:5px 7px;background:#fff}
-.luoi2 .mplBang td,.luoi3 .mplBang td,.luoi5 .mplBang td,.luoi2 .hnLuoi>.the:first-child td,.luoi3 .hnLuoi>.the:first-child td,.luoi5 .hnLuoi>.the:first-child td{border:0!important;padding:0!important;max-width:100%}
-.luoi3 .hnLuoi,.luoi5 .hnLuoi,.luoi2 .hnLuoi{grid-template-columns:1fr!important}.luoi5 .mplBang tr,.luoi5 .hnLuoi tr{font-size:11px}
+.soCot2 .mplBang table,.soCot3 .mplBang table,.soCot5 .mplBang table,.soCot2 .hnLuoi>.the:first-child table,.soCot3 .hnLuoi>.the:first-child table,.soCot5 .hnLuoi>.the:first-child table{display:block}
+.soCot2 .mplBang thead,.soCot3 .mplBang thead,.soCot5 .mplBang thead,.soCot2 .hnLuoi>.the:first-child thead,.soCot3 .hnLuoi>.the:first-child thead,.soCot5 .hnLuoi>.the:first-child thead{display:none}
+.soCot2 .mplBang tbody,.soCot3 .mplBang tbody,.soCot5 .mplBang tbody,.soCot2 .hnLuoi>.the:first-child tbody,.soCot3 .hnLuoi>.the:first-child tbody,.soCot5 .hnLuoi>.the:first-child tbody{display:grid;gap:6px}
+.soCot2 .mplBang tbody,.soCot2 .hnLuoi>.the:first-child tbody{grid-template-columns:repeat(2,minmax(0,1fr))}.soCot3 .mplBang tbody,.soCot3 .hnLuoi>.the:first-child tbody{grid-template-columns:repeat(3,minmax(0,1fr))}.soCot5 .mplBang tbody,.soCot5 .hnLuoi>.the:first-child tbody{grid-template-columns:repeat(5,minmax(0,1fr))}
+.soCot2 .mplBang tr,.soCot3 .mplBang tr,.soCot5 .mplBang tr,.soCot2 .hnLuoi>.the:first-child tr,.soCot3 .hnLuoi>.the:first-child tr,.soCot5 .hnLuoi>.the:first-child tr{display:flex;flex-wrap:wrap;align-items:center;gap:2px 6px;border:1px solid #e5ddd2;border-radius:10px;padding:5px 7px;background:#fff}
+.soCot2 .mplBang td,.soCot3 .mplBang td,.soCot5 .mplBang td,.soCot2 .hnLuoi>.the:first-child td,.soCot3 .hnLuoi>.the:first-child td,.soCot5 .hnLuoi>.the:first-child td{border:0!important;padding:0!important;max-width:100%}
+.soCot3 .hnLuoi,.soCot5 .hnLuoi,.soCot2 .hnLuoi{grid-template-columns:1fr!important}.soCot5 .mplBang tr,.soCot5 .hnLuoi tr{font-size:11px}
 .thanhDCZ{gap:6px;margin:6px 0;flex-wrap:wrap;align-items:center}.segDCZ{display:inline-flex;border:1px solid #e5ddd2;border-radius:10px;overflow:hidden;background:#fff}.segDCZ button{border:0;border-radius:0;padding:4px 9px;font-size:12px;background:transparent;min-width:0}.segDCZ button+button{border-left:1px solid #efe8df}.segDCZ button.on{background:#1e3a5f!important;color:#fff!important}
 .icCot span{display:inline-flex;gap:2px;height:13px;vertical-align:middle}.icCot i{display:block;width:4px;height:13px;border-radius:1.5px;background:currentColor;opacity:.75}
 .lwBang .lwTd:not(.trong){width:var(--lwW);min-width:var(--lwW)!important;max-width:var(--lwW)}.lwGon .lwO{font-size:9.5px}.lwGon .lwNut,.lwGon .lwSo,.lwGon .lwBa i:not(.on){display:none!important}.lwGon .lwKC{min-width:34px}.lwGon .lwDT{font-size:8px}
@@ -828,7 +828,8 @@ function kyXem(k,buoc){ var ad=KY_AD[TAB]; if(!ad) return; var b=new Date((ad[0]
   else { tu=new Date(b.getFullYear(),b.getMonth(),1,12); den=new Date(b.getFullYear(),b.getMonth()+1,0,12); }
   KYXEM=k; try{ localStorage.setItem("hmk_kyXem",k); }catch(e){} veThanhKy(); ad[1](homNay(tu),homNay(den)); }
 function soCot(n){ SOCOT=n; try{ localStorage.setItem("hmk_soCot",n); }catch(e){} veThanhKy(); apSoCot(); if(TAB==="DOICHIEU"&&DCZ) veDCZ(); if(TAB==="TIMELINE"&&TL.ds) veLuoiTL(); }
-function apSoCot(){ var nd=document.getElementById("noiDung"); if(!nd) return; nd.classList.remove("luoi2","luoi3","luoi5"); if(KY_TAB[TAB]&&SOCOT>1) nd.classList.add("luoi"+SOCOT); }
+// Lớp soCotN (không dùng .luoi2 – trùng lớp bố cục cũ của web)
+function apSoCot(){ var nd=document.getElementById("noiDung"); if(!nd) return; nd.classList.remove("luoi2","luoi3","luoi5","soCot2","soCot3","soCot5"); if(KY_TAB[TAB]&&SOCOT>1) nd.classList.add("soCot"+SOCOT); }
 function veThanhKy(){ var e=document.getElementById("thanhKy"); if(!e) return; var nut=function(k,t){ return '<button class="'+(KYXEM===k?"on":"")+'" onclick="kyXem(\''+k+'\')">'+t+'</button>'; };
   e.innerHTML='<span class="segDCZ"><button onclick="kyXem(KYXEM,-1)" title="Kỳ trước">◀</button>'+nut("ngay","📅 Ngày")+nut("tuan","🗓 Tuần")+nut("thang","📆 Tháng")+'<button onclick="kyXem(KYXEM,1)" title="Kỳ sau">▶</button></span>'+
     '<span class="segDCZ" title="Bố cục lưới">'+[1,2,3,5].map(function(n){ return '<button class="icCot'+(SOCOT===n?" on":"")+'" onclick="soCot('+n+')" title="Lưới '+n+' cột"><span>'+new Array(n+1).join("<i></i>")+'</span></button>'; }).join("")+'</span>'; }
@@ -1743,7 +1744,8 @@ function dauDCZ(r){ var ds=r.dong||[], co=ds.filter(function(d){ return d.tn&&d.
 // dải trái = khớp / chênh bao nhiêu; dải xanh = trạng thái thanh toán. Bấm số tiền trên → mặt hàng trong HĐ; bấm chênh → so từng món 2 bên
 function veLuoiDCZ(r,ds,sua){ var a=new Date(DCZLOC.tu+"T12:00:00"), b=new Date(DCZLOC.den+"T12:00:00"), ngay=[];
   for(var x=new Date(a);x<=b&&ngay.length<62;x.setDate(x.getDate()+1)) ngay.push(x.getDate()+"/"+(x.getMonth()+1));
-  var nccs=(r.theoNCC||[]).filter(function(g){ return !DCZTT||g.dem[DCZTT]; }), o={};
+  var coNCC={}; ds.forEach(function(d){ var x=d.tn||d.zl; coNCC[x.quan+"|"+x.ncc]=1; });
+  var nccs=(r.theoNCC||[]).filter(function(g){ return coNCC[g.quan+"|"+g.ncc]; }), o={};
   // Bề rộng 1 cột ngày = (khung − cột NCC) / số cột chọn; 1 ngày thì cột ngày chiếm hết
   var khung=($("dzKQ").clientWidth||900)-140, soCoNgay=0, wCot;
   var coNgay={}; ds.forEach(function(d){ var x=d.tn||d.zl, k=x.quan+"|"+x.ncc+"|"+x.ngay; (o[k]=o[k]||[]).push(d); coNgay[x.ngay]=1; }); ngay.forEach(function(n){ if(coNgay[n]) soCoNgay++; }); wCot=Math.max(120,Math.floor((khung-(ngay.length-soCoNgay)*24)/Math.max(1,Math.min(SOCOT,soCoNgay||1))));
@@ -1771,7 +1773,7 @@ function veLuoiDCZ(r,ds,sua){ var a=new Date(DCZLOC.tu+"T12:00:00"), b=new Date(
     '<div class="the"><div class="bang lwBang'+(wCot<190?' lwGon':'')+'" style="--lwW:'+wCot+'px"><table><tr><th class="lwNCC">Nhà cung cấp</th>'+ngay.map(function(n){ return '<th'+(coNgay[n]?'':' class="trong" title="Không có hoá đơn"')+'>'+n+'</th>'; }).join("")+'</tr>'+
     nccs.map(function(g){ return '<tr><td class="lwNCC">'+theNCC(g.ncc)+''+(Q?'':'<div class="nho">'+esc(g.quan)+'</div>')+'<div class="nho">🧾 '+tienVN(g.tn)+'<br>📲 '+tienVN(g.zl)+'<br><b class="'+(g.tt==="khop"?"":"do")+'">'+(g.tt==="khop"?"✓ Khớp":"Chênh "+tienVN(g.chenh))+'</b></div></td>'+
       ngay.map(function(n){ var c=o[g.quan+"|"+g.ncc+"|"+n]||[]; return '<td class="lwTd'+(coNgay[n]?'':' trong')+'">'+c.map(o1).join("")+'</td>'; }).join("")+'</tr>'; }).join("")+
-    (nccs.length?"":'<tr><td colspan="'+(ngay.length+1)+'" class="nho">Không có hoá đơn trong khoảng này.</td></tr>')+'</table></div></div>'; }
+    (nccs.length?"":'<tr><td colspan="'+(ngay.length+1)+'" class="nho" style="padding:14px!important;text-align:left">🔍 Không có hoá đơn phù hợp với kỳ / bộ lọc đang chọn.'+(DCZTT||DCZ_DT||DCZ_ANKHOP?' <a href="#" onclick="DCZTT=\'\';DCZ_DT=\'\';if(DCZ_ANKHOP)anKhopDCZ();else veDCZ();return false">Bỏ lọc</a>':'')+'</td></tr>')+'</table></div></div>'; }
 // 🐔 Nhờ Gà phân tích chênh lệch (1 NCC hoặc tất cả NCC lệch) – gửi bản tóm tắt hệ thống đã tự so
 function gaDCZ(k){ var ds=(DCZ.theoNCC||[]).filter(function(g){ return g.tt!=="khop"&&(!k||g.quan+"|"+g.ncc===k); }); if(!ds.length) return toast("Không có NCC nào lệch");
   var t="Phân tích đối chiếu hoá đơn nhà cung cấp "+(DCZLOC.tu||"")+" → "+(DCZLOC.den||"")+" (🧾 thu ngân nhập từ hoá đơn giao hàng vs 📲 hoá đơn NCC gửi Zalo). Hệ thống đã tự so:\n"+
