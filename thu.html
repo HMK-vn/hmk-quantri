@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261103102423";
+var HMK_BAN = "20261103102520";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -639,7 +639,7 @@ html.coHop,html.coHop body{overflow:hidden!important;overscroll-behavior:none}.m
 @media screen and (max-width:700px){.bangBep th:nth-child(1),.bangBep td:nth-child(1),.bangBep th:nth-child(2),.bangBep td:nth-child(2){display:none}.bangBep{font-size:11px}.bangBep input{width:3.8em!important}.bangBep td:nth-child(3){white-space:normal;min-width:7em}}
 
 /* ✏️ icon vẽ tay */
-.icv{width:18px;height:18px;vertical-align:-4px;flex:0 0 auto}.icv.lon{width:23px;height:23px;vertical-align:-6px}.segDCZ button .icv.lon,.icNut .icv.lon{width:22px;height:22px}.segDCZ button.on .icv{stroke:#fff}.segDCZ button.on .icv [stroke="#15803d"],.segDCZ button.on .icv [stroke="#e11d48"]{stroke:#fff}
+.icv{width:20px;height:20px;vertical-align:-5px;flex:0 0 auto}.icv.lon{width:28px;height:28px;vertical-align:-8px}.segDCZ button .icv.lon,.icNut .icv.lon{width:27px;height:27px}.segDCZ button:has(.icv){padding:4px 9px!important}.segDCZ button.on .icv{stroke:#fff}.segDCZ button.on .icv [stroke="#15803d"],.segDCZ button.on .icv [stroke="#e11d48"]{stroke:#fff}
 .icSo{padding:5px 12px;font-size:15px;gap:7px}.icSo b{font-size:17px}.kpi.kpiIc>div small{display:inline-flex;align-items:center}.dauDCZ .segDCZ button{display:inline-flex;align-items:center;gap:5px}
 </style>
 </head><body class="misa"><script>try{ window.top.postMessage({ hmk:"song" },"*"); }catch(e){}</script>
