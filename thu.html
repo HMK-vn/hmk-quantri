@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261103205925";
+var HMK_BAN = "20261103212057";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -1369,7 +1369,9 @@ function moNhapTay(i){ var h=i!=null&&F.dsAI?F.dsAI[i]:null, n=new Date(), ng0=T
   while(NT.dong.length<6) NT.dong.push({ nd:"", sl:"", dg:"", gc:"" });
   ntLs(); veNT(); var k=document.getElementById("ntKhung"); if(k&&i!==undefined){ k.scrollIntoView({behavior:"smooth",block:"start"}); var o=k.querySelector("tbody input"); if(o) setTimeout(function(){ o.focus(); },350); } }
 // Bảng nhập tay luôn có sẵn trong trang (giống pop-up Junior nhưng nằm trong trang)
-function ntSan(){ if(!NT) moNhapTay(); else veNT(); ntSoHD(); var g=document.getElementById("ntNguon"); if(g) g.textContent=NT&&NT.suaSo?"· đang sửa hoá đơn "+NT.suaSo:NT&&NT.zlId?"· đang sửa hoá đơn Zalo "+(NT.ncc||""):NT&&NT.the!=null&&F&&F.dsAI&&F.dsAI[NT.the]?"· đang sửa thẻ "+(NT.the+1)+" ("+(F.dsAI[NT.the].ncc||"chưa rõ NCC")+")":""; }
+// Trang Đối chiếu: chọn ghi vào HĐ NCC (Zalo) hay HĐ quầy (Main pay list)
+function ntDoiDich(v){ if(!NT||NT.zlId||NT.suaSo) return; NT.dich=v; var t=document.getElementById("ntTieuDe"); if(t) t.textContent=v==="ZL"?"NCC (ZALO)":"QUẦY"; ntSoHD(); }
+function ntSan(){ if(!NT) moNhapTay(); else veNT(); ntSoHD(); var sd=document.getElementById("ntDich"); if(sd&&NT){ sd.value=NT.dich==="ZL"?"ZL":""; sd.disabled=!!(NT.zlId||NT.suaSo); ntDoiDich(sd.value); } var g=document.getElementById("ntNguon"); if(g) g.textContent=NT&&NT.suaSo?"· đang sửa hoá đơn "+NT.suaSo:NT&&NT.zlId?"· đang sửa hoá đơn Zalo "+(NT.ncc||""):NT&&NT.the!=null&&F&&F.dsAI&&F.dsAI[NT.the]?"· đang sửa thẻ "+(NT.the+1)+" ("+(F.dsAI[NT.the].ncc||"chưa rõ NCC")+")":""; }
 function dongNT(){ NT=null; ntSan(); }
 function ntLs(){ if(!NT) return; goi("lichSuNCC",quanHT()).then(function(r){ if(NT){ NT.ls=r||{}; if(NT.tl) veNT(); } }).catch(function(){}); }
 function bo(x){ return boDau(String(x||"")).toLowerCase().trim(); }
@@ -1442,7 +1444,8 @@ function ntDoi(j,b){ var k=j+b; if(k<0||k>=NT.dong.length) return; var t=NT.dong
 function ntApDung(){ var cu=NT.tlDong>=0&&NT.dong[NT.tlDong]?NT.dong[NT.tlDong].nd:"", moi=(NT.tlChuan||"").trim().toUpperCase(); if(!cu||!moi) return toast("Chọn tên ở Bước 1 và tên chuẩn ở Bước 2");
   var n=0; NT.dong.forEach(function(d){ if(bo(d.nd)===bo(cu)){ d.nd=moi; n++; } }); goi("hocDocAnh",["TÊN: "+cu+" ⇒ "+moi],quanHT()).catch(function(){}); toast("✓ Đã đồng nhất "+n+" dòng: "+cu+" → "+moi,3000); NT.tlDong=-1; NT.tlChuan=""; veNT(); }
 function ntLuu(btn){ var dong=NT.dong.filter(function(d){ return d.nd.trim(); }), bao=function(m){ $("ntKQ").innerHTML='<div class="ntLoi">⚠️ '+esc(m)+'</div>'; };
-  if(!NT.ncc&&dong.length){ var bq=nccBQ(dong,NT.ml); if(bq) NT.ncc=bq; } // điện/nước/tự đi mua… không cần NCC
+  var bqD=nccBQ(dong,NT.ml); if(!NT.ncc&&bqD) NT.ncc=bqD; // điện/nước/tự đi mua… không cần NCC
+  if(NT.dich==="ZL"&&!NT.zlId&&bqD){ NT.dich=""; toast("🚫 "+bqD+" là mục bỏ qua đối chiếu → ghi vào HĐ quầy",3500); } // mục bỏ qua không có HĐ Zalo
   if(NT.dich==="ZL") return ntLuuZL(btn,dong,bao); if(NT.suaSo) return ntLuuSua(btn,dong,bao);
   if(!NT.ncc) return bao("Chưa nhập NCC"); if(!dong.length) return bao("Chưa có mặt hàng"); var thieuML=dong.filter(function(d){ return !(d.ml||NT.ml); })[0]; if(thieuML) return bao("Chưa chọn Main list: "+thieuML.nd); var thieu=dong.filter(function(d){ return !(Number(d.sl)>0); })[0]; if(thieu) return bao("Thiếu SL: "+thieu.nd);
   var nam=NT.nam||new Date().getFullYear(), p={ quan:quanHT(), ngay:nam+"-"+("0"+NT.mm).slice(-2)+"-"+("0"+NT.dd).slice(-2), ncc:NT.ncc, tongGiay:"", hddt:"", ec:F&&F.ec||"Chưa TT", ghiChu:"Nhập tay (pop-up)", anh:null,
@@ -1450,7 +1453,7 @@ function ntLuu(btn){ var dong=NT.dong.filter(function(d){ return d.nd.trim(); })
   var x=NT.the!=null&&F&&F.dsAI?F.dsAI[NT.the]:null; if(x&&!x.tamMa){ p.anh=x.anhTo?{mime:"image/jpeg",data:x.anhTo}:null; p.anhPhu=x.anhTo2||[]; }
   btn.disabled=true; btn.innerHTML=gaTai("Đang ghi…");
   (x&&x.tamMa?goi("duyetTam",x.tamMa,p):goiKT("luuHoaDon",p)).then(function(r){ if(x){ if(x.goc) hocTuSua(x.goc,p); x.daGhi=1; x.soHD=r.soHD||r.maPhieu||""; x.ncc=p.ncc; x.dong=p.dong.map(function(d){ return { nd:d.nd, sl:d.sl, dg:d.dg, tt:ntTT(d), ml:d.ml }; }); }
-      toast(r.soHD?"✅ Đã ghi "+r.soHD+" – "+dong.length+" dòng":"📤 Đã gửi phiếu chờ duyệt",4000); dongNT(); if(TAB==="NHAP") veDsAI(); if(TAB==="HDNGAY") taiHDNgay(); goi("canhBao","").then(capNhatChuong); })
+      toast(r.soHD?"✅ Đã ghi "+r.soHD+" – "+dong.length+" dòng":"📤 Đã gửi phiếu chờ duyệt",4000); dongNT(); if(TAB==="NHAP") veDsAI(); if(TAB==="HDNGAY") taiHDNgay(); if(TAB==="DOICHIEU") taiDCZ(); goi("canhBao","").then(capNhatChuong); })
     .catch(function(e){ btn.disabled=false; btn.textContent="💾 Cập nhật vào Main List"; bao(e.message); }); }
 // ✏️ Sửa dạng danh sách ngay dưới dòng hoá đơn: sửa / xoá từng dòng, xoá cả hoá đơn
 var HNMO=null;
@@ -1727,7 +1730,7 @@ function veDoiChieu(){ var d=new Date(); DCZLOC=DCZLOC||{ tu:homNay(new Date(d.g
   $("noiDung").innerHTML='<div class="the khongIn dauTrang"><div class="hang"><span class="ngayDCZ">📅 <input type="date" id="dzTu" value="'+DCZLOC.tu+'" title="Từ ngày"> → <input type="date" id="dzDen" value="'+DCZLOC.den+'" title="Đến ngày"></span>'+
   '<button class="c icNut" onclick="taiDCZ()" title="Đối chiếu">🔍</button><span id="kyCho"></span><span style="flex:1"></span>'+(sua?'<button class="c icNut" onclick="moDocHD()" title="Đọc HĐ NCC – dán ảnh (⌘V ở trang này cũng được)">'+gaHTML("gaMini gaNut")+'Đọc HĐ</button><button class="icNut" onclick="denNT()" title="Nhập tay hoá đơn NCC">✍️</button><button class="icNut" onclick="quetDCZ(this)" title="Đọc ảnh mới trong thư mục Zalo">🔄</button>':"")+'<details class="mplMenu"><summary class="icNut" title="Thêm">⋯</summary><div><button onclick="moTMZalo(this)">📁 Thư mục ảnh Zalo</button>'+(D.chu?'<button onclick="nhomZalo()">⚙️ Nhóm Zalo</button>':"")+'<button onclick="window.print()">🖨 In</button></div></details>'+
   '<span class="icNut" title="Chép ảnh hoá đơn trong Zalo rồi ⌘V / Ctrl+V ở trang này → Gà tự đọc NCC, ngày, quán, cắt từng tờ và xếp vào đúng ô. Hoặc lưu ảnh vào thư mục Drive đúng tên nhóm → tự đọc mỗi 30 phút (🔄 để đọc ngay). Ghép theo NCC + ngày (±1) + số tiền gần nhất.">ⓘ</span></div></div>'+'<div id="dzKQ">'+gaChoHTML()+'</div>'+
-  (sua?'<section class="ntInline khongIn" id="ntKhung"><div class="ntDau"><b>'+gaGhi()+' NHẬP HÓA ĐƠN NCC (ZALO) CHI TIẾT</b><span class="nho" id="ntNguon">· nhập tay hoá đơn NCC gửi, hệ thống tự ghép với hoá đơn thu ngân</span></div><div id="ntND"></div></section>':""); taiDCZ(); if(sua){ NT=null; napLSN(); ntSan(); } }
+  (sua?'<section class="ntInline khongIn" id="ntKhung"><div class="ntDau"><b>'+gaGhi()+' NHẬP HÓA ĐƠN <span id="ntTieuDe">NCC (ZALO)</span> CHI TIẾT</b> <select id="ntDich" title="Ghi hoá đơn này vào đâu" onchange="ntDoiDich(this.value)"><option value="ZL">📲 Ghi vào HĐ NCC (Zalo)</option><option value="">🏪 Ghi vào HĐ quầy</option></select><span class="nho" id="ntNguon">· nhập tay hoá đơn NCC gửi, hệ thống tự ghép với hoá đơn thu ngân</span></div><div id="ntND"></div></section>':""); taiDCZ(); if(sua){ NT=null; napLSN(); ntSan(); } }
 function taiDCZ(){ DCZLOC={tu:$("dzTu").value,den:$("dzDen").value}; goi("dcZalo",DCZLOC.tu,DCZLOC.den,Q).then(function(r){ DCZ=r; veDCZ(); }).catch(loi); }
 function quetDCZ(b){ b.disabled=true; b.innerHTML=gaTai("Đang đọc ảnh…"); goi("quetZalo").then(function(r){ b.disabled=false; b.textContent="🔄 Đọc ảnh mới";
   toast("📲 Đã đọc "+r.moi+" ảnh mới"+(r.conLai?" · còn "+r.conLai+" ảnh, bấm lại để đọc tiếp":"")+(r.loi.length?" · lỗi: "+r.loi.join("; "):""),8000); taiDCZ(); }).catch(function(e){ b.disabled=false; b.textContent="🔄 Đọc ảnh mới"; loi(e); }); }
