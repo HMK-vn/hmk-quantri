@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261103194415";
+var HMK_BAN = "20261103205645";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -1759,7 +1759,7 @@ function moDocHD(ncc){ DOCHD={ ncc:ncc||"", chay:0 };
     '<div id="dhKQ" class="dhKQ"></div><p style="text-align:right;margin:8px 0 0"><button onclick="dongMo();taiDCZ()">Xong</button></p>');
   setTimeout(function(){ var v=$("vungDan"); if(v) v.focus(); },50); }
 // Cắt 1 tờ theo khung Gemini [y0,x0,y1,x1] (thang 0–1000), chừa lề 2%
-function catKhung(img,k){ var W=img.naturalWidth||img.width, H=img.naturalHeight||img.height, l=20, y0=Math.max(0,k[0]-l)*H/1000, x0=Math.max(0,k[1]-l)*W/1000, y1=Math.min(1000,k[2]+l)*H/1000, x1=Math.min(1000,k[3]+l)*W/1000;
+function catKhungURL(img,k){ var W=img.naturalWidth||img.width, H=img.naturalHeight||img.height, l=20, y0=Math.max(0,k[0]-l)*H/1000, x0=Math.max(0,k[1]-l)*W/1000, y1=Math.min(1000,k[2]+l)*H/1000, x1=Math.min(1000,k[3]+l)*W/1000;
   var c=document.createElement("canvas"), s=Math.min(1,1800/Math.max(x1-x0,y1-y0)); c.width=Math.round((x1-x0)*s); c.height=Math.round((y1-y0)*s);
   c.getContext("2d").drawImage(img,x0,y0,x1-x0,y1-y0,0,0,c.width,c.height); return c.toDataURL("image/jpeg",0.88); }
 function danFiles(fs){ fs=[].slice.call(fs||[]).filter(function(f){ return /^image\//.test(f.type); }); if(!fs.length) return toast("Không có ảnh để dán");
@@ -1768,7 +1768,7 @@ function danFiles(fs){ fs=[].slice.call(fs||[]).filter(function(f){ return /^ima
     docFileAnh(f,2000).then(function(a){ return goi("docAnhZalo",q,"image/jpeg",a.data,DOCHD.ncc).then(function(r){
       if(!r.ds.length) throw new Error(r.thongBao||"Không đọc được hoá đơn");
       o.innerHTML='<div class="nho">'+r.ds.length+' tờ trong ảnh'+(r.thongBao?' · '+esc(r.thongBao):'')+'</div>';
-      return r.ds.reduce(function(p,h){ return p.then(function(){ var url=r.ds.length>1&&h.khung?catKhung(a.img,h.khung):a.url, dong=document.createElement("div"); dong.className="dhTo"; o.appendChild(dong);
+      return r.ds.reduce(function(p,h){ return p.then(function(){ var url=r.ds.length>1&&h.khung?catKhungURL(a.img,h.khung):a.url, dong=document.createElement("div"); dong.className="dhTo"; o.appendChild(dong);
         dong.innerHTML='<img src="'+url+'"><div>'+gaTai("Đang lưu "+esc(h.ncc||"")+"…")+'</div>';
         return goi("luuAnhZalo",h.quan||q,"image/jpeg",url.split(",")[1],h).then(function(s){ var k=nam+"-"+("0"+h.mm).slice(-2)+"-"+("0"+h.dd).slice(-2);
           if($("dzTu")&&k<$("dzTu").value) $("dzTu").value=k; if($("dzDen")&&k>$("dzDen").value) $("dzDen").value=k;
