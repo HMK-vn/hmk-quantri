@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261103183517";
+var HMK_BAN = "20261103194415";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -1308,7 +1308,7 @@ function veLuoiHD(k){ var ds=F.dsAI, cong=function(h){ return (h.dong||[]).reduc
 // Ghi 1 thẻ: thẻ từ Claude (có phiếu tạm) → duyệt phiếu; thẻ Gemini đọc → ghi thẳng hoá đơn (kèm ảnh tờ đó)
 function soHDThe(){ (F.dsAI||[]).forEach(function(x,i){ if(x.daGhi||x.dang||!x.ncc) return; laySoHD(x.ncc,ngayISO(x.ngay)||F.ngay,function(so){ x.soHDXem=so; var e=document.getElementById("soHDL"+i); if(e) e.textContent=so?"🔢 "+so:""; }); }); }
 function ghiTheL(i,btn){ var x=F.dsAI[i], dong=(x.dong||[]).filter(function(d){ return (d.nd||"").trim(); }), bao=function(m){ $("kqL"+i).innerHTML='<b class="do">⚠️ '+esc(m)+'</b>'; };
-  if(!x.ncc) return bao("Chưa có nhà cung cấp"); if(!dong.length) return bao("Chưa có dòng hàng"); if(dong.some(function(d){ return !d.ml; })) return bao("Còn dòng chưa chọn Main list");
+  if(!x.ncc&&dong.length) x.ncc=nccBQ(dong,x.ml); if(!x.ncc) return bao("Chưa có nhà cung cấp"); if(!dong.length) return bao("Chưa có dòng hàng"); if(dong.some(function(d){ return !d.ml; })) return bao("Còn dòng chưa chọn Main list");
   var p={ quan:F.quan||quanHT(), ngay:ngayISO(x.ngay)||F.ngay, ncc:x.ncc, tongGiay:x.tongGiay||"", hddt:"", ec:F.ec||"Chưa TT", ghiChu:x.ghiChu||"", anh:x.tamMa?null:(x.anhTo?{mime:"image/jpeg",data:x.anhTo}:F.anh||null), anhPhu:x.tamMa?[]:(x.anhTo2||[]), vat:(x.vat==null?vatNCC(x.ncc):x.vat), dong:dong.map(function(d){ var v=(x.vat==null?vatNCC(x.ncc):x.vat); return { nd:d.nd, sl:d.sl, dg:dgVAT(d,v), ml:d.ml, gc:gcVAT(d,v,""), ec:F.ec||"Chưa TT" }; }) };
   btn.disabled=true; btn.innerHTML=gaTai("");
   (x.tamMa?goi("duyetTam",x.tamMa,p):goiKT("luuHoaDon",p)).then(function(r){ if(x.goc) hocTuSua(x.goc,p); x.daGhi=1; x.moRong=0; x.soHD=r.soHD||r.maPhieu||""; veDsAI(); goi("canhBao","").then(capNhatChuong);
@@ -1433,6 +1433,7 @@ function ntDoi(j,b){ var k=j+b; if(k<0||k>=NT.dong.length) return; var t=NT.dong
 function ntApDung(){ var cu=NT.tlDong>=0&&NT.dong[NT.tlDong]?NT.dong[NT.tlDong].nd:"", moi=(NT.tlChuan||"").trim().toUpperCase(); if(!cu||!moi) return toast("Chọn tên ở Bước 1 và tên chuẩn ở Bước 2");
   var n=0; NT.dong.forEach(function(d){ if(bo(d.nd)===bo(cu)){ d.nd=moi; n++; } }); goi("hocDocAnh",["TÊN: "+cu+" ⇒ "+moi],quanHT()).catch(function(){}); toast("✓ Đã đồng nhất "+n+" dòng: "+cu+" → "+moi,3000); NT.tlDong=-1; NT.tlChuan=""; veNT(); }
 function ntLuu(btn){ var dong=NT.dong.filter(function(d){ return d.nd.trim(); }), bao=function(m){ $("ntKQ").innerHTML='<div class="ntLoi">⚠️ '+esc(m)+'</div>'; };
+  if(!NT.ncc&&dong.length){ var bq=nccBQ(dong,NT.ml); if(bq) NT.ncc=bq; } // điện/nước/tự đi mua… không cần NCC
   if(NT.dich==="ZL") return ntLuuZL(btn,dong,bao); if(NT.suaSo) return ntLuuSua(btn,dong,bao);
   if(!NT.ncc) return bao("Chưa nhập NCC"); if(!dong.length) return bao("Chưa có mặt hàng"); var thieuML=dong.filter(function(d){ return !(d.ml||NT.ml); })[0]; if(thieuML) return bao("Chưa chọn Main list: "+thieuML.nd); var thieu=dong.filter(function(d){ return !(Number(d.sl)>0); })[0]; if(thieu) return bao("Thiếu SL: "+thieu.nd);
   var nam=NT.nam||new Date().getFullYear(), p={ quan:quanHT(), ngay:nam+"-"+("0"+NT.mm).slice(-2)+"-"+("0"+NT.dd).slice(-2), ncc:NT.ncc, tongGiay:"", hddt:"", ec:F&&F.ec||"Chưa TT", ghiChu:"Nhập tay (pop-up)", anh:null,
@@ -1824,8 +1825,11 @@ var ICV_EMOJI={"🧾":"hoaDon","⚡":"hddt","⚡✓":"hddtCo","⚡✗":"hddtChua
 // Tiền rút gọn cho chỗ hẹp: 1.028.200 → 1,03tr · 227.100 → 227k
 function tienGon(v){ v=Number(v)||0; var a=Math.abs(v), s=v<0?"-":""; return a>=1e6?s+(Math.round(a/1e4)/100).toLocaleString("vi-VN")+"tr":a>=1e3?s+Math.round(a/1e3)+"k":s+a; }
 // NCC tích "Không cần đối chiếu" ở Danh mục → tự coi như Zalo = HĐ quầy (ô ≠ tự tích, không ghi gì thêm)
-function nccKhongDC(ncc){ var t=String(ncc||"").toUpperCase(); return ((D&&D.dm&&D.dm.ncc)||[]).some(function(n){ return n.ten===t&&n.khongDC; }); }
-function zGiong(d){ var tn=d.tn; if(tn&&!d.zl&&nccKhongDC(tn.ncc)) return { id:"", so:tn.so, quan:tn.quan, ncc:tn.ncc, ngay:tn.ngay, tong:tn.tong, dong:tn.dong, anh:"", nguon:"☑ NCC không cần đối chiếu (Danh mục NCC)", ghiChu:"", tuDong:1 }; return tn&&!d.zl&&DCZ&&DCZ.danhDau&&DCZ.danhDau["GIONG|"+tn.so]?{ id:"", so:tn.so, quan:tn.quan, ncc:tn.ncc, ngay:tn.ngay, tong:tn.tong, dong:tn.dong, anh:"", nguon:"☑ Giống HĐ quầy (xác nhận bởi "+DCZ.danhDau["GIONG|"+tn.so]+")", ghiChu:"" }:null; }
+function nccKhongDC(ncc){ var t=String(ncc||"").toUpperCase(); return laBQ(t)||((D&&D.dm&&D.dm.ncc)||[]).some(function(n){ return n.ten===t&&n.khongDC; }); }
+// 🚫 Mục bỏ qua NCC & đối chiếu (Danh mục → Main list): ĐIỆN, NƯỚC, CUNG CẤP LẺ, TỰ ĐI MUA…
+function laBQ(t){ t=String(t||"").trim().toUpperCase(); return !!t&&((D&&D.dm&&D.dm.mlBoQua)||[]).indexOf(t)>=0; }
+function nccBQ(dong,mlc){ var ms=dong.map(function(d){ return String(d.ml||mlc||"").trim().toUpperCase(); }); return ms.length&&ms.every(laBQ)?ms[0]:""; } // mọi dòng thuộc mục bỏ qua → NCC = tên mục
+function zGiong(d){ var tn=d.tn; if(tn&&!d.zl&&(nccKhongDC(tn.ncc)||nccBQ(tn.dong||[],""))) return { id:"", so:tn.so, quan:tn.quan, ncc:tn.ncc, ngay:tn.ngay, tong:tn.tong, dong:tn.dong, anh:"", nguon:laBQ(tn.ncc)||nccBQ(tn.dong||[],"")?"🚫 Mục bỏ qua đối chiếu (Danh mục → Main list)":"☑ NCC không cần đối chiếu (Danh mục NCC)", ghiChu:"", tuDong:1 }; return tn&&!d.zl&&DCZ&&DCZ.danhDau&&DCZ.danhDau["GIONG|"+tn.so]?{ id:"", so:tn.so, quan:tn.quan, ncc:tn.ncc, ngay:tn.ngay, tong:tn.tong, dong:tn.dong, anh:"", nguon:"☑ Giống HĐ quầy (xác nhận bởi "+DCZ.danhDau["GIONG|"+tn.so]+")", ghiChu:"" }:null; }
 // 🔍 Rê chuột vào nửa trên (quầy) / nửa dưới (Zalo) của ô lưới → thẻ nổi chi tiết hoá đơn số hoá
 function theHD(h,loai){ if(!h) return '<div class="nho">'+(loai==="t"?"Quầy chưa nhập hoá đơn này":"NCC chưa gửi hoá đơn qua Zalo")+'</div>';
   var cong=(h.dong||[]).reduce(function(a,x){ return a+(Number(x.tt)||0); },0), giay=loai==="t"?h.giay:h.tong;
@@ -2127,9 +2131,14 @@ var NCCDS=[];
 function veDanhMuc(){ var sua=suaDuoc("DANHMUC");
   $("noiDung").innerHTML='<div class="the bangNCCBoc"><h3>🏪 Nhà cung cấp <span class="nho">– "Viết tắt" dùng tạo Số HĐ (mặc định = chữ cái đầu mỗi từ, sửa nếu 2 NCC trùng chữ cái)</span></h3><div class="bang"><table class="bangNCC"><thead><tr><th>Nhà cung cấp</th><th>Viết tắt</th><th>Quán</th><th>Main list mặc định</th><th>MST</th><th>Tên trên MISA</th><th>Địa chỉ</th><th>Người giao</th><th>SĐT</th><th>Ghi chú</th><th>Dùng</th><th title="Tích: hoá đơn NCC này không cần đối chiếu với HĐ Zalo – Đối chiếu tự tích ô ≠ (coi như khớp)">Không cần đối chiếu</th></tr></thead><tbody id="tbNCC"><tr><td>'+gaTai("Đang tải…")+'</td></tr></tbody></table></div>'+
   (sua?'<p><button onclick="NCCDS.push([\'\',\'\',\'\',\'\',\'\',\'\',\'\',\'\',\'\',\'\',\'\',true]);veNCC()">➕ Thêm NCC</button> <button class="c" onclick="luuNCC()">💾 Lưu danh mục NCC</button></p>':"")+'</div>'+
-  '<div class="the"><h3>🗂 Main list</h3>'+D.dm.mainList.map(function(m){return '<span class="tag">'+esc(m)+'</span>';}).join("")+'<h3 style="margin-top:12px">💳 End cash</h3><div id="dsEC">'+veDsEC()+'</div>'+(sua?'<div class="hang" style="margin-top:6px"><input id="ecMoi" placeholder="Tên End cash mới (vd Momo, Thẻ…)" style="max-width:240px" onkeydown="if(event.key===\'Enter\')themEC()"><button class="c" onclick="themEC()">＋ Thêm End cash</button></div>':'')+'<p class="nho">Main list sửa trong trang tính 🗂 DM Main list. Bỏ một End cash chỉ xoá khỏi danh sách chọn, hoá đơn cũ giữ nguyên.</p></div>';
+  '<div class="the"><h3>🗂 Main list <span class="nho">· tích = 🚫 bỏ qua NCC &amp; Đối chiếu HĐ NCC (Zalo)</span></h3><div id="dsBQ">'+veDsBQ()+'</div>'+'<h3 style="margin-top:12px">💳 End cash</h3><div id="dsEC">'+veDsEC()+'</div>'+(sua?'<div class="hang" style="margin-top:6px"><input id="ecMoi" placeholder="Tên End cash mới (vd Momo, Thẻ…)" style="max-width:240px" onkeydown="if(event.key===\'Enter\')themEC()"><button class="c" onclick="themEC()">＋ Thêm End cash</button></div>':'')+'<p class="nho">Main list sửa trong trang tính 🗂 DM Main list. Bỏ một End cash chỉ xoá khỏi danh sách chọn, hoá đơn cũ giữ nguyên.</p></div>';
   goi("dsNCC").then(function(d){ NCCDS=d.filter(function(r){ return r.slice(0,11).some(function(v){ return String(v==null?"":v).trim(); }); }); veNCC(); }).catch(loi); } // bỏ dòng trống
 // 💳 Danh sách End cash: thêm mới / bỏ (✕) – chủ hoặc người có quyền Sửa Danh mục
+function veDsBQ(){ var sua=suaDuoc("DANHMUC"), bq=D.dm.mlBoQua||[], ds=D.dm.mainList.concat(bq.filter(function(t){ return !D.dm.mainList.some(function(m){ return m.toUpperCase()===t; }); }));
+  return '<div class="nho" style="margin-bottom:4px">Mục được tích: nhập hoá đơn không cần NCC (tự lấy tên mục làm NCC), không báo Thiếu NCC, Đối chiếu Zalo tự coi như khớp.</div>'+ds.map(function(m){ var on=laBQ(m), q=esc(m).replace(/'/g,"\\'");
+    return '<label class="tag" style="cursor:'+(sua?'pointer':'default')+';'+(on?'background:#fde2e1;border-color:#e57373':'')+'"><input type="checkbox" '+(on?"checked":"")+(sua?"":" disabled")+' onchange="doiBQ(\''+q+'\',this.checked)"> '+esc(m)+'</label>'; }).join("")+
+  (sua?'<div class="hang" style="margin-top:6px"><input id="bqMoi" placeholder="Mục khác (vd CUNG CẤP LẺ, TỰ ĐI MUA)" style="max-width:260px" onkeydown="if(event.key===\'Enter\')doiBQ(this.value,true)"><button class="c" onclick="doiBQ($(\'bqMoi\').value,true)">＋ Thêm mục</button></div>':''); }
+function doiBQ(t,bat){ t=String(t||"").trim(); if(!t) return toast("Nhập tên mục"); goi("suaBoQua",bat?"them":"bo",t).then(function(ds){ D.dm.mlBoQua=ds; $("dsBQ").innerHTML=veDsBQ(); toast(bat?"🚫 "+t+": bỏ qua NCC & đối chiếu":"Đã tắt bỏ qua "+t); }).catch(loi); }
 function veDsEC(){ var sua=suaDuoc("DANHMUC"); return D.dm.endCash.map(function(m){ return '<span class="tag">'+esc(m)+(sua?' <a href="#" class="ecBo" title="Bỏ khỏi danh sách chọn" onclick="boEC(\''+esc(m).replace(/'/g,"\\'")+'\');return false">✕</a>':'')+'</span>'; }).join(""); }
 function themEC(){ var o=$("ecMoi"), t=o.value.trim(); if(!t) return toast("Nhập tên End cash"); goi("suaEndCash","them",t).then(function(ds){ D.dm.endCash=ds; o.value=""; $("dsEC").innerHTML=veDsEC(); toast("✅ Đã thêm End cash "+t); }).catch(loi); }
 function boEC(t){ hoiMo("Bỏ End cash <b>"+esc(t)+"</b> khỏi danh sách chọn?<br><span class='nho'>Hoá đơn đã ghi End cash này vẫn giữ nguyên.</span>",function(){ goi("suaEndCash","bo",t).then(function(ds){ D.dm.endCash=ds; $("dsEC").innerHTML=veDsEC(); toast("Đã bỏ "+t); }).catch(loi); }); }
@@ -2280,7 +2289,7 @@ var CFG_MPL = { tieuDe:"📤 Upload Main pay list (Excel / CSV / dán)",
   batBuoc:["nd"], cot:[["ngayX","Ngày"],["soHD","Số HĐ"],["nd","Nội dung"],["ncc","NCC"],["ml","Main list"],["sl","SL"],["dg","Đơn giá",1],["tt","Thành tiền",1],["ec","End cash"]],
   chuanHoa:function(ds){ return ds.map(function(o){ var n=layNgay(o), x={ nam:n?n.nam:"", dd:n?n.dd:"", mm:n?n.mm:"", ngayX:n?n.dd+"/"+n.mm:"", soHD:String(o.soHD||"").trim(), num:o.num, nd:String(o.nd||"").trim().toUpperCase(),
     ncc:String(o.ncc||"").trim().toUpperCase(), hddt:o.hddt, ml:String(o.ml||"").trim(), sl:o.sl, dg:o.dg, tt:o.tt, ec:String(o.ec||"").trim(), gc:o.gc };
-    var l=[]; if(!n) l.push("thiếu ngày"); if(!x.nd) l.push("thiếu nội dung"); if(!x.ncc&&!x.soHD) l.push("thiếu NCC"); if(!x.ml) l.push("thiếu Main list"); if(x.sl===""&&x.tt==="") l.push("thiếu SL/tiền");
+    var l=[]; if(!n) l.push("thiếu ngày"); if(!x.nd) l.push("thiếu nội dung"); if(!x.ncc&&!x.soHD&&!laBQ(x.ml)) l.push("thiếu NCC"); if(!x.ml) l.push("thiếu Main list"); if(x.sl===""&&x.tt==="") l.push("thiếu SL/tiền");
     if(typeof x.tt!=="number" && x.tt!=="") x.tt=+String(x.tt).replace(/[^\d\-]/g,"")||0; if(typeof x.dg!=="number" && x.dg!=="") x.dg=+String(x.dg).replace(/[^\d\-]/g,"")||0;
     if(l.length) x._loi=l.join(", "); return x; }); },
   ghi:function(quan, ds){ return goi("uploadMPL", quan, ds); }, xong:function(){ if(TAB==="MPL") taiMPL(); } };
