@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261103183102";
+var HMK_BAN = "20261103183517";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -964,7 +964,7 @@ function veNhap(){ setTimeout(capNhatNhanQuan,0); setTimeout(kiemDocSan,0);
   '<div class="nhapNut"><button class="nutGa c" onclick="'+(D.aiBat?"docAI()":"danGemini()")+'" '+(D.aiBat&&!F.anh?"disabled":"")+' id="nutAI" title="Trợ lý Gà đọc ảnh thành thẻ hoá đơn">'+gaHTML("gaNut")+(D.aiBat?"Trợ lý Gà đọc HĐ":"Gemini")+'</button>'+
   '<a class="nutClaude" href="'+CLAUDE_DOC+'" target="_blank" rel="noopener" onclick="return moClaudeNoi()" title="Mở Claude Đọc Hoá Đơn – đọc chữ tay khó chuẩn hơn, xong bấm 📤 Sang web">🤖 Claude đọc</a></div>'+
   '<div class="nho nhapPhu"><button class="nutLink" onclick="var k=document.getElementById(\'ntKhung\');if(k){k.scrollIntoView({behavior:\'smooth\'});var o=k.querySelector(\'tbody input\');if(o)setTimeout(function(){o.focus();},350);}">'+gaGhi()+' Nhập tay</button><button class="nutLink" id="nutOCR" onclick="docOCR(this)" '+(F.anh?"":"hidden")+' title="Đọc miễn phí bằng OCR Google Drive">🔍 OCR</button>'+
-  '<button class="nutLink" onclick="var e=$(\'oDanKhung\');e.style.display=e.style.display?\'\':\'none\'">📋 Dán</button><button class="nutLink" onclick="F=hdMoi();veNhap()" title="Làm mới">🧹 Mới</button>'+(F.duyetMa?'<span class="tag">📥 '+F.duyetMa+'</span>':"")+'</div>'+
+  '<button class="nutLink" onclick="var e=$(\'oDanKhung\');e.style.display=e.style.display?\'\':\'none\'">📋 Dán</button><button class="nutLink" onclick="F=hdMoi();veNhap()" title="Làm mới">🧹 Mới</button><button class="nutLink" onclick="try{localStorage.setItem(\'hmk_quet\',quetBat()?\'0\':\'1\')}catch(e){};this.innerHTML=quetBat()?\'✂️ Tự cắt: Bật\':\'✂️ Tự cắt: Tắt\'" title="Quét thông minh: tự cắt đúng khung hoá đơn khi chọn / dán ảnh">'+(quetBat()?'✂️ Tự cắt: Bật':'✂️ Tự cắt: Tắt')+'</button>'+(F.duyetMa?'<span class="tag">📥 '+F.duyetMa+'</span>':"")+'</div>'+
   '<div style="display:none" id="oDanKhung" class="oDan"><textarea id="oDanClaude" rows="3" placeholder="📋 Dán kết quả Claude / Gemini (⌘V)" onpaste="setTimeout(danNhanh,30)"></textarea><button onclick="danNhanh()">➜ Tách thành thẻ</button></div></section>'+
   '<section class="the nhapPhai" id="ketQua"><div class="ketQuaDau"><b>Kết quả</b></div><div class="nho rongKQ" id="rongKQ">Kết quả hiện ở đây: mỗi hoá đơn 1 thẻ kèm ảnh. Dòng tô vàng là số máy đã tự sửa, thẻ viền cam cần soát lại trước khi ghi.</div></section></div>'+
   '<section class="ntInline" id="ntKhung"><div class="ntDau"><b>'+gaGhi()+' NHẬP HÓA ĐƠN CHI TIẾT</b><span class="nho" id="ntNguon"></span></div><div id="ntND"></div></section>'+
@@ -1025,8 +1025,29 @@ function veTong(){ var tong=0, theoML={};
     var f=[].filter.call(e.dataTransfer.files||[],laAnh); if(f.length) nhan(f); else toast("Chỉ nhận file ảnh"); });
   document.addEventListener("paste",function(e){ if(!vung()||/INPUT|TEXTAREA/.test((e.target||{}).tagName)) return;
     var f=[].map.call((e.clipboardData||{}).items||[],function(i){ return i.kind==="file"?i.getAsFile():null; }).filter(laAnh); if(f.length){ e.preventDefault(); nhan(f); } }); })();
-function docFileAnh(f,max){ return new Promise(function(ok){ var rd=new FileReader(); rd.onload=function(){ var img=new Image(); img.onload=function(){ var k=Math.min(1,max/Math.max(img.width,img.height)), c=document.createElement("canvas"); c.width=img.width*k; c.height=img.height*k;
-  c.getContext("2d").drawImage(img,0,0,c.width,c.height); var u=c.toDataURL("image/jpeg",0.85); ok({ url:u, data:u.split(",")[1], img:img }); }; img.src=rd.result; }; rd.readAsDataURL(f); }); }
+// 📐 QUÉT THÔNG MINH: tìm vùng giấy (sáng, ít màu) lớn nhất trong ảnh → tự cắt đúng khung hoá đơn (giữ mọi tờ nếu chụp nhiều tờ) + tăng tương phản nhẹ như máy quét.
+// Không chắc (giấy chiếm gần hết ảnh / quá nhỏ) thì giữ nguyên ảnh. Tắt/bật bằng nút ✂️ ở Nhập hoá đơn (nhớ máy: hmk_quet).
+function quetBat(){ try{ return localStorage.getItem("hmk_quet")!=="0"; }catch(e){ return true; } }
+function quetGiay(src){ var W=src.naturalWidth||src.width, H=src.naturalHeight||src.height, k=Math.min(1,320/Math.max(W,H)), w=Math.max(8,Math.round(W*k)), h=Math.max(8,Math.round(H*k));
+  var c=document.createElement("canvas"); c.width=w; c.height=h; var x=c.getContext("2d"); x.drawImage(src,0,0,w,h); var p=x.getImageData(0,0,w,h).data, L=new Float32Array(w*h), S=new Float32Array(w*h), hist=new Array(256).fill(0);
+  for(var i=0;i<w*h;i++){ var r=p[i*4],g=p[i*4+1],b=p[i*4+2], mx=Math.max(r,g,b), mn=Math.min(r,g,b); L[i]=(r*299+g*587+b*114)/1000; S[i]=mx?(mx-mn)/mx:0; hist[Math.round(L[i])]++; }
+  // ngưỡng Otsu cho độ sáng
+  var tong=w*h, sum=0, sB=0, wB=0, tot=0, nguong=128; for(var t=0;t<256;t++) sum+=t*hist[t]; var best=0; for(t=0;t<256;t++){ wB+=hist[t]; if(!wB) continue; var wF=tong-wB; if(!wF) break; sB+=t*hist[t]; var mB=sB/wB, mF=(sum-sB)/wF, v=wB*wF*(mB-mF)*(mB-mF); if(v>best){ best=v; nguong=t; } }
+  var m=new Uint8Array(w*h); for(i=0;i<w*h;i++) m[i]=L[i]>Math.max(nguong,110)&&S[i]<0.28?1:0;
+  // các mảng giấy liền nhau (BFS), giữ mảng ≥ 6% ảnh
+  var nhan=new Int32Array(w*h).fill(-1), vung=[]; for(i=0;i<w*h;i++){ if(!m[i]||nhan[i]>=0) continue; var q=[i], id=vung.length, o={n:0,x0:w,y0:h,x1:0,y1:0}; nhan[i]=id;
+    while(q.length){ var j=q.pop(), xx=j%w, yy=(j-xx)/w; o.n++; if(xx<o.x0)o.x0=xx; if(xx>o.x1)o.x1=xx; if(yy<o.y0)o.y0=yy; if(yy>o.y1)o.y1=yy;
+      [j-1,j+1,j-w,j+w].forEach(function(z,d){ if(z<0||z>=w*h||nhan[z]>=0||!m[z]) return; if(d<2&&Math.floor(z/w)!==yy) return; nhan[z]=id; q.push(z); }); }
+    vung.push(o); }
+  var lon=vung.filter(function(o){ return o.n>=tong*0.06; }); if(!lon.length) return null;
+  var b={x0:w,y0:h,x1:0,y1:0}; lon.forEach(function(o){ b.x0=Math.min(b.x0,o.x0); b.y0=Math.min(b.y0,o.y0); b.x1=Math.max(b.x1,o.x1); b.y1=Math.max(b.y1,o.y1); });
+  var dt=(b.x1-b.x0+1)*(b.y1-b.y0+1); if(dt>tong*0.93||dt<tong*0.08) return null; // giấy đã kín ảnh hoặc quá nhỏ → giữ nguyên
+  var le=0.02, X0=Math.max(0,(b.x0/w-le))*W, Y0=Math.max(0,(b.y0/h-le))*H, X1=Math.min(1,((b.x1+1)/w+le))*W, Y1=Math.min(1,((b.y1+1)/h+le))*H;
+  var o2=document.createElement("canvas"); o2.width=Math.round(X1-X0); o2.height=Math.round(Y1-Y0); var x2=o2.getContext("2d"); x2.filter="contrast(1.12) brightness(1.04)"; x2.drawImage(src,X0,Y0,X1-X0,Y1-Y0,0,0,o2.width,o2.height);
+  return o2; }
+function docFileAnh(f,max){ return new Promise(function(ok){ var rd=new FileReader(); rd.onload=function(){ var img=new Image(); img.onload=function(){ var nguon=img, cat=null; if(quetBat()) try{ cat=quetGiay(img); if(cat){ nguon=cat; toast("✂️ Đã tự cắt đúng khung hoá đơn (tắt ở nút ✂️ nếu không muốn)",2500); } }catch(e){}
+  var W0=nguon.naturalWidth||nguon.width, H0=nguon.naturalHeight||nguon.height, k=Math.min(1,max/Math.max(W0,H0)), c=document.createElement("canvas"); c.width=W0*k; c.height=H0*k;
+  c.getContext("2d").drawImage(nguon,0,0,c.width,c.height); var u=c.toDataURL("image/jpeg",0.85); ok({ url:u, data:u.split(",")[1], img:nguon }); }; img.src=rd.result; }; rd.readAsDataURL(f); }); }
 // Chọn 1 hay nhiều ảnh (mỗi ảnh 1 tờ là nhanh + chuẩn nhất) – xong tự đọc: có khoá Gemini → AI; không → OCR miễn phí
 // Ảnh iPhone HEIC/HEIF: trình duyệt máy tính không đọc được → tự đổi sang JPEG (thư viện heic2any, chỉ tải khi cần)
 var HEIC_LIB=null;
