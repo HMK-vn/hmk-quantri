@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261103101558";
+var HMK_BAN = "20261103101731";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -568,6 +568,7 @@ html.coHop,html.coHop body{overflow:hidden!important;overscroll-behavior:none}.m
 .tlKy{display:inline-flex;align-items:center;gap:4px}.tlKy select{font-weight:700;padding:6px 8px}.tlChip{font-size:13px;padding:6px 10px}.tlNCCBoc select{max-width:220px;padding:6px 8px}
 .kpi.kpiGon{display:flex!important;flex-wrap:nowrap;overflow-x:auto}.kpi.kpiGon div{flex:1 0 118px;padding:8px 12px!important}.kpi.kpiGon small{font-size:10.5px;white-space:nowrap}.kpi.kpiGon b{font-size:22px!important}
 </style><style>/* 🧾 Hoá đơn – NCC · lưới đối chiếu */
+.lwBang table{width:auto!important;table-layout:fixed}.lwBang th.lwNCC,.lwBang td.lwNCC{width:120px;min-width:120px;max-width:120px}.lwBang th:not(.lwNCC):not(.trong){width:var(--lwW);min-width:var(--lwW)}.lwBang .lwO{width:100%;box-sizing:border-box}.lwBang .lwChu{min-width:60px}.lwBang .lwHang{flex-wrap:nowrap}
 .kpi.kpiIc{display:flex!important;flex-wrap:wrap;gap:6px;grid-template-columns:none!important}.kpi.kpiIc>div{display:inline-flex!important;align-items:center;gap:6px;padding:5px 11px!important;min-height:0!important;border-radius:10px;flex:0 0 auto;width:auto!important}.kpi.kpiIc>div small{font-size:15px!important;margin:0!important}.kpi.kpiIc>div b{font-size:16px!important;line-height:1.2}
 .icLoc button{font-size:15px;padding:5px 10px!important;min-width:40px}.icSo{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border:1px solid #e5ddd2;border-radius:10px;background:#fff;font-size:14px;white-space:nowrap}.icSo b{font-size:16px}#tlKpi.kpi{display:flex!important;flex-wrap:wrap;gap:6px}
 .segDCZ button{font-size:14px}.dauDCZ .segDCZ button{font-size:14px;padding:5px 10px}.icNut{font-size:15px}
@@ -626,6 +627,10 @@ html.coHop,html.coHop body{overflow:hidden!important;overscroll-behavior:none}.m
 .lwBang .lwTTTT{background:#cfe3f7;color:#1e3a5f;text-align:center;font-weight:700;font-size:9.5px;padding:1px 4px;text-transform:uppercase;border-top:1.5px solid #1e3a5f}.lwBang .lwNut{margin-top:2px}.lwBang .lwNut button{font-size:10px;padding:1px 7px;border-radius:10px;border:1.3px solid #1e3a5f;background:#eef5fc}
 .danAnh{padding:8px 10px!important}.danAnh .hang{margin:0}.vungDan{padding:8px!important;margin-top:4px!important}.vungDan>div:first-child{display:none}
 .hdXem{display:inline-flex;gap:4px;margin-left:10px;padding:3px;border-radius:12px;background:var(--giay,#f6f1ea);border:1px solid var(--vien2,#e5ddd2);vertical-align:middle;flex-wrap:wrap}.hdXem button{font-size:13px;padding:5px 11px;border-radius:9px;border:0;background:transparent;font-family:inherit}.hdXem button.on{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.15);font-weight:700}
+
+/* Cỡ chữ ô lưới co giãn theo bề rộng cột (--lwW): ô rộng chữ to, ô hẹp chữ nhỏ */
+.lwBang .lwO{font-size:clamp(9px,calc(var(--lwW,220px) / 20),13.5px)}.lwBang .lwChip{font-size:.92em;line-height:1.5}.lwBang .lwDau .lwSo{font-size:.85em}.lwBang .lwChu a{font-size:1.12em}
+.lwBang .lwKC{font-size:.88em;min-width:4.6em}.lwBang .lwBa i{width:1.35em;height:1.35em;font-size:.9em}.lwBang .lwZalo{font-size:.75em}.lwBang .lwTTTT{font-size:.82em}.lwBang .lwTTTT .lwDT{font-size:.92em}.lwBang .lwDai{font-size:.85em}.lwBang .lwNut button{font-size:.95em}
 </style>
 </head><body class="misa"><script>try{ window.top.postMessage({ hmk:"song" },"*"); }catch(e){}</script>
 <div id="dangNhap" class="login an">
@@ -1778,7 +1783,7 @@ function veLuoiDCZ(r,ds,sua){ var a=new Date(DCZLOC.tu+"T12:00:00"), b=new Date(
   var nccs=(r.theoNCC||[]).filter(function(g){ return coNCC[g.quan+"|"+g.ncc]; }), o={};
   // Bề rộng 1 cột ngày = (khung − cột NCC) / số cột chọn; 1 ngày thì cột ngày chiếm hết
   var khung=($("dzKQ").clientWidth||900)-140, soCoNgay=0, wCot;
-  var coNgay={}; ds.forEach(function(d){ var x=d.tn||d.zl, k=x.quan+"|"+x.ncc+"|"+x.ngay; (o[k]=o[k]||[]).push(d); coNgay[x.ngay]=1; }); ngay.forEach(function(n){ if(coNgay[n]) soCoNgay++; }); var rongNg=khung-(ngay.length-soCoNgay)*24; wCot=Math.max(120,Math.floor(rongNg/soCotHL(rongNg,190,soCoNgay||1)));
+  var coNgay={}; ds.forEach(function(d){ var x=d.tn||d.zl, k=x.quan+"|"+x.ncc+"|"+x.ngay; (o[k]=o[k]||[]).push(d); coNgay[x.ngay]=1; }); ngay.forEach(function(n){ if(coNgay[n]) soCoNgay++; }); var rongNg=khung-(ngay.length-soCoNgay)*24; wCot=Math.max(SOCOT>=5?150:210,Math.floor(rongNg/soCotHL(rongNg,230,soCoNgay||1)));
   var IC={khop:"✅",lech:"❌",lechMon:"❗",chiTN:"❗",chiZL:"❗"}, mau={khop:"#1f8a4c",lech:"#c0392b",lechMon:"#b7791f",chiTN:"#b7791f",chiZL:"#b7791f"};
   // Ô theo hình chủ vẽ: dải dọc trái = khớp / chênh 2 bên; mỗi nửa = [Tên NCC · Số HĐ · Số tiền] [✗ ✓ !] [Khớp/Chênh] + dải TRẠNG THÁI THANH TOÁN
   var kc=function(c){ return c===""||c==null?'':Math.abs(c)<(r.lech||1000)?'<b class="lwOk">Khớp</b>':'<b class="do">Chênh<br>'+(c>0?"+":"")+tienVN(c)+'</b>'; };
