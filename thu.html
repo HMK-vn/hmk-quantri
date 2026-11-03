@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261103101731";
+var HMK_BAN = "20261103101836";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -631,6 +631,12 @@ html.coHop,html.coHop body{overflow:hidden!important;overscroll-behavior:none}.m
 /* Cỡ chữ ô lưới co giãn theo bề rộng cột (--lwW): ô rộng chữ to, ô hẹp chữ nhỏ */
 .lwBang .lwO{font-size:clamp(9px,calc(var(--lwW,220px) / 20),13.5px)}.lwBang .lwChip{font-size:.92em;line-height:1.5}.lwBang .lwDau .lwSo{font-size:.85em}.lwBang .lwChu a{font-size:1.12em}
 .lwBang .lwKC{font-size:.88em;min-width:4.6em}.lwBang .lwBa i{width:1.35em;height:1.35em;font-size:.9em}.lwBang .lwZalo{font-size:.75em}.lwBang .lwTTTT{font-size:.82em}.lwBang .lwTTTT .lwDT{font-size:.92em}.lwBang .lwDai{font-size:.85em}.lwBang .lwNut button{font-size:.95em}
+
+/* 👩‍🍳 Phiếu báo bếp trên màn hình: dòng thấp, ô nhập nhỏ, chữ co theo bề ngang để thấy đủ cột + nhiều dòng (bản in giữ kiểu riêng) */
+@media screen{.bangBep{width:100%;border-collapse:collapse;table-layout:auto;font-size:clamp(11px,1vw,13.5px)}.bangBep th,.bangBep td{padding:2px 6px!important;line-height:1.25;height:auto!important;vertical-align:middle}
+ .bangBep th{font-size:.88em;white-space:normal;line-height:1.15;position:sticky;top:0;z-index:1;background:#f3efe9}.bangBep td:nth-child(2){font-size:.85em;color:#9a8a7c}.bangBep td:nth-child(3){white-space:nowrap}
+ .bangBep input{width:4.8em!important;height:1.9em;padding:1px 4px!important;font-size:1em!important;border:1px solid #d9c9b8!important;border-radius:6px;text-align:right}.bangBep input[type=text]{width:7em!important;text-align:left}.bangBep tr:nth-child(even) td{background:#fcfaf7}}
+@media screen and (max-width:700px){.bangBep th:nth-child(1),.bangBep td:nth-child(1),.bangBep th:nth-child(2),.bangBep td:nth-child(2){display:none}.bangBep{font-size:11px}.bangBep input{width:3.8em!important}.bangBep td:nth-child(3){white-space:normal;min-width:7em}}
 </style>
 </head><body class="misa"><script>try{ window.top.postMessage({ hmk:"song" },"*"); }catch(e){}</script>
 <div id="dangNhap" class="login an">
