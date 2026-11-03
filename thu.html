@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261103102804";
+var HMK_BAN = "20261103103028";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -644,6 +644,8 @@ html.coHop,html.coHop body{overflow:hidden!important;overscroll-behavior:none}.m
 
 /* ◀ ▶ gọn, không chiếm chỗ */
 .segDCZ button:first-child:not(.icCot),.segDCZ button:last-child:not(.icCot){padding:4px 7px!important;font-size:11px;min-width:0}.tlKy button.icon{width:28px!important;min-width:28px!important;height:30px;padding:0!important;font-size:11px;border-radius:8px}.tlKy select{padding:4px 8px;height:30px}
+
+.lwBang .lwDai{font-size:.9em;letter-spacing:.2px;padding:3px 2px}.lwBang .lwDT{max-width:9em;overflow:hidden;text-overflow:ellipsis}
 </style>
 </head><body class="misa"><script>try{ window.top.postMessage({ hmk:"song" },"*"); }catch(e){}</script>
 <div id="dangNhap" class="login an">
@@ -1769,6 +1771,8 @@ var ICV={
 function icv(t,lon){ var v=ICV[t]; return v?'<svg class="icv'+(lon?' lon':'')+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+v+'</svg>':''; }
 // emoji cũ ở ô số → icon vẽ tay tương ứng
 var ICV_EMOJI={"🧾":"hoaDon","⚡":"hddt","⚡✓":"hddtCo","⚡✗":"hddtChua","⏳":"cho","🔴":"lech","✔":"xacNhan","✅":"xacNhan","📈":"tyLe","🟢":"khop","🟡":"lechMon","📲":"zalo","🙈":"an","🗓":"luoi","🏪":"ncc","📃":"ds","📌":"ghim","✖":"chuaXN","💳":"quay","💰":"lechTien","📄":"hoaDon"};
+// Tiền rút gọn cho chỗ hẹp: 1.028.200 → 1,03tr · 227.100 → 227k
+function tienGon(v){ v=Number(v)||0; var a=Math.abs(v), s=v<0?"-":""; return a>=1e6?s+(Math.round(a/1e4)/100).toLocaleString("vi-VN")+"tr":a>=1e3?s+Math.round(a/1e3)+"k":s+a; }
 function zGiong(d){ var tn=d.tn; return tn&&!d.zl&&DCZ&&DCZ.danhDau&&DCZ.danhDau["GIONG|"+tn.so]?{ id:"", so:tn.so, quan:tn.quan, ncc:tn.ncc, ngay:tn.ngay, tong:tn.tong, dong:tn.dong, anh:"", nguon:"☑ Giống HĐ quầy (xác nhận bởi "+DCZ.danhDau["GIONG|"+tn.so]+")", ghiChu:"" }:null; }
 // 🔍 Rê chuột vào nửa trên (quầy) / nửa dưới (Zalo) của ô lưới → thẻ nổi chi tiết hoá đơn số hoá
 function theHD(h,loai){ if(!h) return '<div class="nho">'+(loai==="t"?"Quầy chưa nhập hoá đơn này":"NCC chưa gửi hoá đơn qua Zalo")+'</div>';
@@ -1835,8 +1839,8 @@ function veLuoiDCZ(r,ds,sua){ var a=new Date(DCZLOC.tu+"T12:00:00"), b=new Date(
     if(giong){ z=giong; tt="khop"; ch=0; }
     var sumZ=z&&z.dong&&z.dong.length?z.dong.reduce(function(a,x){ return a+(Number(x.tt)||0); },0):"", cTN=tn&&tn.giay!==""&&tn.giay!=null?tn.giay-tn.tong:"", cZ=z&&sumZ!==""?z.tong-sumZ:"";
     // Dải dưới cùng (gộp 1 chỗ): trạng thái thanh toán · ⚡ hoá đơn điện tử
-    var duoi='<div class="lwTTTT">'+(tn?ecNut(tn.so,tn.ec):'<span>'+esc(z&&z.ghiChu||"Chưa rõ thanh toán")+'</span>')+(tn?'<span class="lwDT '+(tn.hddt?'co':'')+'" title="Hoá đơn điện tử'+(tn.hddt?': '+esc(tn.hddt):' – chưa có')+'">⚡ '+(tn.hddt?'HĐĐT':'Chưa HĐĐT')+'</span>':'')+'</div>';
-    return '<div class="lwO" style="--lw:'+mau[tt]+'"><div class="lwDai" onclick="soSanhDCZ('+i+')" title="Bấm xem so sánh từng dòng 2 bên">'+(tn&&(!d.zl||giong)?'<label class="lwGiong" title="Hoá đơn Zalo giống hoá đơn nhập hằng ngày" onclick="event.stopPropagation()"><input type="checkbox"'+(giong?' checked':'')+(sua?'':' disabled')+' onchange="danhDauDCZ(\'GIONG|'+esc(tn.so).replace(/'/g,"")+'\',this.checked)"></label>':'')+'<span>'+(tt==="khop"?"Khớp":"Chênh "+(ch>0?"+":"")+tienVN(ch))+'</span>'+'</div><div class="lwThan">'+
+    var duoi='<div class="lwTTTT">'+(tn?ecNut(tn.so,tn.ec):'<span>'+esc(z&&z.ghiChu||"Chưa rõ thanh toán")+'</span>')+(tn?'<span class="lwDT '+(tn.hddt?'co':'')+'" title="Hoá đơn điện tử'+(tn.hddt?': '+esc(tn.hddt):' – chưa có')+'">⚡ '+(tn.hddt?esc(tn.hddt):'Chưa HĐĐT')+'</span>':'')+'</div>';
+    return '<div class="lwO" style="--lw:'+mau[tt]+'"><div class="lwDai" onclick="soSanhDCZ('+i+')" title="Bấm xem so sánh từng dòng 2 bên">'+(tn&&(!d.zl||giong)?'<label class="lwGiong" title="Hoá đơn Zalo giống hoá đơn nhập hằng ngày" onclick="event.stopPropagation()"><input type="checkbox"'+(giong?' checked':'')+(sua?'':' disabled')+' onchange="danhDauDCZ(\'GIONG|'+esc(tn.so).replace(/'/g,"")+'\',this.checked)"></label>':'')+'<span title="'+(tt==="khop"?"Khớp":"Chênh "+(ch>0?"+":"")+tienVN(ch)+" đ")+'">'+(tt==="khop"?"✓":"≠ "+tienGon(ch))+'</span>'+'</div><div class="lwThan">'+
       '<div class="lwDau">'+theNCC((tn||z).ncc)+'<span class="lwSo">'+esc((tn&&tn.so)||(z&&z.so)||"")+'</span></div>'+
       '<div class="lwNua" data-hv="t'+i+'"><div class="lwHang"><div class="lwChu">'+(tn?'<a href="#" onclick="moHD(\''+esc(tn.so)+'\');return false">'+tienVN(tn.tong)+'</a>':'<span class="nho">Quầy chưa nhập</span>')+'</div>'+
         (tn?ba(cTN===""?null:Math.abs(cTN)<(r.lech||1000),"TN|"+tn.so):'')+'<div class="lwKC">'+(tn?kc(cTN):'')+'</div></div></div>'+
