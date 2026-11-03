@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261103103634";
+var HMK_BAN = "20261103123206";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -2073,12 +2073,12 @@ function tuChoi(ma){ hoiChu("Lý do từ chối phiếu "+ma+":","",function(ly)
 // ---------- 📚 DANH MỤC ----------
 var NCCDS=[];
 function veDanhMuc(){ var sua=suaDuoc("DANHMUC");
-  $("noiDung").innerHTML='<div class="the"><h3>🏪 Nhà cung cấp <span class="nho">– "Viết tắt" dùng tạo Số HĐ (mặc định = chữ cái đầu mỗi từ, sửa nếu 2 NCC trùng chữ cái)</span></h3><div class="bang"><table><thead><tr><th>Nhà cung cấp</th><th>Viết tắt</th><th>Quán</th><th>Main list mặc định</th><th>End cash</th><th>MST</th><th>Tên trên MISA</th><th>Địa chỉ</th><th>Người giao</th><th>SĐT</th><th>Ghi chú</th><th>Dùng</th></tr></thead><tbody id="tbNCC"><tr><td>'+gaTai("Đang tải…")+'</td></tr></tbody></table></div>'+
+  $("noiDung").innerHTML='<div class="the"><h3>🏪 Nhà cung cấp <span class="nho">– "Viết tắt" dùng tạo Số HĐ (mặc định = chữ cái đầu mỗi từ, sửa nếu 2 NCC trùng chữ cái)</span></h3><div class="bang"><table><thead><tr><th>Nhà cung cấp</th><th>Viết tắt</th><th>Quán</th><th>Main list mặc định</th><th>MST</th><th>Tên trên MISA</th><th>Địa chỉ</th><th>Người giao</th><th>SĐT</th><th>Ghi chú</th><th>Dùng</th></tr></thead><tbody id="tbNCC"><tr><td>'+gaTai("Đang tải…")+'</td></tr></tbody></table></div>'+
   (sua?'<p><button onclick="NCCDS.push([\'\',\'\',\'\',\'\',\'\',\'\',\'\',\'\',\'\',\'\',\'\',true]);veNCC()">➕ Thêm NCC</button> <button class="c" onclick="luuNCC()">💾 Lưu danh mục NCC</button></p>':"")+'</div>'+
   '<div class="the"><h3>🗂 Main list</h3>'+D.dm.mainList.map(function(m){return '<span class="tag">'+esc(m)+'</span>';}).join("")+'<h3 style="margin-top:12px">💳 End cash</h3>'+D.dm.endCash.map(function(m){return '<span class="tag">'+esc(m)+'</span>';}).join("")+'<p class="nho">Sửa trực tiếp trong trang tính 🗂 DM Main list.</p></div>';
   goi("dsNCC").then(function(d){ NCCDS=d; veNCC(); }).catch(loi); }
 function veNCC(){ var sua=suaDuoc("DANHMUC");
-  $("tbNCC").innerHTML=NCCDS.map(function(r,i){ return '<tr>'+r.map(function(v,j){ if(j===11) return '<td><input type="checkbox" '+(v!==false?"checked":"")+(sua?"":" disabled")+' onchange="NCCDS['+i+'][11]=this.checked"></td>';
+  $("tbNCC").innerHTML=NCCDS.map(function(r,i){ return '<tr>'+r.map(function(v,j){ if(j===4) return ""; /* End cash không gắn với NCC – ẩn cột, giữ dữ liệu cũ */ if(j===11) return '<td><input type="checkbox" '+(v!==false?"checked":"")+(sua?"":" disabled")+' onchange="NCCDS['+i+'][11]=this.checked"></td>';
     return '<td><input '+(sua?"":"disabled ")+'value="'+esc(v)+'" onchange="NCCDS['+i+']['+j+']=this.value" style="min-width:'+(j===0||j===7?170:80)+'px"></td>'; }).join("")+'</tr>'; }).join(""); }
 function luuNCC(){ goi("luuNCC",NCCDS).then(function(){ toast("✅ Đã lưu danh mục NCC"); return goi("khoiDong"); }).then(function(d){ D.dm=d.dm; }).catch(loi); }
 
