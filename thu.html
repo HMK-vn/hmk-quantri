@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261103212057";
+var HMK_BAN = "20261103213233";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -1962,12 +1962,14 @@ function luuHD(){ docForm(); var p=JSON.parse(JSON.stringify(F)); delete p.dsAI;
 
 // ---------- 📋 MAIN PAY LIST ----------
 // ---------- 📑 HOÁ ĐƠN TRONG NGÀY: tổng hợp chi phí theo NCC & số hoá đơn ----------
-var HDN={ tu:"", den:"" };
+var HDN={ tu:"", den:"", theo:(function(){ try{ return localStorage.getItem("hmk_hnTheo")||""; }catch(e){ return ""; } })() };
+function hnTheo(v){ HDN.theo=v; try{ localStorage.setItem("hmk_hnTheo",v); }catch(e){} veHDNgay(); }
 function veHDNgay(){ if(!HDN.tu){ HDN.tu=HDN.den=homNay(); }
   $("noiDung").innerHTML='<div class="the"><div class="hang" style="gap:8px;align-items:end">'+
     (HDN.khoang?'':'<button onclick="hnLui(-1)" title="Ngày trước">◀</button>')+'<label>'+(HDN.khoang?'📅 Từ':'📅 Ngày')+'<input type="date" id="hnNgay" value="'+HDN.tu+'" onchange="taiHDNgay()"></label>'+(HDN.khoang?'<label>Đến<input type="date" id="hnDen" value="'+HDN.den+'" onchange="taiHDNgay()"></label>':'<button onclick="hnLui(1)" title="Ngày sau">▶</button>')+
     '<button onclick="HDN.khoang=!HDN.khoang;if(!HDN.khoang)HDN.den=HDN.tu;veHDNgay()">'+(HDN.khoang?'📅 Xem 1 ngày':'📆 Khoảng ngày')+'</button>'+
-    '<span class="hang" style="gap:6px"><button onclick="hnNhanh(0)">Hôm nay</button><button onclick="hnNhanh(1)">Hôm qua</button></span><span class="nho" id="hnTT"></span></div></div>'+
+    '<span class="hang" style="gap:6px"><button onclick="hnNhanh(0)">Hôm nay</button><button onclick="hnNhanh(1)">Hôm qua</button></span>'+
+    '<span class="hang" style="gap:0" title="Lọc theo ngày ghi trên hoá đơn, hay theo lúc nhập liệu vào hệ thống"><button class="'+(HDN.theo?'':'c')+'" onclick="hnTheo(\'\')">🗓 Theo ngày HĐ</button><button class="'+(HDN.theo?'c':'')+'" onclick="hnTheo(\'nhap\')">⏱ Theo giờ nhập</button></span><span class="nho" id="hnTT"></span></div></div>'+
     '<div class="kpi" id="hnKpi"></div><div class="hnLuoi"><div class="the"><h3>🧾 Hoá đơn theo nhà cung cấp</h3><div class="hang khongIn" id="hnChonBar" hidden><b id="hnChonSo"></b><button class="xoaChu" onclick="hnXoaChon()">🗑 Xoá hoá đơn đã chọn</button><button onclick="hnBoChon()">Bỏ chọn</button></div><div class="bang"><table><thead><tr><th class="khongIn"><input type="checkbox" title="Chọn tất cả" onclick="hnChonHet(this.checked)"></th><th>#</th><th>Nhà cung cấp</th><th>Số HĐ</th><th>Ngày</th><th>Hình thức TT</th><th>HĐ điện tử</th><th class="so">Dòng</th><th class="so">Tổng chi phí</th><th class="khongIn"></th></tr></thead><tbody id="hnBang"></tbody></table></div></div>'+
     '<div class="the"><h3>💳 Theo hình thức thanh toán</h3><div class="bang"><table><thead><tr><th>Hình thức TT</th><th class="so">Số HĐ</th><th class="so">Tổng tiền</th><th class="so">Tỷ trọng</th></tr></thead><tbody id="hnTT2"></tbody></table></div></div></div>'+
     (suaDuoc("MPL")?'<div class="hang khongIn" style="margin-top:12px"><button id="hnNutNT" onclick="hnNT()">'+gaGhi()+' Nhập hoá đơn mới ▾</button><span class="nho">hoặc bấm 1 hoá đơn ở danh sách trên để sửa / xoá</span></div>'+
@@ -1976,11 +1978,11 @@ function veHDNgay(){ if(!HDN.tu){ HDN.tu=HDN.den=homNay(); }
 function hnNhanh(n){ $("hnNgay").value=truNgay(n); if($("hnDen")) $("hnDen").value=truNgay(n); taiHDNgay(); }
 function hnLui(n){ var d=new Date(($("hnNgay").value||homNay())+"T12:00:00"); d.setDate(d.getDate()+n); $("hnNgay").value=homNay(d); taiHDNgay(); }
 function taiHDNgay(){ HN_CT={}; HDN.tu=$("hnNgay").value||homNay(); var hb=document.getElementById("hnChonBar"); if(hb){ hb.hidden=true; var hc=document.querySelector("#hnBang")&&document.querySelector("#hnBang").closest("table").querySelector("thead input"); if(hc) hc.checked=false; } if(NT&&NT.dich==="HD"&&!NT.suaSo&&!NT.dong.some(function(d){ return String(d.nd).trim(); })&&document.getElementById("ntND")){ NT.nam=+HDN.tu.slice(0,4); NT.mm=+HDN.tu.slice(5,7); NT.dd=+HDN.tu.slice(8,10); veNT(); } HDN.den=HDN.khoang&&$("hnDen")?($("hnDen").value||HDN.tu):HDN.tu; $("hnTT").innerHTML=gaTai("Đang tải…");
-  goi("hdNgay",HDN.tu,HDN.den,Q).then(function(r){
+  goi("hdNgay",HDN.tu,HDN.den,Q,HDN.theo).then(function(r){
     var f=function(d){ return d?d.slice(8)+"/"+d.slice(5,7)+"/"+d.slice(0,4):"đầu"; };
-    $("hnTT").textContent=(HDN.tu===HDN.den?"Ngày "+f(HDN.tu):"Từ "+f(HDN.tu)+" đến "+f(HDN.den))+(Q?" · "+Q:" · tất cả quán");
+    $("hnTT").textContent=(HDN.theo?"⏱ Nhập liệu ":"")+(HDN.tu===HDN.den?"Ngày "+f(HDN.tu):"Từ "+f(HDN.tu)+" đến "+f(HDN.den))+(Q?" · "+Q:" · tất cả quán")+(HDN.theo?" · mới nhập lên đầu":"");
     $("hnKpi").innerHTML='<div style="background:#1f3a8a;color:#fff"><small style="color:#dbe4ff">💰 Tổng chi phí</small><b>'+VN(r.tong)+'</b></div><div><small>💵 Tiền mặt (Cash)</small><b>'+VN(r.tienMat)+'</b></div><div><small>🏦 Chuyển khoản (Bank)</small><b>'+VN(r.bank)+'</b></div><div><small>🧾 Số hoá đơn</small><b>'+r.soHD+'</b></div>';
-    $("hnBang").innerHTML=r.ds.length?r.ds.map(function(x,i){ return '<tr class="hnDong'+(NT&&NT.suaSo===x.so?' dangSua':'')+'" onclick="ntTuHD(\''+esc(x.so)+'\')" title="Bấm để mở hoá đơn trong bảng nhập chi tiết – sửa / xoá"'+(x.trung?' style="background:#fff1e0"':'')+'><td class="khongIn" onclick="event.stopPropagation()"><input type="checkbox" class="hnChon" value="'+esc(x.so)+'" onchange="hnDemChon()"></td><td class="nho" style="white-space:nowrap"><button class="nutXo" title="Xem chi tiết hoá đơn" onclick="event.stopPropagation();hnXo(\''+esc(x.so)+'\',this)">▸</button> '+(i+1)+'</td><td><b>'+esc(x.ncc||"(chưa rõ)")+'</b>'+(Q?'':'<div class="nho">'+esc(x.quan)+'</div>')+'</td>'+
+    $("hnBang").innerHTML=r.ds.length?r.ds.map(function(x,i){ return '<tr class="hnDong'+(NT&&NT.suaSo===x.so?' dangSua':'')+'" onclick="ntTuHD(\''+esc(x.so)+'\')" title="Bấm để mở hoá đơn trong bảng nhập chi tiết – sửa / xoá"'+(x.trung?' style="background:#fff1e0"':'')+'><td class="khongIn" onclick="event.stopPropagation()"><input type="checkbox" class="hnChon" value="'+esc(x.so)+'" onchange="hnDemChon()"></td><td class="nho" style="white-space:nowrap"><button class="nutXo" title="Xem chi tiết hoá đơn" onclick="event.stopPropagation();hnXo(\''+esc(x.so)+'\',this)">▸</button> '+(i+1)+'</td><td><b>'+esc(x.ncc||"(chưa rõ)")+'</b>'+(Q?'':'<div class="nho">'+esc(x.quan)+'</div>')+(x.gio?'<div class="nho" title="Lúc nhập liệu · người nhập · nguồn">⏱ '+esc(x.gio)+(HDN.theo||x.ngayNhap===x.ngay?'':' '+esc(x.ngayNhap))+(x.nguoi?' · '+esc(String(x.nguoi).split("@")[0]):'')+(x.nguon?' · '+esc(x.nguon):'')+'</div>':'')+'</td>'+
       '<td><a href="#" onclick="return false">'+esc(x.so)+'</a></td><td>'+esc(x.ngay)+'</td><td>'+ecNut(x.so,x.ec)+'</td><td class="nho">'+esc(x.hddt||"")+'</td><td class="so">'+x.soDong+'</td><td class="so"><b>'+VN(x.tong)+'</b>'+(x.trung?' ⚠️':'')+'</td><td class="khongIn hnTac">'+(suaDuoc("MPL")?'<button class="nutIcon" title="Sửa / xoá từng dòng" onclick="event.stopPropagation();hnSua(\''+esc(x.so)+'\',this)">✏️</button>':'')+'</td></tr>'; }).join("")+
       '<tr style="font-weight:700;background:#eef2ff"><td class="khongIn"></td><td></td><td colspan="5">TỔNG CỘNG · '+r.soHD+' hoá đơn</td><td class="so">'+r.ds.reduce(function(a,x){ return a+x.soDong; },0)+'</td><td class="so">'+VN(r.tong)+'</td><td></td></tr>'
       :'<tr><td colspan="10" class="nho">Không có hoá đơn nào trong khoảng ngày này.</td></tr>';
