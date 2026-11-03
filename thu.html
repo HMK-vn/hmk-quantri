@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261103103028";
+var HMK_BAN = "20261103103634";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -646,6 +646,8 @@ html.coHop,html.coHop body{overflow:hidden!important;overscroll-behavior:none}.m
 .segDCZ button:first-child:not(.icCot),.segDCZ button:last-child:not(.icCot){padding:4px 7px!important;font-size:11px;min-width:0}.tlKy button.icon{width:28px!important;min-width:28px!important;height:30px;padding:0!important;font-size:11px;border-radius:8px}.tlKy select{padding:4px 8px;height:30px}
 
 .lwBang .lwDai{font-size:.9em;letter-spacing:.2px;padding:3px 2px}.lwBang .lwDT{max-width:9em;overflow:hidden;text-overflow:ellipsis}
+
+.gaNut.gaMini{width:22px;height:22px;margin-right:3px;vertical-align:-6px}.lwBang .lwNut .gaNut.gaMini{width:18px;height:18px;margin:0;vertical-align:-4px}
 </style>
 </head><body class="misa"><script>try{ window.top.postMessage({ hmk:"song" },"*"); }catch(e){}</script>
 <div id="dangNhap" class="login an">
@@ -1665,7 +1667,7 @@ var DCZ=null, DCZLOC=null, DCZTT="";
 var DCZ_TT={khop:["🟢","Khớp"],lech:["🔴","Lệch tiền"],lechMon:["🟡","Lệch món"],chiTN:["🧾","Chỉ thu ngân nhập"],chiZL:["📲","Chỉ NCC gửi"]};
 function veDoiChieu(){ var d=new Date(); DCZLOC=DCZLOC||{ tu:homNay(new Date(d.getFullYear(),d.getMonth(),d.getDate()-6)), den:homNay() }; var sua=suaDuoc("DOICHIEU");
   $("noiDung").innerHTML='<div class="the khongIn dauTrang"><div class="hang"><span class="ngayDCZ">📅 <input type="date" id="dzTu" value="'+DCZLOC.tu+'" title="Từ ngày"> → <input type="date" id="dzDen" value="'+DCZLOC.den+'" title="Đến ngày"></span>'+
-  '<button class="c icNut" onclick="taiDCZ()" title="Đối chiếu">🔍</button><span id="kyCho"></span><span style="flex:1"></span>'+(sua?'<button class="c icNut" onclick="moDocHD()" title="Đọc HĐ NCC – dán ảnh (⌘V ở trang này cũng được)">🐔 Đọc HĐ</button><button class="icNut" onclick="denNT()" title="Nhập tay hoá đơn NCC">✍️</button><button class="icNut" onclick="quetDCZ(this)" title="Đọc ảnh mới trong thư mục Zalo">🔄</button>':"")+'<details class="mplMenu"><summary class="icNut" title="Thêm">⋯</summary><div><button onclick="moTMZalo(this)">📁 Thư mục ảnh Zalo</button>'+(D.chu?'<button onclick="nhomZalo()">⚙️ Nhóm Zalo</button>':"")+'<button onclick="window.print()">🖨 In</button></div></details>'+
+  '<button class="c icNut" onclick="taiDCZ()" title="Đối chiếu">🔍</button><span id="kyCho"></span><span style="flex:1"></span>'+(sua?'<button class="c icNut" onclick="moDocHD()" title="Đọc HĐ NCC – dán ảnh (⌘V ở trang này cũng được)">'+gaHTML("gaMini gaNut")+'Đọc HĐ</button><button class="icNut" onclick="denNT()" title="Nhập tay hoá đơn NCC">✍️</button><button class="icNut" onclick="quetDCZ(this)" title="Đọc ảnh mới trong thư mục Zalo">🔄</button>':"")+'<details class="mplMenu"><summary class="icNut" title="Thêm">⋯</summary><div><button onclick="moTMZalo(this)">📁 Thư mục ảnh Zalo</button>'+(D.chu?'<button onclick="nhomZalo()">⚙️ Nhóm Zalo</button>':"")+'<button onclick="window.print()">🖨 In</button></div></details>'+
   '<span class="icNut" title="Chép ảnh hoá đơn trong Zalo rồi ⌘V / Ctrl+V ở trang này → Gà tự đọc NCC, ngày, quán, cắt từng tờ và xếp vào đúng ô. Hoặc lưu ảnh vào thư mục Drive đúng tên nhóm → tự đọc mỗi 30 phút (🔄 để đọc ngay). Ghép theo NCC + ngày (±1) + số tiền gần nhất.">ⓘ</span></div></div>'+'<div id="dzKQ">'+gaChoHTML()+'</div>'+
   (sua?'<section class="ntInline khongIn" id="ntKhung"><div class="ntDau"><b>'+gaGhi()+' NHẬP HÓA ĐƠN NCC (ZALO) CHI TIẾT</b><span class="nho" id="ntNguon">· nhập tay hoá đơn NCC gửi, hệ thống tự ghép với hoá đơn thu ngân</span></div><div id="ntND"></div></section>':""); taiDCZ(); if(sua){ NT=null; napLSN(); ntSan(); } }
 function taiDCZ(){ DCZLOC={tu:$("dzTu").value,den:$("dzDen").value}; goi("dcZalo",DCZLOC.tu,DCZLOC.den,Q).then(function(r){ DCZ=r; veDCZ(); }).catch(loi); }
@@ -1699,10 +1701,10 @@ function veDCZ(){ var r=DCZ, sua=suaDuoc("DOICHIEU"), ds=r.dong.filter(function(
 var DCZXEM="luoi", DCZMO={};
 // 📋 Hoá đơn NCC (Zalo): chép ảnh trong Zalo → ⌘V ở trang Đối chiếu (hoặc bấm 🐔 Đọc HĐ) → cửa sổ dán ảnh; Gà tự nhận NCC, ngày, quán (theo "Người mua"),
 //  1 ảnh nhiều tờ thì tự cắt riêng từng tờ → lưu thư mục Quán / Tháng / Ngày + đưa vào đúng ô lưới. Không cần chọn NCC hay ngày trước.
-function oDanAnh(){ return '<div class="the khongIn danAnh"><div class="hang" style="flex-wrap:nowrap"><b style="white-space:nowrap">📋 HĐ NCC (Zalo)</b><span class="nho" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Chép ảnh trong Zalo rồi ⌘V / Ctrl+V ở trang này – Gà tự nhận NCC, ngày, quán và cắt từng tờ</span><button class="c" onclick="moDocHD()">🐔 Đọc HĐ</button></div></div>'; }
+function oDanAnh(){ return '<div class="the khongIn danAnh"><div class="hang" style="flex-wrap:nowrap"><b style="white-space:nowrap">📋 HĐ NCC (Zalo)</b><span class="nho" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Chép ảnh trong Zalo rồi ⌘V / Ctrl+V ở trang này – Gà tự nhận NCC, ngày, quán và cắt từng tờ</span><button class="c" onclick="moDocHD()">'+gaHTML("gaMini gaNut")+'Đọc HĐ</button></div></div>'; }
 var DOCHD=null;
 function moDocHD(ncc){ DOCHD={ ncc:ncc||"", chay:0 };
-  moHop('<h3>🐔 Đọc hoá đơn NCC (Zalo)</h3><div class="vungDan" id="vungDan" tabindex="0" onclick="this.focus()" ondragover="event.preventDefault();this.classList.add(\'keo\')" ondragleave="this.classList.remove(\'keo\')" ondrop="event.preventDefault();this.classList.remove(\'keo\');danFiles(event.dataTransfer.files)">'+
+  moHop('<h3>'+gaHTML("gaMini")+' Đọc hoá đơn NCC (Zalo)</h3><div class="vungDan" id="vungDan" tabindex="0" onclick="this.focus()" ondragover="event.preventDefault();this.classList.add(\'keo\')" ondragleave="this.classList.remove(\'keo\')" ondrop="event.preventDefault();this.classList.remove(\'keo\');danFiles(event.dataTransfer.files)">'+
     '<div style="font-size:30px">📋</div><b>Nhấn ⌘V / Ctrl+V để dán ảnh hoá đơn</b><div class="nho">Dán 1 hay nhiều ảnh, 1 ảnh có nhiều tờ cũng được – Gà tự tách. Hoặc kéo thả / <label class="lienKet">chọn ảnh<input type="file" accept="image/*" multiple hidden onchange="danFiles(this.files)"></label></div></div>'+
     (ncc?'<div class="nho" style="margin-top:4px">Gợi ý NCC: <b>'+esc(ncc)+'</b> (chỉ dùng khi ảnh không đọc được tên NCC)</div>':'')+
     '<div id="dhKQ" class="dhKQ"></div><p style="text-align:right;margin:8px 0 0"><button onclick="dongMo();taiDCZ()">Xong</button></p>');
@@ -1845,7 +1847,7 @@ function veLuoiDCZ(r,ds,sua){ var a=new Date(DCZLOC.tu+"T12:00:00"), b=new Date(
       '<div class="lwNua" data-hv="t'+i+'"><div class="lwHang"><div class="lwChu">'+(tn?'<a href="#" onclick="moHD(\''+esc(tn.so)+'\');return false">'+tienVN(tn.tong)+'</a>':'<span class="nho">Quầy chưa nhập</span>')+'</div>'+
         (tn?ba(cTN===""?null:Math.abs(cTN)<(r.lech||1000),"TN|"+tn.so):'')+'<div class="lwKC">'+(tn?kc(cTN):'')+'</div></div></div>'+
       '<div class="lwNua" data-hv="z'+i+'"><div class="lwHang"><div class="lwChu"><span class="lwZalo">Zalo</span> '+(z?(z.anh?'<a href="#" onclick="anhDCZ(\''+z.anh+'\');return false">'+tienVN(z.tong)+'</a>':tienVN(z.tong)):'<span class="nho">chưa gửi</span>')+
-        (sua&&!giong?'<span class="lwNut">'+(z?'<button onclick="gemDCZ(\''+z.id+'\')" title="Gà Trợ Lý đọc hoá đơn">🐔</button>':'<button onclick="danChoO(\''+esc((tn||{}).ncc||"").replace(/'/g,"")+'\')" title="Đọc HĐ – dán ảnh hoá đơn NCC, Gà tự đọc">🐔</button>')+'</span>':'')+'</div>'+
+        (sua&&!giong?'<span class="lwNut">'+(z?'<button onclick="gemDCZ(\''+z.id+'\')" title="Gà Trợ Lý đọc hoá đơn">'+gaHTML("gaMini gaNut")+'</button>':'<button onclick="danChoO(\''+esc((tn||{}).ncc||"").replace(/'/g,"")+'\')" title="Đọc HĐ – dán ảnh hoá đơn NCC, Gà tự đọc">'+gaHTML("gaMini gaNut")+'</button>')+'</span>':'')+'</div>'+
         (z?ba(cZ===""?null:Math.abs(cZ)<(r.lech||1000),"ZL|"+z.id):'')+'<div class="lwKC">'+(z?kc(cZ):'')+'</div></div></div>'+duoi+'</div></div>'; };
   $("dzKQ").innerHTML=dauDCZ(r)+
     '<div class="the"><div class="bang lwBang'+(wCot<190?' lwGon':'')+'" style="--lwW:'+wCot+'px"><table><tr><th class="lwNCC">Nhà cung cấp</th>'+ngay.map(function(n){ return '<th'+(coNgay[n]?'':' class="trong" title="Không có hoá đơn"')+'>'+n+'</th>'; }).join("")+'</tr>'+
@@ -2690,12 +2692,12 @@ function congPhut(g,p){ var m=/^(\d{1,2}):(\d{2})/.exec(g||""); if(!m) return g|
 function ngayVN(iso,them){ var d=new Date(iso+"T00:00:00"); d.setDate(d.getDate()+(them||0)); return ("0"+d.getDate()).slice(-2)+"/"+("0"+(d.getMonth()+1)).slice(-2)+"/"+d.getFullYear(); }
 function veKiemThuc(){ if(MO.ngay){ KT=null; } var q=quanHT(); if(KT&&KT.quan!==q) KT=null;
   $("noiDung").innerHTML='<datalist id="dlMonKT"></datalist><datalist id="dlTPKT"></datalist><div class="the khongIn"><div class="hang"><label>🏠 Quán'+nhanQuanHT("ktQuan",q)+'</label>'+
-  '<label>📅 Ngày<input type="date" id="ktNgay" value="'+((KT&&KT.ngay)||MO.ngay||homNay())+'"></label><button class="c" onclick="moKT()">📂 Mở ngày</button>'+(D.chu?'<button onclick="napKTCu(this)">📥 Lấy danh mục món & thực phẩm từ file KIỂM THỰC cũ</button>':"")+'<span id="ktDS" class="nho"></span></div></div><div id="ktND"></div>';
+  '<label>📅 Ngày<input type="date" id="ktNgay" value="'+((KT&&KT.ngay)||MO.ngay||homNay())+'"></label><button class="c" onclick="moKT()">📂 Mở ngày</button><button onclick="moKT(1)" title="Đọc lại tab ngày trong file KIỂM THỰC tháng (sửa trên sheet) về web">📄 Lấy từ sheet</button>'+(D.chu?'<button onclick="napKTCu(this)">📥 Lấy danh mục món & thực phẩm từ file KIỂM THỰC cũ</button>':"")+'<span id="ktDS" class="nho"></span></div></div><div id="ktND"></div>';
   goi("dsNgayKT",Q).then(function(ds){ $("ktDS").innerHTML=ds.length?'Đã lưu: '+ds.slice(0,10).map(function(x){ return '<a href="#" onclick="$(\'ktQuan\').value=\''+x.quan+'\';$(\'ktNgay\').value=\''+x.ngay+'\';moKT();return false">'+x.ngay.slice(8)+'/'+x.ngay.slice(5,7)+'</a>'; }).join(" · "):""; });
   MO.ngay=""; if(KT) veKT(); else moKT(); }
 function napKTCu(b){ b.disabled=true; goi("napKTCu",$("ktQuan").value).then(function(r){ b.disabled=false; toast("✅ Đã lấy "+r.mon+" món, "+r.thucPham+" thực phẩm & "+(r.ngayMau||0)+" món ngày mẫu",6000); moKT(); }).catch(function(e){ b.disabled=false; loi(e); }); }
-function moKT(){ var q=$("ktQuan").value, ng=$("ktNgay").value; $("ktND").innerHTML=''+gaChoHTML()+'';
-  goi("moKT",q,ng).then(function(r){ KT={ quan:q, ngay:ng, nguoi:r.nguoi, ghiChu:r.ghiChu, b1:r.b1, b2:r.b2, b3:r.b3, b5:r.b5, mau:r.mau||{mon:[]}, nhap:r.nhap, tp:r.thucPham||[], hs:r.heSo||0.25, daLuu:r.daLuu, diaDiem:r.diaDiem, tenQuan:r.tenQuan };
+function moKT(tuSheet){ var q=$("ktQuan").value, ng=$("ktNgay").value; $("ktND").innerHTML=''+gaChoHTML()+'';
+  goi(tuSheet?"layKTTuSheet":"moKT",q,ng).then(function(r){ if(r.tuSheet) toast("📄 Đã lấy phần sửa trên sheet tháng về web",5000); else if(tuSheet) toast("Sheet không có thay đổi mới (hoặc chưa có tab ngày này)",4000); KT={ quan:q, ngay:ng, nguoi:r.nguoi, ghiChu:r.ghiChu, b1:r.b1, b2:r.b2, b3:r.b3, b5:r.b5, mau:r.mau||{mon:[]}, nhap:r.nhap, tp:r.thucPham||[], hs:r.heSo||0.25, daLuu:r.daLuu, diaDiem:r.diaDiem, tenQuan:r.tenQuan };
     if(!KT.daLuu&&!KT.b1.length) layNhapKT(true); veKT(); }).catch(loi); }
 function layNhapKT(im){ var g=gioNay(); KT.b1=KT.nhap.map(function(x){ return { loai:x.loai==="tuoi"?"I. Tươi sống":"II. Khô / bao gói", ten:x.ten, slThuc:x.slThuc, sl:x.sl, gio:g, kl:x.kl||x.sl, ncc:x.ncc, dc:x.dc, ng:x.ng, ct:x.ct, tv:x.tv, kd:x.kd, cq:DAT, xl:"" }; });
   if(!im){ toast("⬇️ Đã lấy "+KT.b1.length+" thực phẩm nhập trong ngày"); veKT(); } }
