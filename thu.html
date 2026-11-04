@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261104160626";
+var HMK_BAN = "20261104161341";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -700,6 +700,7 @@ body .lwBang th.lwNCC,body .lwBang td.lwNCC{width:150px!important;min-width:150p
 .icTu{display:inline-flex;vertical-align:-3px}.icTu .icv{width:18px;height:18px}h3 .icTu .icv{width:20px;height:20px}
 .nkDS{display:flex;flex-direction:column}.nkDong{display:grid;grid-template-columns:86px 110px 220px 1fr;gap:8px;align-items:baseline;padding:7px 4px;border-bottom:1px solid #f2f2f7;font-size:13px}.nkDong:hover{background:#fafafc}.nkGio{color:#86868b;font-variant-numeric:tabular-nums}.nkAi{color:#0066cc;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.nkViec{font-weight:600}.nkCT{color:#3a3a3c;overflow-wrap:anywhere}
 @media(max-width:700px){.nkDong{grid-template-columns:auto 1fr;gap:2px 8px}.nkViec,.nkCT{grid-column:1/-1}}
+body main{max-width:none!important;width:auto}main>#tieuDeTrang,main .tieuDe{max-width:none} /* 05/11: nội dung tràn hết bề ngang màn hình */
 /* 🍏 Nhập hoá đơn chi tiết – kiểu Apple: ô tự giãn theo chữ (không che chữ), chọn dạng viên thuốc không mũi tên, bấm là xổ danh sách */
 body .ntInline{border-radius:18px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 10px 30px rgba(0,0,0,.06);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",sans-serif}
 body .ntInline .ntBang{background:#fff!important;border:1px solid #ececf0!important;border-radius:14px!important;overflow-x:auto!important;overflow-y:visible!important;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
