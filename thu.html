@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261104162204";
+var HMK_BAN = "20261104162441";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -578,8 +578,12 @@ html.coHop,html.coHop body{overflow:hidden!important;overscroll-behavior:none}.m
 main{max-width:none!important;width:100%;box-sizing:border-box}.chanTrang{max-width:none!important}
 #mplLoc label,#mplLoc button,#mplLoc .mplNhan,.mplTagLoc{display:inline-flex;align-items:center;gap:5px}#mplLoc .icv.lon,.mplTagLoc .icv.lon{width:22px;height:22px;flex:0 0 auto}.mplTagLoc a{display:inline-flex}.mplTagLoc a .icv.lon{width:16px;height:16px}
 .dczBang{overflow-x:hidden!important}.dczBang table{width:100%!important;min-width:0!important;table-layout:fixed}.dczBang th,.dczBang td{white-space:normal!important;overflow-wrap:anywhere;word-break:normal;padding:6px 7px!important;font-size:clamp(11px,1.05vw,14px)}
-.dczBang col.cTT{width:14%}.dczBang col.cTN{width:32%}.dczBang col.cZL{width:22%}.dczBang col.cSo{width:9%}.dczBang col.cNut{width:5%}.dczBang td.so,.dczBang th.so{white-space:nowrap!important;overflow-wrap:normal}.dczBang td.khongIn{white-space:normal!important}.dczBang td.khongIn button{padding:2px 4px;margin:1px}.dczBang .dzChip{display:inline-block;margin:1px}.dczBang .nccChip,.dczBang b{max-width:100%}
-@media(max-width:700px){.dczBang col.cTT{width:15%}.dczBang col.cTN{width:30%}.dczBang col.cZL{width:20%}.dczBang col.cSo{width:11%}.dczBang col.cNut{width:2%}.dczBang td.khongIn,.dczBang th.khongIn{padding:0!important}.dczBang td.khongIn button{display:block}.dczBang th,.dczBang td{padding:4px 3px!important;font-size:11px}}
+.dczBang col.cTT{width:12%}.dczBang col.cTN{width:31%}.dczBang col.cZL{width:19%}.dczBang col.cSo{width:11%}.dczBang col.cNut{width:5%}.dczBang td:not(.so) *{white-space:normal!important;overflow-wrap:anywhere}.dczBang td.so{font-size:clamp(10.5px,.95vw,13.5px)!important;font-variant-numeric:tabular-nums}.dczBang td.khongIn button{max-width:100%;overflow:hidden}.dczBang .gaMini{transform:scale(.85)}.dczBang td.so,.dczBang th.so{white-space:nowrap!important;overflow-wrap:normal}.dczBang td.khongIn{white-space:normal!important}.dczBang td.khongIn button{padding:2px 4px;margin:1px}.dczBang .dzChip{display:inline-block;margin:1px}.dczBang .nccChip,.dczBang b{max-width:100%}
+@media(max-width:700px){.dczBang table,.dczBang tbody{display:block}.dczBang colgroup,.dczBang tr:first-child{display:none}
+.dczBang tr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px 8px;padding:6px 4px;border-bottom:1px solid var(--vien2,#eee)}.dczBang td{display:block;border:0!important;padding:1px 2px!important;font-size:12.5px!important}
+.dczBang td:nth-child(1){order:1;grid-column:1/-1}.dczBang td:nth-child(2){order:2;grid-column:1/-1}.dczBang td:nth-child(4){order:3;grid-column:1/-1}.dczBang td:nth-child(4):empty{display:none}
+.dczBang td:nth-child(3){order:4}.dczBang td:nth-child(5){order:5}.dczBang td:nth-child(6){order:6}.dczBang td:nth-child(7){order:7;grid-column:1/-1;display:flex;flex-wrap:wrap;gap:4px}.dczBang td:nth-child(7):empty{display:none}
+.dczBang td.so{text-align:left!important}.dczBang td.so:before{display:block;font-size:10px;font-weight:400;color:var(--muc2,#888)}.dczBang td:nth-child(3):before{content:"Quầy"}.dczBang td:nth-child(5):before{content:"Zalo"}.dczBang td:nth-child(6):before{content:"Chênh"}.dczBang td.khongIn button{display:inline-flex}}
 header.dau .tenWeb{white-space:nowrap!important;flex:0 0 auto;font-size:clamp(12px,1.25vw,15px)!important;line-height:1.2}
 
 .lwBang table{width:auto!important;table-layout:fixed}.lwBang th.lwNCC,.lwBang td.lwNCC{width:120px;min-width:120px;max-width:120px}.lwBang th:not(.lwNCC):not(.trong){width:var(--lwW);min-width:var(--lwW)}.lwBang .lwO{width:100%;box-sizing:border-box}.lwBang .lwChu{min-width:60px}.lwBang .lwHang{flex-wrap:nowrap}
