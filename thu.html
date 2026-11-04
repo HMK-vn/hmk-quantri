@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261104081515";
+var HMK_BAN = "20261104081901";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -1841,7 +1841,7 @@ function veDCZ(){ var r=DCZ, sua=suaDuoc("DOICHIEU"), ds=r.dong.filter(function(
   '<div class="the"><div class="bang" style="max-height:none"><table><tr><th>Trạng thái</th><th>🧾 Thu ngân nhập</th><th class="so">Tổng</th><th>📲 NCC gửi (Zalo)</th><th class="so">Tổng</th><th class="so">Chênh</th><th class="khongIn"></th></tr>'+
   than+(ds.length?"":'<tr><td colspan="7" class="nho">Không có hoá đơn trong khoảng này.</td></tr>')+'</table></div></div>';
   DCZ._ds=ds; }
-var DCZXEM=(function(){ try{ return localStorage.getItem("hmk_dczXem")||"xl"; }catch(e){ return "xl"; } })(), DCZMO={}, DCZ_NCC="";
+var DCZXEM=(function(){ try{ return localStorage.getItem("hmk_dczXem")||"luoi"; }catch(e){ return "luoi"; } })() /* mặc định lưới dạng timeline; 🧭 Cần xử lý là tab chọn thêm */, DCZMO={}, DCZ_NCC="";
 function luuXemDCZ(){ try{ localStorage.setItem("hmk_dczXem",DCZXEM); }catch(e){} }
 // 🏪 Bộ lọc nhà cung cấp (dùng chung cho mọi kiểu xem)
 function chonNCCDCZ(r){ var dem={}; (r.dong||[]).forEach(function(d){ var n=(d.tn||d.zl||{}).ncc; if(n) dem[n]=(dem[n]||0)+1; });
