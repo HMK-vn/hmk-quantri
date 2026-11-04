@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261104082654";
+var HMK_BAN = "20261104083058";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -678,6 +678,7 @@ body .bangNCC td,body.misa .bangNCC td{padding:2px 3px!important}
 .upSo{font-size:11.5px;font-weight:600;color:#1f8a4c;white-space:nowrap}.upSo i{font-style:normal;border-radius:8px;padding:0 4px;font-size:10.5px}.upCho{background:#fff4e0;color:#b7791f}.upLoi{background:#fdecea;color:#c0392b}.upDang{font-size:11px;color:#0066cc;white-space:nowrap}
 .upGhim{position:absolute;right:3px;bottom:2px;cursor:pointer;font-size:14px;opacity:.35;line-height:1;padding:2px;border-radius:6px}.upO:hover .upGhim,.upGhim:focus-within{opacity:1}.upGhim:hover{background:#fff}@media(hover:none){.upGhim{opacity:.8}}
 @media(max-width:640px){.upO{min-height:50px;padding:3px}.upO b{font-size:12px}.upSo{font-size:10.5px}.upLuoi{grid-template-columns:1fr}}
+body .lwBang th.lwNCC,body .lwBang td.lwNCC{width:150px!important;min-width:150px!important;max-width:150px!important;box-sizing:border-box;overflow:hidden}body .lwBang td.lwNCC .lwChip{max-width:100%;overflow:hidden;text-overflow:ellipsis}
 /* 🍏 Nhập hoá đơn chi tiết – kiểu Apple: ô tự giãn theo chữ (không che chữ), chọn dạng viên thuốc không mũi tên, bấm là xổ danh sách */
 body .ntInline{border-radius:18px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 10px 30px rgba(0,0,0,.06);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",sans-serif}
 body .ntInline .ntBang{background:#fff!important;border:1px solid #ececf0!important;border-radius:14px!important;overflow-x:auto!important;overflow-y:visible!important;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
@@ -2282,7 +2283,7 @@ function veDanhMuc(){ var sua=suaDuoc("DANHMUC");
   goi("dsNCC").then(function(d){ NCCDS=d.filter(function(r){ return r.slice(0,11).some(function(v){ return String(v==null?"":v).trim(); }); }); veNCC(); }).catch(loi); } // bỏ dòng trống
 // 💳 Danh sách End cash: thêm mới / bỏ (✕) – chủ hoặc người có quyền Sửa Danh mục
 function veDsBQ(){ var sua=suaDuoc("DANHMUC"), ds=(D.dm.ncc||[]).slice().sort(function(a,b){ return (b.khongDC?1:0)-(a.khongDC?1:0)||a.ten.localeCompare(b.ten,"vi"); });
-  return '<div class="nho" style="margin-bottom:4px">Tích NCC (vd điện, nước, cung cấp lẻ, tự đi mua…) → Đối chiếu Zalo tự coi như khớp, không báo lệch. Cùng cột "Không cần đối chiếu" ở bảng NCC bên dưới.</div>'+ds.map(function(n){ var q=esc(n.ten).replace(/'/g,"\\'");
+  return '<div class="nho" style="margin-bottom:4px">Tích NCC (vd điện, nước, Grab, két, tự đi mua…) → loại hẳn khỏi Đối chiếu HĐ NCC (Zalo), không báo lệch. Cùng cột "Không cần đối chiếu" ở bảng NCC bên dưới.</div>'+ds.map(function(n){ var q=esc(n.ten).replace(/'/g,"\\'");
     return '<label class="tag" style="cursor:'+(sua?'pointer':'default')+';'+(n.khongDC?'background:#fde2e1;border-color:#e57373':'')+'"><input type="checkbox" '+(n.khongDC?"checked":"")+(sua?"":" disabled")+' onchange="doiBQ(\''+q+'\',this.checked)"> '+esc(n.ten)+'</label>'; }).join(""); }
 function doiBQ(t,bat){ goi("suaKhongDC",t,bat).then(function(ds){ D.dm.ncc=ds; $("dsBQ").innerHTML=veDsBQ(); (NCCDS||[]).forEach(function(r){ if(String(r[0]||"").trim().toUpperCase()===t) r[12]=bat; }); if(typeof veNCC==="function"&&$("tbNCC")) veNCC(); toast(bat?"☑ "+t+": không cần đối chiếu Zalo":"Đã bật lại đối chiếu "+t); }).catch(loi); }
 // 🗂 Danh sách Main list: thêm / bỏ (✕) – bỏ chỉ xoá khỏi danh sách chọn, dòng đã ghi giữ nguyên
