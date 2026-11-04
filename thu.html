@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261104172740";
+var HMK_BAN = "20261104173042";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -614,6 +614,14 @@ button.dmChip{cursor:pointer}button.dmChip:hover{border-color:#d9b9a2!important}
 .nutGa{white-space:nowrap}@media(max-width:420px){.nhapNut .nutGa,.nhapNut button{font-size:13.5px;padding-left:8px!important;padding-right:8px!important}}
 #noiDung:has(#thanhKy) :is(button[onclick^="mplLui"],button[onclick^="hnLui"],button[onclick^="locLui"],button[onclick^="tlLui"],button[onclick="nhanhNgay(6)"],button[onclick="nhanhNgay(29)"],button[onclick="nhanhNgay(-1)"],button[onclick="nhanhKhoang('pl',6)"],button[onclick="nhanhKhoang('pl',-1)"]){display:none!important}
 .mplMenu div button{white-space:nowrap}
+/* điện thoại: icon & ô số nhỏ gọn để thấy nhiều hơn */
+@media(max-width:700px){main .icv.lon{width:20px!important;height:20px!important;vertical-align:-5px!important}
+.icSo{padding:3px 8px!important;font-size:12.5px!important;gap:4px!important;border-radius:8px!important}.icSo b{font-size:14px!important}
+.kpi:has(.icSo){display:flex!important;flex-wrap:wrap;gap:5px!important}
+.icLoc button,.segDCZ.icLoc button{padding:3px 6px!important;min-width:30px!important;height:30px}
+.thanhKy{gap:4px!important;margin:4px 0!important}.thanhKy button,#thanhKy .segDCZ button{height:28px!important;padding:0 7px!important;font-size:12px!important}.thanhKy .icv{width:15px!important;height:15px!important}
+.tieuDeTrang{font-size:19px!important;margin-bottom:8px!important;gap:8px!important}.tieuDeTrang .icMac{width:30px!important;height:30px!important;border-radius:9px!important}.tieuDeTrang .icMac svg{width:18px;height:18px}
+.tlThanh{padding:8px 10px!important}.tlHang{gap:6px!important}}
 header.dau .tenWeb{white-space:nowrap!important;flex:0 0 auto;font-size:clamp(12px,1.25vw,15px)!important;line-height:1.2}
 
 .lwBang table{width:auto!important;table-layout:fixed}.lwBang th.lwNCC,.lwBang td.lwNCC{width:120px;min-width:120px;max-width:120px}.lwBang th:not(.lwNCC):not(.trong){width:var(--lwW);min-width:var(--lwW)}.lwBang .lwO{width:100%;box-sizing:border-box}.lwBang .lwChu{min-width:60px}.lwBang .lwHang{flex-wrap:nowrap}
