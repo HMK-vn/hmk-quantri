@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261104083548";
+var HMK_BAN = "20261104083850";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -690,6 +690,8 @@ body .lwBang th.lwNCC,body .lwBang td.lwNCC{width:150px!important;min-width:150p
 .locHang input,.locHang select,.locHang button{height:34px;box-sizing:border-box;padding:0 12px!important;font-size:13px;border-radius:10px!important;margin:0!important;width:auto;min-width:0}.locHang input[type=date]{width:150px}.locHang input[list]{width:170px}.locHang select{max-width:200px}
 .locSeg{display:inline-flex;flex-wrap:wrap;background:#f2f2f7;border-radius:11px;padding:2px;gap:2px}.locSeg button{border:0!important;background:transparent!important;box-shadow:none!important;height:30px!important;border-radius:9px!important;color:#1d1d1f!important;font-weight:500}.locSeg button:hover{background:#fff!important}
 @media(max-width:640px){.locHang input[list],.locHang select{width:100%;max-width:none}.locHang label{flex:1 1 100%}}
+@keyframes ntMoRa{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}.ntInline:not(.thuGon) #ntND{animation:ntMoRa .3s cubic-bezier(.2,.8,.2,1)}
+@keyframes gaViet{0%,100%{transform:rotate(0)}25%{transform:rotate(-6deg) translateY(-1px)}75%{transform:rotate(5deg)}}.ntDau .gaGhiI,.ntDau .gaGhiI *{animation:none!important}.ntInline.dangGo .ntDau .gaGhiI{display:inline-block;animation:gaViet .9s ease-in-out infinite!important;transform-origin:50% 90%}.ntInline.thuGon .ntDau{cursor:pointer}.ntMoGon{transition:transform .2s}
 /* 🍏 Nhập hoá đơn chi tiết – kiểu Apple: ô tự giãn theo chữ (không che chữ), chọn dạng viên thuốc không mũi tên, bấm là xổ danh sách */
 body .ntInline{border-radius:18px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 10px 30px rgba(0,0,0,.06);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",sans-serif}
 body .ntInline .ntBang{background:#fff!important;border:1px solid #ececf0!important;border-radius:14px!important;overflow-x:auto!important;overflow-y:visible!important;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
@@ -1035,7 +1037,7 @@ function veNhap(){ setTimeout(capNhatNhanQuan,0); setTimeout(kiemDocSan,0);
   '<button class="nutLink" onclick="var e=$(\'oDanKhung\');e.style.display=e.style.display?\'\':\'none\'">📋 Dán</button><button class="nutLink" onclick="F=hdMoi();veNhap()" title="Làm mới">🧹 Mới</button><button class="nutLink" onclick="try{localStorage.setItem(\'hmk_quet\',quetBat()?\'0\':\'1\')}catch(e){};this.innerHTML=quetBat()?\'✂️ Tự cắt: Bật\':\'✂️ Tự cắt: Tắt\'" title="Quét thông minh: tự cắt đúng khung hoá đơn khi chọn / dán ảnh">'+(quetBat()?'✂️ Tự cắt: Bật':'✂️ Tự cắt: Tắt')+'</button>'+(F.duyetMa?'<span class="tag">📥 '+F.duyetMa+'</span>':"")+'</div>'+
   '<div style="display:none" id="oDanKhung" class="oDan"><textarea id="oDanClaude" rows="3" placeholder="📋 Dán kết quả Claude / Gemini (⌘V)" onpaste="setTimeout(danNhanh,30)"></textarea><button onclick="danNhanh()">➜ Tách thành thẻ</button></div></section>'+
   '<section class="the nhapPhai" id="ketQua"><div class="ketQuaDau"><b>Kết quả</b></div><div class="nho rongKQ" id="rongKQ">Kết quả hiện ở đây: mỗi hoá đơn 1 thẻ kèm ảnh. Dòng tô vàng là số máy đã tự sửa, thẻ viền cam cần soát lại trước khi ghi.</div></section></div>'+
-  '<section class="ntInline" id="ntKhung"><div class="ntDau"><b>'+gaGhi()+' NHẬP HÓA ĐƠN CHI TIẾT</b><span class="nho" id="ntNguon"></span></div><div id="ntND"></div></section>'+
+  '<section class="ntInline thuGon" id="ntKhung"><div class="ntDau"><button class="ntMoGon" onclick="ntMoGon()" title="Mở / thu gọn bảng nhập">▸</button><b onclick="ntMoGon()" style="cursor:pointer">'+gaGhi()+' NHẬP HÓA ĐƠN CHI TIẾT</b><span class="nho" id="ntNguon"></span></div><div id="ntND"></div></section>'+
   '<div class="luoi2"><div class="the"><h3>🔍 Dữ liệu nhận diện <span class="nho">(sửa trực tiếp từng ô)</span></h3><img id="anhXem" onclick="phongAnh(this.src)">'+
   '<div class="bang" style="max-height:none"><table><thead><tr><th>#</th><th>Nội dung chi</th><th class="so">SL</th><th class="so">Đơn giá</th><th class="so">Thành tiền</th><th></th></tr></thead><tbody id="tbDong"></tbody>'+
   '<tfoot><tr><td></td><td><button onclick="themDong()">➕ Thêm dòng</button></td><td colspan="2" class="so"><b>Tổng số hoá</b></td><td class="so"><b id="tongSo">0</b></td><td></td></tr></tfoot></table></div></div>'+
@@ -1441,7 +1443,7 @@ function moNhapTay(i){ var h=i!=null&&F.dsAI?F.dsAI[i]:null, n=new Date(), ng0=T
 function ntDoiDich(v){ if(!NT||NT.zlId||NT.suaSo) return; NT.dich=v; var t=document.getElementById("ntTieuDe"); if(t) t.textContent=v==="ZL"?"NCC (ZALO)":"QUẦY"; ntSoHD(); }
 // Bảng nhập ở trang Đối chiếu: thu gọn mặc định (chỉ tiêu đề), bấm ▸ để mở; mở sẵn khi đang sửa 1 hoá đơn
 function ntMoGon(mo){ var k=document.getElementById("ntKhung"); if(!k) return; var gon=mo===true?false:mo===false?true:!k.classList.contains("thuGon"); k.classList.toggle("thuGon",gon); var b=k.querySelector(".ntMoGon"); if(b) b.textContent=gon?"▸":"▾"; if(!gon) k.scrollIntoView({behavior:"smooth",block:"start"}); }
-function ntSan(){ if(!NT) moNhapTay(); else veNT(); ntSoHD(); if(NT&&(NT.zlId||NT.suaSo)) ntMoGon(true); var sd=document.getElementById("ntDich"); if(sd&&NT){ sd.value=NT.dich==="ZL"?"ZL":""; sd.disabled=!!(NT.zlId||NT.suaSo); ntDoiDich(sd.value); } var g=document.getElementById("ntNguon"); if(g) g.textContent=NT&&NT.suaSo?"· đang sửa hoá đơn "+NT.suaSo:NT&&NT.zlId?"· đang sửa hoá đơn Zalo "+(NT.ncc||""):NT&&NT.the!=null&&F&&F.dsAI&&F.dsAI[NT.the]?"· đang sửa thẻ "+(NT.the+1)+" ("+(F.dsAI[NT.the].ncc||"chưa rõ NCC")+")":""; }
+function ntSan(){ if(!NT) moNhapTay(); else veNT(); ntSoHD(); if(NT&&(NT.zlId||NT.suaSo||NT.the!=null||NT.dong.some(function(d){ return String(d.nd||"").trim(); }))) ntMoGon(true); var sd=document.getElementById("ntDich"); if(sd&&NT){ sd.value=NT.dich==="ZL"?"ZL":""; sd.disabled=!!(NT.zlId||NT.suaSo); ntDoiDich(sd.value); } var g=document.getElementById("ntNguon"); if(g) g.textContent=NT&&NT.suaSo?"· đang sửa hoá đơn "+NT.suaSo:NT&&NT.zlId?"· đang sửa hoá đơn Zalo "+(NT.ncc||""):NT&&NT.the!=null&&F&&F.dsAI&&F.dsAI[NT.the]?"· đang sửa thẻ "+(NT.the+1)+" ("+(F.dsAI[NT.the].ncc||"chưa rõ NCC")+")":""; }
 function dongNT(){ NT=null; ntSan(); }
 function ntLs(){ if(!NT) return; goi("lichSuNCC",quanHT()).then(function(r){ if(NT){ NT.ls=r||{}; if(NT.tl) veNT(); } }).catch(function(){}); }
 function bo(x){ return boDau(String(x||"")).toLowerCase().trim(); }
@@ -1485,6 +1487,8 @@ function ntCoMot(el){ var c=ntCoMot.c||(ntCoMot.c=document.createElement("canvas
 function ntCo(){ var r=document.getElementById("ntND"); if(!r) return; [].forEach.call(r.querySelectorAll(".ntBang input:not([type=checkbox]),.ntBang select"),ntCoMot); }
 (function(){ var g=veNT; veNT=function(){ var k=g.apply(this,arguments); try{ ntCo(); }catch(e){} return k; }; })();
 document.addEventListener("input",function(e){ var t=e.target; if(t&&t.closest&&t.closest("#ntND .ntBang")) try{ ntCoMot(t); }catch(x){} },true);
+// 🐔 Gà ghi chép ở tiêu đề chỉ động khi đang gõ trong bảng nhập bên dưới
+document.addEventListener("input",function(e){ var t=e.target, k=t&&t.closest&&t.closest("#ntKhung"); if(!k) return; k.classList.add("dangGo"); clearTimeout(k._go); k._go=setTimeout(function(){ k.classList.remove("dangGo"); },1500); },true);
 document.addEventListener("change",function(e){ var t=e.target; if(t&&t.closest&&t.closest("#ntND .ntBang")) try{ ntCoMot(t); }catch(x){} },true);
 // 📖 Hướng dẫn sử dụng: mỗi mục = các bước ngắn + nút mở đúng trang (chỉ hiện trang người dùng có quyền). Ô tìm lọc theo chữ.
 var HD_MUC=[
