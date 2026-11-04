@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261104162441";
+var HMK_BAN = "20261104163630";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -1044,7 +1044,7 @@ function veCB(t){ var ds=cbCuaMenu(t), ten=t==="*"?"Trung tâm cảnh báo"+(Q?"
 function hienLaiCB(t){ try{ localStorage.removeItem("hmkBoQuaCB"); }catch(e){} veTagMenu(); veCB(t); }
 function boQuaMot(k,t){ var bq=boQuaCB(); bq[k]=1; try{ localStorage.setItem("hmkBoQuaCB",JSON.stringify(bq)); }catch(e){} veTagMenu(); veCB(t); capNhatSoCB(); }
 function capNhatSoCB(){ var n=cbCuaMenu("*").filter(function(x){ return x.muc!=="xanh"; }).length; if($("soCB")){ $("soCB").textContent=n; $("soCB").style.display=n?"":"none"; } }
-function diToiCB(i){ var c=D.canhBao[i]; dongMo(); if(c.tab){ moTab(c.tab); return; } MPLLOC = Object.assign({ tu:"", den:"", motNgay:false }, c.loc); moTab("MPL"); }
+function diToiCB(i){ var c=D.canhBao[i]; dongMo(); if(c.tab){ moTab(c.tab); return; } MPLLOC = Object.assign({ tu:"", den:"", motNgay:false, nghiTrung:false }, c.loc); moTab("MPL"); }
 // Hộp nổi luôn hiện ngay tại màn hình đang xem (điện thoại không phải cuộn lên đầu trang): cuộn hộp về đầu + khoá cuộn trang nền
 function moHop(html){ $("moND").classList.remove("tgRong"); $("moND").innerHTML=html; hien("mo"); $("mo").scrollTop=0; document.documentElement.classList.add("coHop"); } function dongMo(){ an("mo"); document.documentElement.classList.remove("coHop"); }
 
@@ -1546,7 +1546,7 @@ function veHDMuc(){ var q=bo(HD_TIM), ds=HD_MUC.filter(function(m){ return !m[0]
 var UPHD={ thang:"", quan:"", so:null, dang:{} };
 function veUpload(){ if(!UPHD.thang) UPHD.thang=homNay().slice(0,7); UPHD.quan=Q||UPHD.quan||D.quan[0];
   $("noiDung").innerHTML='<div class="the upDau"><button onclick="upLui(-1)" title="Tháng trước">◀</button><input type="month" id="upThang" value="'+UPHD.thang+'" onchange="UPHD.thang=this.value;veUpLich();taiUpDem()"><button onclick="upLui(1)" title="Tháng sau">▶</button><button onclick="UPHD.thang=homNay().slice(0,7);veUpload()">Tháng này</button>'+
-    (Q||D.quan.length<2?'<span class="upQuan">🏪 '+esc(UPHD.quan)+'</span>':'<select onchange="UPHD.quan=this.value;veUpLich();taiUpDem()">'+D.quan.map(function(q){ return '<option'+(q===UPHD.quan?' selected':'')+'>'+esc(q)+'</option>'; }).join("")+'</select>')+
+    (Q||D.quan.length<2?'':'<select onchange="UPHD.quan=this.value;veUpLich();taiUpDem()">'+D.quan.map(function(q){ return '<option'+(q===UPHD.quan?' selected':'')+'>'+esc(q)+'</option>'; }).join("")+'</select>')+
     '<span class="nho upGoiY">Kéo thả ảnh vào đúng ngày, hoặc bấm 📎 · Gà tự đọc trong ~5 phút</span></div><div class="upLuoi"><section class="the upLich" id="upCASHIER"></section><section class="the upLich" id="upZALO"></section></div>';
   veUpLich(); taiUpDem(); }
 function upLui(n){ var p=UPHD.thang.split("-"), d=new Date(+p[0],+p[1]-1+n,1); UPHD.thang=d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2); veUpload(); }
@@ -2230,7 +2230,7 @@ function veMPL(){
     '<label>'+icv("mainList",1)+' Main list<select id="lML" onchange="taiMPL()"><option value="">Tất cả</option>'+D.dm.mainList.map(function(m){return '<option'+(m===L.ml?" selected":"")+'>'+esc(m)+'</option>';}).join("")+'</select></label>'+
     '<label>'+icv("endCash",1)+' End cash<select id="lEC" onchange="taiMPL()"><option value="">Tất cả</option>'+D.dm.endCash.map(function(m){return '<option'+(m===L.ec?" selected":"")+'>'+esc(m)+'</option>';}).join("")+'</select></label>'+
     '<label class="hangNgang"><input type="checkbox" id="lTrung" '+(L.chiTrung?"checked":"")+' onchange="taiMPL()">'+icv("canhBao",1)+' Dòng trùng (cũ)</label>'+
-    '<button id="nutTrung" onclick="MPLLOC.nghiTrung=!MPLLOC.nghiTrung;taiMPL()" title="Cùng ngày HĐ + NCC + mặt hàng + thành tiền; dòng tích Ngoại lệ không tính">'+icv("trung",1)+' Nghi trùng</button>'+
+    '<button id="nutTrung" onclick="MPLLOC.nghiTrung=!MPLLOC.nghiTrung;if(MPLLOC.nghiTrung)MPLLOC.thieu=\'\';veMPL()" title="Cùng ngày HĐ + NCC + mặt hàng + thành tiền; dòng tích Ngoại lệ không tính">'+icv("trung",1)+' Nghi trùng</button>'+
     (L.thieu?'<span class="tag mplTagLoc">'+icv("tim",1)+' '+({ncc:"thiếu NCC",ml:"thiếu Main list",mlLa:"Main list lạ"})[L.thieu]+' <a href="#" onclick="MPLLOC.thieu=\'\';moTab(\'MPL\');return false" title="Bỏ lọc">'+icv("xoa",1)+'</a></span>':'')+'</div>'+
     '<div class="mplHang"><b class="mplNhan">'+icv("dongHo",1)+' Ngày nhập liệu</b><button id="nutGanNhat" onclick="locNhap(\'gan\')">Gần nhất</button><span id="tabNhap" class="mplHang"></span>'+
     '<label>Từ<input type="date" id="nTu" value="'+(L.nhapTu||"")+'" onchange="locNhap()"></label><label>Đến<input type="date" id="nDen" value="'+(L.nhapDen||"")+'" onchange="locNhap()"></label><button onclick="locNhap(\'bo\')">'+icv("xoa",1)+' Bỏ</button></div></details>'+
@@ -2243,6 +2243,7 @@ function mplDongBoNgam(){ if(!D||!D.lienKet||TAB!=="MPL"||document.hidden||Date.
   goi("dongBoAdmin").then(function(r){ var n=r&&r.admin; if(TAB==="MPL"&&n!==MPL_SODONG){ if(MPL_SODONG>=0) toast("🔄 Main pay list ADMIN có thay đổi – đã cập nhật",3000); MPL_SODONG=n; taiMPL(); } }).catch(function(){}); }
 setInterval(mplDongBoNgam,300000); document.addEventListener("visibilitychange",function(){ if(!document.hidden) mplDongBoNgam(); });
 function dongBoAD(b){ b.disabled=true; goi("dongBoAdmin").then(function(r){ b.disabled=false; toast("🔄 Đã đồng bộ "+r.admin+" dòng từ ADMIN",6000); taiMPL(); }).catch(function(e){ b.disabled=false; loi(e); }); }
+function boLocMPL(){ var L=MPLLOC||{}; ["thieu","ncc","ml","ec","q","nhapTu","nhapDen"].forEach(function(k){ L[k]=""; }); L.nghiTrung=L.chiTrung=L.ganNhat=false; MPLLOC=L; veMPL(); }
 function doiKhoangMPL(){ var L=MPLLOC||{}; L.motNgay=!L.motNgay; L.tu=$("lTu").value||homNay(); L.den=L.motNgay?L.tu:($("lDen").value||L.tu); veMPL(); }
 function mplLui(n){ var d=new Date(($("lTu").value||homNay())+"T12:00:00"); d.setDate(d.getDate()+n); $("lTu").value=homNay(d); mplDoiNgay(); }
 function nhanhNgay(n){ if(MPLLOC&&MPLLOC.motNgay&&n!==0){ MPLLOC.motNgay=false; veMPL(); }  var d=new Date(); if(n===-2){ $("lTu").value=""; $("lDen").value=""; } else if(n===-1){ $("lTu").value=homNay(new Date(d.getFullYear(),d.getMonth(),1)); $("lDen").value=homNay(); } else { $("lTu").value=truNgay(n); $("lDen").value=homNay(); } taiMPL(); }
@@ -2294,7 +2295,7 @@ function taiMPL(){
           '<td class="mplTen"><b>'+esc(x[6])+'</b>'+(canh?' <span class="do" title="'+esc(canh)+'">⚠️</span>':'')+(x[9]?'':' <span class="do nho" title="Thiếu Main list">🗂?</span>')+((x[9]||x[14])?'<div class="nho mplPhu">'+(x[9]?esc(x[9]):'')+(x[14]?' · 📝 '+esc(x[14]):'')+'</div>':'')+'</td>'+
           '<td class="so nho mplSL">'+x[10]+' × '+VN(x[11])+'</td><td class="so mplTien">'+VN(x[12])+'</td>'+
           '<td class="mplThao"><label title="Ngoại lệ: không coi là trùng"><input type="checkbox" '+(x[16]?"checked":"")+(sua?"":" disabled")+' onchange="suaNhanh(\''+x[0]+'\',{ngoaiLe:this.checked})"></label>'+(sua?'<button class="icon mplSua" onclick="moSua('+i+')" title="Sửa dòng">✏️</button>':"")+'</td></tr>'; }).join(""); }).join("")
-      :'<tr><td colspan="5" class="nho">Không có dòng nào trong ngày/bộ lọc này.</td></tr>')+(r.catBot?'<tr><td colspan="5" class="bao vàng">Chỉ hiện 3.000 dòng đầu – thu hẹp khoảng ngày để xem hết.</td></tr>':"");
+      :'<tr><td colspan="5" class="nho">Không có dòng nào trong ngày/bộ lọc này.'+(MPLLOC.thieu||MPLLOC.nghiTrung||MPLLOC.ncc||MPLLOC.ml||MPLLOC.ec||MPLLOC.q||MPLLOC.chiTrung?' <button onclick="boLocMPL()">'+icv("xoa",1)+' Bỏ hết bộ lọc</button>':'')+'</td></tr>')+(r.catBot?'<tr><td colspan="5" class="bao vàng">Chỉ hiện 3.000 dòng đầu – thu hẹp khoảng ngày để xem hết.</td></tr>':"");
   }).catch(loi);
 }
 function chonHet(v){ [].forEach.call(document.querySelectorAll(".chon"),function(c){ c.checked=v; }); }
