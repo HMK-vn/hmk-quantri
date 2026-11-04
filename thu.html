@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261104085017";
+var HMK_BAN = "20261104085450";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -696,6 +696,7 @@ body .lwBang th.lwNCC,body .lwBang td.lwNCC{width:150px!important;min-width:150p
 .dauTrang{padding:6px 8px!important}.dauTrang .hang{gap:5px!important;flex-wrap:wrap}.dauTrang button,.dauTrang .icNut,.dauTrang summary{height:32px!important;min-height:0!important;padding:0 10px!important;font-size:13px!important;display:inline-flex;align-items:center;border-radius:10px!important}.dauTrang input[type=date]{height:32px;padding:0 8px!important;font-size:13px;width:132px}.dauTrang img,.dauTrang .gaMini{max-height:22px}
 #thanhKy .segDCZ button,.thanhKy button{height:30px!important;padding:0 9px!important;font-size:12.5px!important}
 .dczDau .segDCZ .icv,.thanhKy .icv,.dczTong .icv,.dczAn .icv,.ngayDCZ .icv,.dauTrang .icv{width:17px;height:17px;vertical-align:-3px}.dczDau .segDCZ button{display:inline-flex;align-items:center;gap:4px}.dczDau .segDCZ button.on .icv,.dczDau .segDCZ button.on .icv *{stroke:#1d1d1f}
+.icTu{display:inline-flex;vertical-align:-3px}.icTu .icv{width:18px;height:18px}h3 .icTu .icv{width:20px;height:20px}
 /* 🍏 Nhập hoá đơn chi tiết – kiểu Apple: ô tự giãn theo chữ (không che chữ), chọn dạng viên thuốc không mũi tên, bấm là xổ danh sách */
 body .ntInline{border-radius:18px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 10px 30px rgba(0,0,0,.06);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",sans-serif}
 body .ntInline .ntBang{background:#fff!important;border:1px solid #ececf0!important;border-radius:14px!important;overflow-x:auto!important;overflow-y:visible!important;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
@@ -966,7 +967,12 @@ function datThanhKy(){ if(!KY_TAB[TAB]) return; var k=document.getElementById("t
 function gonKPI(){ if(!KY_TAB[TAB]) return; [].forEach.call(document.querySelectorAll("#noiDung .kpi"),function(k){ k.classList.add("kpiIc");
   [].forEach.call(k.children,function(o){ var s=o.querySelector("small"); if(!s||o.dataset.ic) return; o.dataset.ic=1; var t=s.textContent.trim(), m=/^([^\p{L}\p{N}]+)\s*(.*)$/u.exec(t);
     o.title=m?m[2]:t; var e=m?m[1].trim():"", ic=ICV_EMOJI[e]||ICV_EMOJI[e.slice(0,2)]||ICV_EMOJI[[...e][0]]; if(ic) s.innerHTML=icv(ic,1); else s.textContent=e||"•"; }); }); }
-var HEN_KY=null; new MutationObserver(function(){ clearTimeout(HEN_KY); HEN_KY=setTimeout(function(){ datThanhKy(); gonKPI(); },40); }).observe(document.getElementById("noiDung"),{childList:true,subtree:true});
+// 🎨 Emoji đứng đầu nút / tiêu đề / ô thống kê → icon nét tay cùng bộ (đồng bộ toàn trang). Chỉ đổi emoji có trong ICV_EMOJI
+var RE_EMO=null;
+function iconHoa(goc){ RE_EMO=RE_EMO||new RegExp("^\\s*("+Object.keys(ICV_EMOJI).sort(function(a,b){ return b.length-a.length; }).map(function(k){ return k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"); }).join("|")+")\\uFE0F?\\s*");
+  [].forEach.call((goc||document).querySelectorAll("button:not(.khongIc),.icNut,h3,.bkTK>span,label,summary,.kpi small"),function(el){ var n=el.firstChild; while(n&&n.nodeType===3&&!n.nodeValue.trim()) n=n.nextSibling; if(!n||n.nodeType!==3) return;
+    var m=RE_EMO.exec(n.nodeValue); if(!m) return; var ic=ICV_EMOJI[m[1]]; if(!ic||!ICV[ic]) return; var sp=document.createElement("span"); sp.className="icTu"; sp.innerHTML=icv(ic,1); n.nodeValue=(n.nodeValue.slice(m[0].length)?" "+n.nodeValue.slice(m[0].length):""); el.insertBefore(sp,n); }); }
+var HEN_KY=null; new MutationObserver(function(){ clearTimeout(HEN_KY); HEN_KY=setTimeout(function(){ datThanhKy(); gonKPI(); try{ iconHoa(document.getElementById("noiDung")); }catch(e){} },40); }).observe(document.getElementById("noiDung"),{childList:true,subtree:true});
 // 💬 Chú thích nhanh khi rê chuột: mọi phần tử có title → khung chú thích gọn hiện ngay (thay tooltip mặc định chậm của trình duyệt)
 (function(){ var tip=null, cur=null;
   document.addEventListener("mouseover",function(e){ var el=e.target.closest&&e.target.closest("[title],[data-tip]"); if(el===cur) return;
@@ -1969,6 +1975,13 @@ document.addEventListener("click",function(e){ var el=e.target.closest&&e.target
       if(TAB==="DOICHIEU"&&DCZ) veDCZ(); else if(TAB==="MPL") taiMPL(); else if(TAB==="HDNGAY") taiHDNgay(); else if(typeof lamMoiHD==="function") lamMoiHD(); }).catch(loi); }; },true);
 // ✏️ Bộ icon nét vẽ tay (SVG, cỡ vừa ~22px) – nhìn là hiểu: dùng cho ô số, nút lọc, cách xem ở Hoá đơn – NCC / Timeline / Đối chiếu
 var ICV={
+ bank:'<path d="M3.4 9.3 12 3.6l8.6 5.7c-5.7.1-11.5-.1-17.2 0z" fill="#e0f2fe" stroke="#0369a1"/><path d="M5.6 10.6v7.2M9.9 10.6v7.2M14.1 10.6v7.2M18.4 10.6v7.2M3.6 19.6c5.6-.1 11.2.1 16.8 0"/>',
+ tien:'<path d="M9.1 6.6c-1-1.1-1.4-2.4-.6-3.1 1.1.4 2.3.4 3.5 0 1.2.4 2.4.4 3.5 0 .8.7.4 2-.6 3.1"/><path d="M8.8 6.8c-3.5 2.3-5.4 6-4.6 9.4.7 3 3.7 4.7 7.8 4.7s7.1-1.7 7.8-4.7c.8-3.4-1.1-7.1-4.6-9.4z" fill="#fef3c7" stroke="#b45309"/><path d="M12 10v7.4M14.1 11.4c-1.2-1-4.4-.9-4.3.8.1 1.8 4.3 1 4.4 2.9.1 1.7-3.2 1.8-4.5.8" stroke="#b45309"/>',
+ lamMoi:'<path d="M19.6 8.6c-1.4-3-4.3-4.9-7.6-4.9-4.4 0-8 3.6-8.1 8"/><path d="M19.9 3.9l-.2 4.8-4.7-.3"/><path d="M4.4 15.4c1.4 3 4.3 4.9 7.6 4.9 4.4 0 8-3.6 8.1-8"/><path d="M4.1 20.1l.2-4.8 4.7.3"/>',
+ so:'<path d="M6.1 4.6c4-.1 7.9.1 11.9 0l.1 16c-4 .1-8-.1-12 .1z"/><path d="M9.2 3.3c1.9-.1 3.8.1 5.6 0l.1 2.6c-1.9.1-3.8-.1-5.7 0z" fill="#fde68a" stroke="#b45309"/><path d="M8.9 10.2h6.3M8.9 13.6h6.3M8.9 17h3.8"/>',
+ thuMuc:'<path d="M3.4 6.3c2.2-.1 4.4.1 6.6 0l1.8 2.1c2.9 0 5.9-.1 8.8 0l-.1 11.3c-5.7.1-11.4-.1-17.1.1z" fill="#fef3c7" stroke="#b45309"/>',
+ inA4:'<path d="M7.2 8.4V3.6h9.6v4.8"/><path d="M4.2 8.6c5.2-.1 10.4.1 15.6 0l.1 8.2h-3.1M7.2 16.8H4.1z"/><path d="M7.4 13.6h9.2v6.8H7.4z" fill="#fff"/>',
+ viet:'<path d="M14.9 4.4l4.7 4.7-9.8 9.8-5.6 1 .9-5.7z" fill="#fef3c7" stroke="#b45309"/><path d="M13.1 6.2l4.7 4.7"/>',
  laBan:'<path d="M12 2.9c5.1-.1 9.2 4.1 9.1 9.2 0 5-4.1 9-9.1 9-5.1.1-9.2-4-9.1-9.1 0-5 4-9.1 9.1-9.1z"/><path d="M15.6 8.3l-2 5.4-5.3 2 2-5.4z" fill="#fde68a" stroke="#b45309"/>',
  lich:'<path d="M4.1 6.1c5.3-.1 10.6.1 15.9-.1l.1 14c-5.3.1-10.7-.1-16 .1z"/><path d="M4.2 10.2c5.2.1 10.5-.1 15.8 0M8.3 3.6v4M15.8 3.6v4"/><path d="M9.6 13.3h2.6v2.6H9.6z" fill="#fecaca" stroke="#dc2626"/>',
  tuan:'<path d="M4.1 6.1c5.3-.1 10.6.1 15.9-.1l.1 14c-5.3.1-10.7-.1-16 .1z"/><path d="M4.2 10.2c5.2.1 10.5-.1 15.8 0M8.3 3.6v4M15.8 3.6v4"/><path d="M6.6 14.6c3.6-.1 7.2.1 10.8 0" stroke="#2563eb" stroke-width="2.6"/>',
@@ -1997,7 +2010,7 @@ var ICV={
 };
 function icv(t,lon){ var v=ICV[t]; return v?'<svg class="icv'+(lon?' lon':'')+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+v+'</svg>':''; }
 // emoji cũ ở ô số → icon vẽ tay tương ứng
-var ICV_EMOJI={"🧾":"hoaDon","⚡":"hddt","⚡✓":"hddtCo","⚡✗":"hddtChua","⏳":"cho","🔴":"lech","✔":"xacNhan","✅":"xacNhan","📈":"tyLe","🟢":"khop","🟡":"lechMon","📲":"zalo","🙈":"an","🗓":"luoi","🏪":"ncc","📃":"ds","📌":"ghim","✖":"chuaXN","💳":"quay","💰":"lechTien","📄":"hoaDon"};
+var ICV_EMOJI={"🏦":"bank","💰":"tien","💵":"tien","🔄":"lamMoi","📋":"so","📁":"thuMuc","📂":"thuMuc","🖨":"inA4","✍️":"viet","✍":"viet","🔍":"tim","🔎":"tim","📅":"lich","📆":"thang","🧭":"laBan","🧾":"hoaDon","⚡":"hddt","⚡✓":"hddtCo","⚡✗":"hddtChua","⏳":"cho","🔴":"lech","✔":"xacNhan","✅":"xacNhan","📈":"tyLe","🟢":"khop","🟡":"lechMon","📲":"zalo","🙈":"an","🗓":"luoi","🏪":"ncc","📃":"ds","📌":"ghim","✖":"chuaXN","💳":"quay","💰":"lechTien","📄":"hoaDon"};
 // Tiền rút gọn cho chỗ hẹp: 1.028.200 → 1,03tr · 227.100 → 227k
 function tienGon(v){ v=Number(v)||0; var a=Math.abs(v), s=v<0?"-":""; return a>=1e6?s+(Math.round(a/1e4)/100).toLocaleString("vi-VN")+"tr":a>=1e3?s+Math.round(a/1e3)+"k":s+a; }
 // NCC tích "Không cần đối chiếu" ở Danh mục → tự coi như Zalo = HĐ quầy (ô ≠ tự tích, không ghi gì thêm)
