@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261104165718";
+var HMK_BAN = "20261104172740";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -606,6 +606,14 @@ main{max-width:none!important;width:100%;box-sizing:border-box}.chanTrang{max-wi
 button.dmChip{cursor:pointer}button.dmChip:hover{border-color:#d9b9a2!important}.dmChip.on{background:#fdecea!important;border-color:#eba59c!important;color:#a33a2c}.dmChip .icv.lon{width:14px;height:14px}
 .dmBo{display:inline-flex;opacity:.45;margin-left:1px}.dmBo:hover{opacity:1}.dmBo .icv.lon{width:13px;height:13px}
 .dmThem{display:inline-flex;align-items:center;border:1px dashed #d9c6b6;border-radius:999px;overflow:hidden;background:#fff}.dmThem input{border:0!important;padding:4px 9px!important;font-size:12px;width:120px;background:transparent!important;outline:0}.dmThem button{border:0!important;border-radius:0!important;padding:4px 10px!important;background:#d97757!important;color:#fff;font-size:14px;line-height:1}
+/* rà soát 04/11: điện thoại + nút trùng với thanh kỳ */
+.nutThoat{display:inline-flex;align-items:center;gap:3px}@media(max-width:700px){.nutThoat span{display:none}.nutThoat{padding:5px 8px!important}header.dau .tren{gap:6px}}
+.nkCT{display:flex;flex-wrap:wrap;gap:4px 10px}.nkDoi{display:inline-flex;gap:4px;align-items:baseline;background:#faf6f1;border-radius:6px;padding:1px 7px;font-size:12.5px;overflow-wrap:anywhere}
+@media screen{#ktND #vungIn{overflow-x:auto;-webkit-overflow-scrolling:touch}}
+.tlHang{flex-wrap:wrap}.tlThanh .icLoc{flex-wrap:wrap;max-width:100%}
+.nutGa{white-space:nowrap}@media(max-width:420px){.nhapNut .nutGa,.nhapNut button{font-size:13.5px;padding-left:8px!important;padding-right:8px!important}}
+#noiDung:has(#thanhKy) :is(button[onclick^="mplLui"],button[onclick^="hnLui"],button[onclick^="locLui"],button[onclick^="tlLui"],button[onclick="nhanhNgay(6)"],button[onclick="nhanhNgay(29)"],button[onclick="nhanhNgay(-1)"],button[onclick="nhanhKhoang('pl',6)"],button[onclick="nhanhKhoang('pl',-1)"]){display:none!important}
+.mplMenu div button{white-space:nowrap}
 header.dau .tenWeb{white-space:nowrap!important;flex:0 0 auto;font-size:clamp(12px,1.25vw,15px)!important;line-height:1.2}
 
 .lwBang table{width:auto!important;table-layout:fixed}.lwBang th.lwNCC,.lwBang td.lwNCC{width:120px;min-width:120px;max-width:120px}.lwBang th:not(.lwNCC):not(.trong){width:var(--lwW);min-width:var(--lwW)}.lwBang .lwO{width:100%;box-sizing:border-box}.lwBang .lwChu{min-width:60px}.lwBang .lwHang{flex-wrap:nowrap}
@@ -785,7 +793,7 @@ body .ntInline .ntBang td:nth-child(2) input{min-width:8.5em!important}
 <div id="app" class="an">
 <header class="dau"><div class="tren"><button id="nutMenu" onclick="batMenu()" title="Ẩn / hiện menu">☰</button><span class="tenWeb">HOÀNG MINH KHIÊM</span><span id="chonQuan"></span><span class="timGaBoc khongIn"><span class="timGaIc" id="timGaIc"></span><input id="timGa" autocomplete="off" placeholder="Hỏi Gà hoặc tìm chức năng…" oninput="timGaGoi()" onfocus="timGaGoi()" onkeydown="timGaPhim(event)" onblur="setTimeout(function(){ var g=document.getElementById('timGaDs'); if(g) g.style.display='none'; },180)"><div id="timGaDs"></div></span><span class="sp"></span>
   <button id="nutSheet" class="an khongIn" onclick="moSheet()" title="Mở Google Sheet liên quan"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="#1e8e3e" d="M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><path fill="#8bd3a5" d="M15 2v5h5z"/><path fill="#fff" d="M7.5 10.5h9v7h-9zm1.3 1.3v1.6h2.6v-1.6zm3.9 0v1.6h2.5v-1.6zm-3.9 2.9v1.5h2.6v-1.5zm3.9 0v1.5h2.5v-1.5z"/></svg></button><button id="chuong" onclick="moCanhBao()" title="Cảnh báo">🔔<i id="soCB">0</i></button><span id="nguoi" class="nho nguoiDoi" onclick="moDoiTk()" title="Đổi người dùng / thêm tài khoản"></span>
-  <button class="chip" onclick="dangXuat()">Thoát</button></div></header>
+  <button class="chip nutThoat" onclick="dangXuat()" title="Đăng xuất"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 3v8"/><path d="M6.6 6.6a8 8 0 1 0 10.8 0"/></svg><span> Thoát</span></button></div></header>
 <div class="khung" onclick="if(event.target===this)document.body.classList.remove('moMenu')"><nav id="tabs"></nav><main><h2 class="tieuDeTrang khongIn" id="tieuDeTrang"></h2><div id="noiDung"></div></main></div>
 <footer class="chanTrang"><div><b>🍲 Lẩu Gà Rau Lỗ Bình</b>Hẻm 85 Khe Sanh, Đà Lạt.</div><div><b>🔥 Túi Nướng Lavender</b>17/6 Nguyễn Trãi, Đà Lạt.</div></footer>
 <div id="gaBong" title="🐔 Gà Trợ Lý – kéo để di chuyển, bấm để chat"><span id="gaHinh" class="gaDong chao"><i class="gaKhung"></i><i class="gaBui"></i><img id="gaBongAnh" alt="" hidden></span><i id="gaCham"></i><b id="gaNhan"></b></div>
@@ -1599,7 +1607,14 @@ function veNhatKy(){ if(!NK.tu){ NK.den=homNay(); NK.tu=truNgay(6); }
     '<div class="the" id="nkDS">'+gaTai("Đang tải nhật ký…")+'</div>'; taiNK(); }
 function taiNK(){ goi("dsNhatKy",NK.tu,NK.den,NK.tim,NK.nguoi).then(function(r){ var sel=$("nkNguoi"); if(sel) sel.innerHTML='<option value="">Mọi người</option>'+r.nguoi.map(function(x){ return '<option value="'+esc(x[0])+'"'+(x[0]===NK.nguoi?' selected':'')+'>'+esc(String(x[0]).split("@")[0])+' ('+x[1]+')</option>'; }).join("");
   $("nkTT").textContent=r.ds.length+(r.ds.length>=800?"+":"")+" thao tác";
-  $("nkDS").innerHTML=r.ds.length?'<div class="nkDS">'+r.ds.map(function(x){ return '<div class="nkDong"><span class="nkGio">'+esc(x[0])+'</span><span class="nkAi" title="'+esc(x[1])+'">'+esc(String(x[1]).split("@")[0]||"–")+'</span><b class="nkViec">'+esc(x[2])+'</b><span class="nkCT">'+linkHD(x[3])+'</span></div>'; }).join("")+'</div>':'<div class="nho">Không có thao tác nào trong khoảng này.</div>'; }).catch(loi); }
+  $("nkDS").innerHTML=r.ds.length?'<div class="nkDS">'+r.ds.map(function(x){ return '<div class="nkDong"><span class="nkGio">'+esc(x[0])+'</span><span class="nkAi" title="'+esc(x[1])+'">'+esc(String(x[1]).split("@")[0]||"–")+'</span><b class="nkViec">'+esc(x[2])+'</b><span class="nkCT">'+ctNK(x[3])+'</span></div>'; }).join("")+'</div>':'<div class="nho">Không có thao tác nào trong khoảng này.</div>'; }).catch(loi); }
+// Chi tiết nhật ký: JSON {cu,moi} → chỉ hiện ô đổi "cũ → mới"; JSON phẳng → các trường có giá trị; còn lại giữ nguyên chữ
+function ctNK(t){ var o=null; t=String(t==null?"":t); if(/^\s*[\[{]/.test(t)){ try{ o=JSON.parse(t); }catch(e){} } if(!o||typeof o!=="object") return linkHD(t);
+  var gt=function(v){ return v===""||v==null?'<i class="nho">trống</i>':v===true?"✓":v===false?"✗":linkHD(typeof v==="object"?JSON.stringify(v):String(v)); };
+  if(Array.isArray(o.cu)&&Array.isArray(o.moi)){ var d=[]; for(var i=0;i<Math.max(o.cu.length,o.moi.length);i++) if(String(o.cu[i]==null?"":o.cu[i])!==String(o.moi[i]==null?"":o.moi[i])) d.push('<span class="nkDoi">'+gt(o.cu[i])+' → <b>'+gt(o.moi[i])+'</b></span>');
+    return d.length?d.join(""):'<span class="nho">không đổi giá trị</span>'; }
+  var ks=Object.keys(o).filter(function(k){ return o[k]!==""&&o[k]!=null; }); if(!ks.length) return '<span class="nho">không có thay đổi chi tiết</span>';
+  return ks.map(function(k){ return '<span class="nkDoi"><span class="nho">'+esc(k)+':</span> '+gt(o[k])+'</span>'; }).join(""); }
 // Gợi ý NCC tự vẽ (thay datalist của trình duyệt – đồng bộ màu trang, kèm chấm màu riêng của NCC)
 function ntGoiNCC(o){ var q=bo(o.value), ds=(D.dm.ncc||[]).filter(function(n){ return !q||bo(n.ten).indexOf(q)>=0||bo(n.vt||"").indexOf(q)>=0; }).slice(0,10), g=document.getElementById("ntGoi"); if(!g) return;
   g._i=-1; g.innerHTML=ds.map(function(n){ var m=mauNCC(n.ten); return '<div class="ntGoiDong" onmousedown="ntChonNCC(this.dataset.t)" data-t="'+esc(n.ten)+'"><i style="background:'+m.dam+'"></i><b>'+esc(n.ten)+'</b>'+(n.vt?'<span>'+esc(n.vt)+'</span>':'')+'</div>'; }).join(""); g.style.display=ds.length?"block":"none"; }
