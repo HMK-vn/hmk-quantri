@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261104161928";
+var HMK_BAN = "20261104162204";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -1922,7 +1922,7 @@ function veDCZ(){ var r=DCZ, sua=suaDuoc("DOICHIEU"), ds=r.dong.filter(function(
     var nhom=(r.theoNCC||[]).filter(function(g){ return !DCZTT||g.dem[DCZTT]; });
     than=nhom.map(function(g){ var k=g.quan+"|"+g.ncc, mo=DCZMO[k]!=null?DCZMO[k]:g.tt!=="khop", con=ds.filter(function(d){ var x=d.tn||d.zl; return x.quan===g.quan&&x.ncc===g.ncc; });
       var chip=Object.keys(DCZ_TT).filter(function(t){ return g.dem[t]; }).map(function(t){ return '<span class="dzChip">'+DCZ_TT[t][0]+' '+g.dem[t]+'</span>'; }).join("");
-      return '<tr class="dzNhom '+g.tt+'" onclick="DCZMO[\''+esc(k).replace(/'/g,"")+'\']='+(!mo)+';veDCZ()"><td><button class="nutXo">'+(mo?'▾':'▸')+'</button> '+chip+'</td><td><b>'+esc(g.ncc)+'</b>'+(Q?'':' <span class="nho">'+esc(g.quan)+'</span>')+(g.lyDo.length?'<div class="nho dzLy">'+g.lyDo.slice(0,2).map(esc).join("<br>")+(g.lyDo.length>2?'<br>… +'+(g.lyDo.length-2)+' chỗ khác':'')+'</div>':'')+'</td><td class="so"><b>'+tienVN(g.tn)+'</b></td><td></td><td class="so"><b>'+tienVN(g.zl)+'</b></td><td class="so '+(Math.abs(g.chenh)>r.lech?"do":"")+'"><b>'+tienVN(g.chenh)+'</b></td><td class="khongIn">'+(g.tt!=="khop"?'<button onclick="event.stopPropagation();gaDCZ(\''+esc(k).replace(/'/g,"")+'\')" title="Nhờ Gà phân tích NCC này">'+gaHTML("gaMini")+'Phân tích</button>':'')+'</td></tr>'+
+      return '<tr class="dzNhom '+g.tt+'" onclick="DCZMO[\''+esc(k).replace(/'/g,"")+'\']='+(!mo)+';veDCZ()"><td><button class="nutXo">'+(mo?'▾':'▸')+'</button> '+chip+'</td><td><b>'+esc(g.ncc)+'</b>'+(Q?'':' <span class="nho">'+esc(g.quan)+'</span>')+(g.lyDo.length?'<div class="nho dzLy">'+g.lyDo.slice(0,2).map(esc).join("<br>")+(g.lyDo.length>2?'<br>… +'+(g.lyDo.length-2)+' chỗ khác':'')+'</div>':'')+'</td><td class="so"><b>'+tienVN(g.tn)+'</b></td><td></td><td class="so"><b>'+tienVN(g.zl)+'</b></td><td class="so '+(Math.abs(g.chenh)>r.lech?"do":"")+'"><b>'+tienVN(g.chenh)+'</b></td><td class="khongIn">'+(g.tt!=="khop"?'<button onclick="event.stopPropagation();gaDCZ(\''+esc(k).replace(/'/g,"")+'\')" title="Nhờ Gà phân tích NCC này">'+gaHTML("gaMini")+'</button>':'')+'</td></tr>'+
         (mo?con.map(function(d){ return dongHD(d,ds.indexOf(d),1); }).join(""):""); }).join("");
   } else than=ds.map(function(d,i){ return dongHD(d,i); }).join("");
   $("dzKQ").innerHTML=dauDCZ(r)+
