@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261104163630";
+var HMK_BAN = "20261104165031";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -1246,7 +1246,7 @@ function veCat(){ var cv=document.getElementById("catCv"), im=CAT.img, k=Math.mi
   if(CAT.box){ var b=CAT.box, x=b[1]/1000*cv.width, y=b[0]/1000*cv.height, w=(b[3]-b[1])/1000*cv.width, hh=(b[2]-b[0])/1000*cv.height; g.fillStyle="rgba(0,0,0,.45)"; g.fillRect(0,0,cv.width,y); g.fillRect(0,y+hh,cv.width,cv.height-y-hh); g.fillRect(0,y,x,hh); g.fillRect(x+w,y,cv.width-x-w,hh); g.strokeStyle="#0a84ff"; g.lineWidth=3; g.strokeRect(x,y,w,hh); } }
 function dongCat(){ var n=document.getElementById("catNen"); if(n) n.style.display="none"; CAT=null; }
 function xongCat(){ if(!CAT||!CAT.box||CAT.box[2]-CAT.box[0]<20||CAT.box[3]-CAT.box[1]<20) return toast("Kéo khung quanh hoá đơn trước"); var h=F.dsAI[CAT.i], b=CAT.box, img=CAT.img; dongCat();
-  h.khung=b; h.anhTo=catKhung(img,b)||h.anhTo; h.anhTo2=[]; h.trang=null; h.dang=1; veDsAI(); ttDoc("✂️ Đang đọc lại vùng vừa cắt…",30);
+  h.khung=b; h.anhTo=catKhung(img,b,0,h.xoay)||h.anhTo; h.anhTo2=[]; h.trang=null; h.dang=1; veDsAI(); ttDoc("✂️ Đang đọc lại vùng vừa cắt…",30);
   goi("docAnhAI",{mime:"image/jpeg",data:catKhung(img,b,true),quan:quanHT(),goiY:"Ảnh là ĐÚNG 1 hoá đơn (chủ đã cắt). Gộp mọi dòng vào 1 hoá đơn, đọc đủ từng dòng hàng."}).then(function(r){ h.dang=0;
     if(!r.ok){ ttDoc("⚠️ "+esc(r.thongBao||"Chưa đọc được vùng cắt")); veDsAI(); return; }
     var m=(r.ds||[r]).reduce(function(a,x){ a.dong=a.dong.concat(x.dong||[]); a.tongGiay=Math.max(a.tongGiay,x.tongGiay||0); a.ncc=a.ncc||x.ncc; a.ngay=a.ngay||x.ngay; a.ghiChu=a.ghiChu||x.ghiChu; return a; },{ dong:[], tongGiay:0, ncc:"", ngay:"", ghiChu:"" });
@@ -1313,18 +1313,21 @@ function soatNen(kqAnh,anhs){ var can=anhs.map(function(a,i){ return i; }).filte
   var xong=0, tot=0; can.forEach(function(i){ var truoc=kqAnh[i].map(function(h){ var x=Object.assign({},h); delete x.anhTo; delete x.goc; delete x.anhTo2; return x; });
     goi("docAnhKhop",{mime:"image/jpeg",data:anhs[i].data,quan:quanHT(),dsTruoc:truoc}).catch(function(){ return {ok:false}; }).then(function(r){ xong++;
       var biSua=F.dsAI.some(function(h){ return h.iAnh===i&&(h.daGhi||h.daSua); });
-      if(r.ok&&!biSua){ tot++; kqAnh[i]=(r.ds||[r]).map(function(h){ var x=Object.assign({},h); x.iAnh=i; x.docLai=1; x.anhTo=(x.khung&&anhs[i].img&&catKhung(anhs[i].img,x.khung))||anhs[i].data; x.goc=JSON.parse(JSON.stringify({ ncc:x.ncc, dong:x.dong })); return x; }); kqAnh[i]=gopToCungAnh(kqAnh[i]);
+      if(r.ok&&!biSua){ tot++; kqAnh[i]=(r.ds||[r]).map(function(h){ var x=Object.assign({},h); x.iAnh=i; x.docLai=1; x.anhTo=(x.khung&&anhs[i].img&&catKhung(anhs[i].img,x.khung,0,x.xoay))||anhs[i].data; x.goc=JSON.parse(JSON.stringify({ ncc:x.ncc, dong:x.dong })); return x; }); kqAnh[i]=gopToCungAnh(kqAnh[i]);
         var giu=F.dsAI.filter(function(h){ return h.daGhi||h.loi; }), tho=[].concat.apply([],kqAnh.map(function(k,j){ return F.dsAI.some(function(h){ return h.iAnh===j&&h.daGhi; })?[]:(k||[]).filter(function(h){ return !h.loi; }); }));
         goi("gopTheDoc",tho.map(function(h,k){ var x=Object.assign({},h); delete x.anhTo; delete x.goc; x._k=k; return x; })).then(function(g){
           F.dsAI=g.ds.map(function(x){ var o=tho[x._k]; x.anhTo=o.anhTo; x.goc=o.goc; x.anhTo2=(x.anhTo2||[]).length?x.anhTo2:o.anhTo2; delete x._k; return x; }).concat(giu); veDsAI(); }).catch(function(){}); }
       else F.dsAI.forEach(function(h){ if(h.iAnh===i) h.soat=0; });
       if(xong===can.length){ soatTT(tot?"✅ Soát lại xong: cập nhật "+tot+"/"+can.length+" ảnh (thẻ gắn 🔍 đã đọc lại)":"ℹ️ Soát lại xong – đọc lại không tốt hơn, giữ kết quả cũ (thẻ viền cam: soát tay hoặc 🤖 Claude đọc)"); setTimeout(function(){ soatTT(""); },15000); } veDsAI(); }); }); }
 function soatTT(t){ var k=document.getElementById("ketQua"); if(!k) return; var e=document.getElementById("soatTT"); if(!e){ e=document.createElement("div"); e.id="soatTT"; e.className="nho"; e.style.cssText="margin:6px 0;padding:6px 10px;border-radius:8px;background:rgba(175,82,222,.08)"; var d=document.getElementById("ttDoc"); if(d) d.after(e); else k.prepend(e); } e.textContent=t; e.style.display=t?"":"none"; }
-function catKhung(img,box,net){ var W=img.width, H=img.height, p=0.015, y0=Math.max(0,box[0]/1000-p)*H, x0=Math.max(0,box[1]/1000-p)*W, y1=Math.min(1,box[2]/1000+p)*H, x1=Math.min(1,box[3]/1000+p)*W;
+function catKhung(img,box,net,xoay){ var W=img.width, H=img.height, p=0.015, y0=Math.max(0,box[0]/1000-p)*H, x0=Math.max(0,box[1]/1000-p)*W, y1=Math.min(1,box[2]/1000+p)*H, x1=Math.min(1,box[3]/1000+p)*W;
   var w=x1-x0, h=y1-y0; if(w<20||h<20) return null; var k=Math.min(1.6,1600/Math.max(w,h)), c=document.createElement("canvas"); c.width=w*k; c.height=h*k; var g=c.getContext("2d"); g.drawImage(img,x0,y0,w,h,0,0,c.width,c.height);
   if(net){ var im=g.getImageData(0,0,c.width,c.height), d=im.data, lo=255, hi=0, i; for(i=0;i<d.length;i+=16){ var v=(d[i]+d[i+1]+d[i+2])/3; if(v<lo) lo=v; if(v>hi) hi=v; }
     for(i=0;i<d.length;i+=4){ var y=((d[i]*.3+d[i+1]*.59+d[i+2]*.11)-lo)*255/Math.max(1,hi-lo); y=Math.max(0,Math.min(255,(y-128)*1.35+128)); d[i]=d[i+1]=d[i+2]=y; } g.putImageData(im,0,0); }
-  return c.toDataURL("image/jpeg",0.88).split(",")[1]; }
+  c=xoayCanvas(c,xoay); return c.toDataURL("image/jpeg",0.88).split(",")[1]; }
+// Xoay ảnh đã cắt cho chữ đứng thẳng (Gà báo số độ theo chiều kim đồng hồ: 90/180/270)
+function xoayCanvas(c,dz){ dz=((+dz||0)%360+360)%360; if(!dz) return c; var o=document.createElement("canvas"), dung=dz===90||dz===270; o.width=dung?c.height:c.width; o.height=dung?c.width:c.height;
+  var g=o.getContext("2d"); g.translate(o.width/2,o.height/2); g.rotate(dz*Math.PI/180); g.drawImage(c,-c.width/2,-c.height/2); return o; }
 // Thẻ gộp nhiều tờ còn lệch tổng: đọc lại từng tờ (cắt + làm nét, model Flash), nối lại – giữ nếu ít lỗi hơn
 function docLaiNhieuTo(h,anhs){ var gy="Ảnh là 1 tờ của hoá đơn "+(h.ncc||"")+" ("+h.trang.length+" tờ, tổng giấy cả hoá đơn "+(h.tongGiay||"?")+"). Soát từng chữ số SL, giá, thành tiền; SL × giá phải = thành tiền.";
   return Promise.all(h.trang.map(function(t){ var a=anhs[t.iAnh], d=a&&a.img&&t.khung&&catKhung(a.img,t.khung,true); return d?goi("docAnhAI",{mime:"image/jpeg",data:d,quan:quanHT(),manh:1,goiY:gy}).catch(function(){ return null; }):null; }))
@@ -1346,7 +1349,7 @@ function docAI(){ var b=$("nutAI"); b.disabled=true; b.classList.add("dangDoc");
   Promise.all(anhs.map(function(a,i){ return goi("docAnhAI",{mime:"image/jpeg",data:a.data,quan:quanHT()}).catch(function(e){ return {ok:false,thongBao:e.message}; }).then(function(r){
     xong++; ttLuc="📑 Đã đọc "+xong+"/"+n+" ảnh…"; stA[i].xong=1; stA[i].s=Math.round((Date.now()-stA[i].t0)/1000); stA[i].loi=!r.ok?1:0; stA[i].n=r.ok?(r.ds||[r]).length:0;
     if(!r.ok){ loiN++; kqAnh[i]=[{ ncc:"", ngay:"", tongGiay:0, dong:[], loi:1, ghiChu:r.thongBao||"Lỗi đọc", anhTo:a.data, quaTai:r.quaTai }]; return; }
-    kqAnh[i]=(r.ds||[r]).map(function(h){ var x=Object.assign({},h); x.iAnh=i; x.anhTo=(x.khung&&a.img&&catKhung(a.img,x.khung))||a.data; x.goc=JSON.parse(JSON.stringify({ ncc:x.ncc, dong:x.dong })); return x; }); kqAnh[i]=gopToCungAnh(kqAnh[i]);
+    kqAnh[i]=(r.ds||[r]).map(function(h){ var x=Object.assign({},h); x.iAnh=i; x.anhTo=(x.khung&&a.img&&catKhung(a.img,x.khung,0,x.xoay))||a.data; x.goc=JSON.parse(JSON.stringify({ ncc:x.ncc, dong:x.dong })); return x; }); kqAnh[i]=gopToCungAnh(kqAnh[i]);
     F.dsAI=[].concat.apply([],kqAnh.map(function(k,j){ return k||[{ ncc:"", ngay:"", tongGiay:0, dong:[], dang:1, anhTo:anhs[j].data }]; })); veDsAI(); }); }))
   .then(function(){ buoc=1; ttLuc="🧮 Đối chiếu tổng, gộp tờ cùng NCC, bỏ thẻ trùng…"; var ds=F.dsAI.filter(function(h){ return !h.loi; });
     return goi("gopTheDoc",ds.map(function(h){ var x=Object.assign({},h); delete x.anhTo; delete x.goc; x._k=F.dsAI.indexOf(h); return x; })).then(function(g){
@@ -1965,16 +1968,16 @@ function moDocHD(ncc){ DOCHD={ ncc:ncc||"", chay:0 };
     '<div id="dhKQ" class="dhKQ"></div><p style="text-align:right;margin:8px 0 0"><button onclick="dongMo();taiDCZ()">Xong</button></p>');
   setTimeout(function(){ var v=$("vungDan"); if(v) v.focus(); },50); }
 // Cắt 1 tờ theo khung Gemini [y0,x0,y1,x1] (thang 0–1000), chừa lề 2%
-function catKhungURL(img,k){ var W=img.naturalWidth||img.width, H=img.naturalHeight||img.height, l=20, y0=Math.max(0,k[0]-l)*H/1000, x0=Math.max(0,k[1]-l)*W/1000, y1=Math.min(1000,k[2]+l)*H/1000, x1=Math.min(1000,k[3]+l)*W/1000;
+function catKhungURL(img,k,xoay){ var W=img.naturalWidth||img.width, H=img.naturalHeight||img.height, l=20, y0=Math.max(0,k[0]-l)*H/1000, x0=Math.max(0,k[1]-l)*W/1000, y1=Math.min(1000,k[2]+l)*H/1000, x1=Math.min(1000,k[3]+l)*W/1000;
   var c=document.createElement("canvas"), s=Math.min(1,1800/Math.max(x1-x0,y1-y0)); c.width=Math.round((x1-x0)*s); c.height=Math.round((y1-y0)*s);
-  c.getContext("2d").drawImage(img,x0,y0,x1-x0,y1-y0,0,0,c.width,c.height); return c.toDataURL("image/jpeg",0.88); }
+  c.getContext("2d").drawImage(img,x0,y0,x1-x0,y1-y0,0,0,c.width,c.height); return xoayCanvas(c,xoay).toDataURL("image/jpeg",0.88); }
 function danFiles(fs){ fs=[].slice.call(fs||[]).filter(function(f){ return /^image\//.test(f.type); }); if(!fs.length) return toast("Không có ảnh để dán");
   if(!$("dhKQ")) moDocHD(); var q=Q||(QS||[])[0]||"", kq=$("dhKQ"), nam=new Date().getFullYear();
   fs.forEach(function(f){ var o=document.createElement("div"); o.className="dhThe"; o.innerHTML=gaTai("Gà đang đọc ảnh…"); kq.appendChild(o); DOCHD.chay++;
     docFileAnh(f,2000).then(function(a){ return goi("docAnhZalo",q,"image/jpeg",a.data,DOCHD.ncc).then(function(r){
       if(!r.ds.length) throw new Error(r.thongBao||"Không đọc được hoá đơn");
       o.innerHTML='<div class="nho">'+r.ds.length+' tờ trong ảnh'+(r.thongBao?' · '+esc(r.thongBao):'')+'</div>';
-      return r.ds.reduce(function(p,h){ return p.then(function(){ var url=r.ds.length>1&&h.khung?catKhungURL(a.img,h.khung):a.url, dong=document.createElement("div"); dong.className="dhTo"; o.appendChild(dong);
+      return r.ds.reduce(function(p,h){ return p.then(function(){ var url=h.khung&&(r.ds.length>1||h.xoay)?catKhungURL(a.img,h.khung,h.xoay):a.url, dong=document.createElement("div"); dong.className="dhTo"; o.appendChild(dong);
         dong.innerHTML='<img src="'+url+'"><div>'+gaTai("Đang lưu "+esc(h.ncc||"")+"…")+'</div>';
         return goi("luuAnhZalo",h.quan||q,"image/jpeg",url.split(",")[1],h).then(function(s){ var k=nam+"-"+("0"+h.mm).slice(-2)+"-"+("0"+h.dd).slice(-2);
           if($("dzTu")&&k<$("dzTu").value) $("dzTu").value=k; if($("dzDen")&&k>$("dzDen").value) $("dzDen").value=k;
