@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261105094919";
+var HMK_BAN = "20261105095829";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -2684,8 +2684,8 @@ function chuyenCaTN(btn){ var v=$("caChuyenO").value; if(!v) return toast("Chọ
   hoiMo("Chuyển ca cho <b>"+esc(p[1])+"</b> ("+esc(p[0])+")?",function(){ btn.disabled=true; btn.innerHTML=gaTai("Đang chuyển…"); goi("nhanCa",KCQ,p[0],p[1]).then(function(r){ r._luc=Date.now(); CATN=r; veCaTN(); veBannerCa(); toast("✅ Đã chuyển ca cho "+p[1]); gaMung(); }).catch(function(e){ btn.disabled=false; btn.textContent="Chuyển ca"; toast("⚠️ "+e.message,5000); }); }); }
 // 🧮 Kết ca có 2 menu phụ: Lập kết ca · Lịch sử ca (mỗi ngày 1 hàng, mỗi ca thu ngân 1 cột, bấm ô để xem / sửa)
 var KCXEM="lap", KCLS={ thang:"", ds:null };
-function kcMenuPhu(){ return '<div class="kcMenuPhu khongIn"><span class="locSeg"><button class="'+(KCXEM==="lap"?"on":"")+'" onclick="KCXEM=\'lap\';veKetCa()">'+icv("so",1)+' Lập kết ca</button><button class="'+(KCXEM==="ls"?"on":"")+'" onclick="KCXEM=\'ls\';veKetCa()">'+icv("lich",1)+' Lịch sử ca</button></span></div>'; }
-function veKetCa(giuQ){ if(!giuQ) KCQ=quanHT(); KCNGAY=KCNGAY||homNay();
+function kcMenuPhu(){ return '<div class="kcMenuPhu khongIn"><span class="locSeg"><button class="'+(KCXEM==="lap"?"on":"")+'" onclick="KCXEM=\'lap\';veKetCa()">'+icv("so",1)+' Lập kết ca</button><button class="'+(KCXEM==="ls"?"on":"")+'" onclick="KCXEM=\'ls\';veKetCa()">'+icv("lich",1)+' Lịch sử ca</button></span> <span class="nho" id="kcTuLuu"></span></div>'; }
+function veKetCa(giuQ){ if(KC_HEN) kcTuLuu(); if(!giuQ) KCQ=quanHT(); KCNGAY=KCNGAY||homNay();
   if(KCXEM==="ls") return veLichSuCa();
   $("noiDung").innerHTML=kcMenuPhu()+'<div id="kcCa" class="the khongIn"></div><div id="kcForm"></div>';
   moKetCa(); veCaTN(); taiCaTN(); }
@@ -2716,7 +2716,7 @@ function taiDSKetCa(){ if(!document.getElementById("kcDS")) return; goi("dsKetCa
     '<td class="so '+(c!==""&&Math.abs(c)>=1000?"do":"xanh")+'"><b>'+(c===""?"–":VN(c))+'</b></td><td class="nho">'+esc(o["Người sửa cuối"])+'<br>'+o["Thời điểm"]+'</td><td><button onclick="moKetCaCu(\''+o["Quán"]+'\','+o["Năm"]+','+o.MM+','+o.DD+',\''+esc(o.Ca)+'\')">📂</button></td></tr>'; }).join("")+'</table>':'<div class="nho">Chưa có báo cáo nào.</div>'; }).catch(loi); }
 function moKetCaCu(q,n,m,d,ca){ KCNGAY=n+"-"+("0"+m).slice(-2)+"-"+("0"+d).slice(-2); KCQ=q; KCCA=ca; KCXEM="lap"; veKetCa(true); window.scrollTo(0,0); }
 var KC_LUOT=0;
-function moKetCa(){ var q=KCQ, ng=KCNGAY, ca=KCCA, luot=++KC_LUOT; $("kcForm").innerHTML='<div class="the">'+gaTai("Đang mở báo cáo kết ca…")+'</div>';
+function moKetCa(){ if(KC_HEN) kcTuLuu(); kcTT(""); var q=KCQ, ng=KCNGAY, ca=KCCA, luot=++KC_LUOT; $("kcForm").innerHTML='<div class="the">'+gaTai("Đang mở báo cáo kết ca…")+'</div>';
   goi("ttKetCa",q,ng,ca).then(function(t){ if(luot!==KC_LUOT) return; KCTT=t; var c=t.cu;
     KCF={ id:c?c.ID:"", quan:q, ngay:ng, ca:ca, doanhThu:c?c["Doanh thu máy"]:"", dauCa:c?c["Tiền đầu ca"]:t.dauCa, demThu:c?(c["Đếm thu (JSON)"]||{}):{}, demGiu:c?(c["Đếm giữ két (JSON)"]||{}):{}, demNhap:c?(c["Đếm nhập két (JSON)"]||{}):{},
       ngoaiMay:c?(c["Bán ngoài máy (JSON)"]||[]):t.mauNgoaiMay, ghiChu:c?c["Ghi chú"]:"" }; veFormKC();
@@ -2766,6 +2766,13 @@ function xuatKC(kieu,b){ var vung=$("vungIn"); if(!vung) return; var cu=b.textCo
       while(y<h){ if(y) pdf.addPage(); pdf.addImage(anh,"JPEG",10,10-y,w,h); y+=trang; }
       pdf.save(ten+".pdf"); }
     toast("✅ Đã xuất "+(kieu==="jpg"?"JPEG":"PDF")+" – xem trong thư mục Tải về"); }).catch(loi).then(function(){ b.disabled=false; b.textContent=cu; }); }
+// 💾 Tự lưu: nhập bất kỳ ô tiền nào là ghi nhận vào Lịch sử ca (sau 3 giây ngừng gõ). Bấm Lưu để chốt và ghi sang ADMIN
+var KC_HEN=null, KC_DANGLUU=0, KC_CHO=0;
+function kcCoSo(){ var co=function(o){ return Object.keys(o||{}).some(function(k){ return +o[k]>0; }); }; return !!(KCF&&(+KCF.doanhThu>0||+KCF.dauCa>0||co(KCF.demThu)||co(KCF.demGiu)||co(KCF.demNhap)||(KCF.ngoaiMay||[]).some(function(x){ return +x.sl>0&&+x.dg>0; }))); }
+function kcTT(t){ var e=document.getElementById("kcTuLuu"); if(e) e.textContent=t; }
+function kcTuLuu(){ clearTimeout(KC_HEN); KC_HEN=null; if(!KCF||!kcCoSo()||!suaDuoc("KETCA")) return; if(KC_DANGLUU){ KC_CHO=1; return; } KC_DANGLUU=1; kcTT("Đang tự lưu…"); var f=KCF, p=Object.assign({},f,{tuLuu:1});
+  goi("luuKetCa",p).then(function(o){ if(f===KCF||!f.id) f.id=o.ID; kcTT("✓ Đã tự lưu "+new Date().toLocaleTimeString("vi-VN",{hour:"2-digit",minute:"2-digit"})+" · bấm Lưu để chốt"); },function(e){ kcTT("⚠️ Chưa tự lưu được: "+e.message); }).then(function(){ KC_DANGLUU=0; if(KC_CHO){ KC_CHO=0; kcTuLuu(); } }); }
+["input","change"].forEach(function(ev){ document.addEventListener(ev,function(e){ var t=e.target; if(!t||!t.closest||!t.closest("#kcForm")||!/INPUT|TEXTAREA|SELECT/.test(t.tagName)) return; clearTimeout(KC_HEN); KC_HEN=setTimeout(kcTuLuu,3000); }); });
 function luuKC(b){ b.disabled=true; goi("luuKetCa",KCF).then(function(o){ b.disabled=false; KCF.id=o.ID; toast("✅ Đã lưu báo cáo kết ca"); taiDSKetCa(); }).catch(function(e){ b.disabled=false; loi(e); }); }
 function xoaKC(){ hoiOK("Xoá báo cáo kết ca này?",function(){ goi("xoaKetCa",KCF.id).then(function(){ toast("🗑 Đã xoá"); $("kcForm").innerHTML=""; taiDSKetCa(); }).catch(loi); },"🗑 Xoá"); }
 
