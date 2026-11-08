@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzIWPz00WSzB659piig0WYLBOOd_KWUFQa_sBJgrtHDQQ0Luq9hDHdyGJFVU0HtIWbo/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261105210438";
+var HMK_BAN = "20261108140439";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -1558,7 +1558,7 @@ function ntTenChuan(){ var t={}, ncc=(NT.ncc||"").toUpperCase(); if(NT.ls){ (Arr
   (D.dm.hang||[]).forEach(function(h){ t[h.ten]=t[h.ten]||1; }); return Object.keys(t).sort(function(a,b){ return t[b]-t[a]; }); }
 function veNT(){ if(!NT||!document.getElementById("ntND")) return; if(NT.vat===undefined) NT.vat=(NT.suaSo||NT.zlId)?0:vatNCC(NT.ncc); var tong=NT.dong.reduce(function(a,d){ return a+Math.round(ntTT(d)*(1+vatDong(d,NT.vat)/100)); },0), ten=NT.tl?ntTenChuan():[];
   var tlTen=NT.tlDong>=0&&NT.dong[NT.tlDong]?NT.dong[NT.tlDong].nd:"", q=bo(NT.tlTim||""), ds=ten.filter(function(t){ return !q||bo(t).indexOf(q)>=0; }).slice(0,40);
-  $("ntND").innerHTML='<div class="ntHang1"><label>📅 Ngày:<input type="date" class="ntNgay"'+(NT.suaSo?' disabled title="Đổi ngày: xoá hoá đơn rồi nhập lại"':'')+' value="'+(NT.nam||new Date().getFullYear())+'-'+('0'+NT.mm).slice(-2)+'-'+('0'+NT.dd).slice(-2)+'" onchange="var m=/^(\\d{4})-(\\d{2})-(\\d{2})$/.exec(this.value);if(m){NT.nam=+m[1];NT.mm=+m[2];NT.dd=+m[3];ntSoHD();}"></label>'+
+  $("ntND").innerHTML='<div class="ntHang1"><label>📅 Ngày:<input type="date" class="ntNgay"'+(NT.suaSo?' title="Đổi ngày thì hoá đơn được cấp số mới theo ngày đó"':'')+' value="'+(NT.nam||new Date().getFullYear())+'-'+('0'+NT.mm).slice(-2)+'-'+('0'+NT.dd).slice(-2)+'" onchange="var m=/^(\\d{4})-(\\d{2})-(\\d{2})$/.exec(this.value);if(m){NT.nam=+m[1];NT.mm=+m[2];NT.dd=+m[3];ntSoHD();}"></label>'+
     ('<label class="ntML" title="Chọn 1 lần áp cho mọi dòng của hoá đơn – dòng nào khác thì đổi riêng ở cột Main list">Main list chung:<span class="ntGoiBoc"><input id="ntMLo" autocomplete="off" value="'+esc(NT.ml)+'" placeholder="– chọn –" oninput="ntGoiML(this)" onfocus="this.select();ntGoiML(this,1)" onblur="setTimeout(function(){ ntAnGoi(\'ntGoiML\'); var o=document.getElementById(\'ntMLo\'); if(o) o.value=NT.ml; },180)" onkeydown="ntPhimGoi(event,\'ntGoiML\')"><div class="ntGoi" id="ntGoiML"></div></span></label>'+
     '<label>Số HĐ:<input id="ntSoHD" value="'+esc(NT.soHD||"")+'" placeholder="chọn NCC" disabled title="Tự tạo như Main pay list: viết tắt NCC + ngày + số thứ tự trong ngày"></label>')+'<label class="ntNCC">NCC:<span class="ntGoiBoc"><input id="ntNCCo" autocomplete="off" value="'+esc(NT.ncc)+'" placeholder="Tên NCC…" oninput="ntGoiNCC(this)" onfocus="ntGoiNCC(this)" onblur="setTimeout(function(){ ntAnGoi(\'ntGoi\'); },180)" onkeydown="ntPhimGoi(event,\'ntGoi\')" onchange="NT.ncc=this.value.trim().toUpperCase();this.value=NT.ncc;ntSoHD()"><div class="ntGoi" id="ntGoi"></div></span></label></div>'+goiYNCCNT()+
     '<div class="ntDS"><span>DANH SÁCH CHI TIẾT MẶT HÀNG</span>'+(D.chu?'<button class="ntTLNut" onclick="moTenGan()">'+gaGhi()+' Dò tên gần trùng toàn hệ thống</button>':'')+'</div>'+
@@ -1772,7 +1772,7 @@ function hnNT(mo){ var k=document.getElementById("ntKhung"), b=document.getEleme
   if(hien) napLSN(); if(hien&&(!NT||NT.suaSo&&mo==null)){ NT=null; ntSan(); } k.hidden=!hien; if(b) b.innerHTML=gaGhi()+(hien?" Nhập hoá đơn mới ▴":" Nhập hoá đơn mới ▾");
   if(hien){ k.scrollIntoView({behavior:"smooth",block:"start"}); var o=document.getElementById(NT&&NT.suaSo?"":"ntNCCo"); if(o&&!o.disabled) setTimeout(function(){ o.focus(); },400); } }
 function ntTuHD(so){ if(!suaDuoc("MPL")) return moHD(so); toast("⏳ Đang mở "+so+"…",1500);
-  goi("hoaDon",so).then(function(h){ NT={ dich:"HD", suaSo:so, nam:+h["Năm"], dd:+h.DD, mm:+h.MM, ncc:String(h["Nhà Cung Cấp"]||"").toUpperCase(), nccGoc:String(h["Nhà Cung Cấp"]||"").toUpperCase(), ml:(h.dong[0]&&h.dong[0].ml)||"", ec:(h.dong[0]&&h.dong[0].ec)||"", tl:false, tlDong:-1, tlChuan:"", ls:null,
+  goi("hoaDon",so).then(function(h){ NT={ dich:"HD", suaSo:so, ngayG:+h["Năm"]+"-"+(+h.MM)+"-"+(+h.DD), nam:+h["Năm"], dd:+h.DD, mm:+h.MM, ncc:String(h["Nhà Cung Cấp"]||"").toUpperCase(), nccGoc:String(h["Nhà Cung Cấp"]||"").toUpperCase(), ml:(h.dong[0]&&h.dong[0].ml)||"", ec:(h.dong[0]&&h.dong[0].ec)||"", tl:false, tlDong:-1, tlChuan:"", ls:null,
       goc:h.dong.map(function(d){ return { id:d.id, nd:String(d.nd), sl:d.sl, dg:d.dg, gc:String(d.gc||""), ml:d.ml }; }), tong:h["Tổng số hoá"],
       dong:h.dong.map(function(d){ return { id:d.id, nd:String(d.nd||""), sl:d.sl, dg:d.dg, gc:String(d.gc||""), ml:d.ml }; }) };
     NT.dong.push({ nd:"", sl:"", dg:"", gc:"" }); ntLs(); ntSan(); hnNT(true); taiHDNgay(); }).catch(loi); }
@@ -1781,16 +1781,17 @@ function ntLuuSua(btn,dong,bao){ var so=NT.suaSo, coId={}; dong.forEach(function
   var thieu=dong.filter(function(d){ return !(Number(d.sl)>0); })[0]; if(thieu) return bao("Thiếu SL: "+thieu.nd);
   var doi=dong.filter(function(d){ if(!d.id) return false; var g=NT.goc.filter(function(x){ return x.id===d.id; })[0]; return g&&(g.nd!==d.nd||Number(g.sl)!==Number(d.sl)||Number(g.dg)!==Number(d.dg)||g.gc!==d.gc||(d.ml||"")!==(g.ml||"")||vatDong(d,NT.vat)!==0); });
   var bo=NT.goc.filter(function(g){ return !coId[g.id]; }).map(function(g){ return g.id; }), moi=dong.filter(function(d){ return !d.id; });
-  var doiNCC=NT.ncc&&NT.ncc!==NT.nccGoc;
-  if(!doi.length&&!bo.length&&!moi.length&&!doiNCC) return bao("Chưa có thay đổi nào.");
+  var doiNCC=NT.ncc&&NT.ncc!==NT.nccGoc, doiNgay=NT.ngayG&&(NT.nam+"-"+NT.mm+"-"+NT.dd)!==NT.ngayG, soHT=so, ngayM=NT.nam+"-"+("0"+NT.mm).slice(-2)+"-"+("0"+NT.dd).slice(-2), ngayTB=NT.dd+"/"+NT.mm;
+  if(!doi.length&&!bo.length&&!moi.length&&!doiNCC&&!doiNgay) return bao("Chưa có thay đổi nào.");
   if(bo.length&&!dong.length) return ntXoaHD();
   btn.disabled=true; btn.innerHTML=gaTai("Đang lưu…");
   var viec=doi.map(function(d){ return function(){ return goi("suaDong",d.id,{ nd:d.nd, sl:d.sl, dg:dgVAT(d,NT.vat), ml:d.ml||NT.ml, gc:gcVAT(d,NT.vat,d.gc.replace(/^🧩.*/,"")) }); }; });
   if(moi.length) viec.push(function(){ return goi("themDongHD",so,{ dong:moi.map(function(d){ return { nd:d.nd, sl:d.sl, dg:dgVAT(d,NT.vat), ml:d.ml||NT.ml, ec:NT.ec||"Chưa TT", gc:gcVAT(d,NT.vat,d.gc.replace(/^🧩.*/,"")) }; }) }); });
   if(bo.length) viec.push(function(){ return goi("xoaDong",bo,"Sửa hoá đơn "+so+": bỏ dòng"); });
-  if(doiNCC) viec.push(function(){ return goi("doiNCCHD",so,NT.ncc); });
+  if(doiNCC) viec.push(function(){ return goi("doiNCCHD",so,NT.ncc).then(function(r){ soHT=r&&r.soMoi||soHT; }); });
+  if(doiNgay) viec.push(function(){ return goi("doiNgayHD",soHT,ngayM).then(function(r){ soHT=r&&r.soMoi||soHT; }); }); // đổi ngày cuối cùng vì số HĐ đổi theo
   var chay=function(k){ return k<viec.length?viec[k]().then(function(){ return chay(k+1); }):Promise.resolve(); };
-  chay(0).then(function(){ toast("✅ Đã lưu "+so+(doi.length?" · sửa "+doi.length:"")+(moi.length?" · thêm "+moi.length:"")+(bo.length?" · bỏ "+bo.length:"")+" dòng"+(doiNCC?" · NCC → "+NT.ncc:""),4000); NT=null; hnNT(false); taiHDNgay(); })
+  chay(0).then(function(){ toast("✅ Đã lưu "+so+(doi.length?" · sửa "+doi.length:"")+(moi.length?" · thêm "+moi.length:"")+(bo.length?" · bỏ "+bo.length:"")+" dòng"+(doiNCC?" · NCC → "+NT.ncc:"")+(doiNgay?" · ngày → "+ngayTB+(soHT!==so?" (số mới "+soHT+")":""):""),5000); NT=null; hnNT(false); taiHDNgay(); })
     .catch(function(e){ btn.disabled=false; btn.textContent="💾 Lưu sửa hoá đơn"; bao(e.message); }); }
 function ntXoaHD(){ var so=NT&&NT.suaSo; if(!so) return; hnXoaMot(so,NT.ncc,NT.tong); }
 // 📲 Bảng nhập tay ở Đối chiếu HĐ NCC (Zalo): lưu thành 1 hoá đơn phía NCC (nguồn "Nhập tay") – ghép tự động với hoá đơn thu ngân
