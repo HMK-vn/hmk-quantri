@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzIWPz00WSzB659piig0WYLBOOd_KWUFQa_sBJgrtHDQQ0Luq9hDHdyGJFVU0HtIWbo/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261108140439";
+var HMK_BAN = "20261109215000";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -897,7 +897,7 @@ function dangXuat(){ try{ google.accounts&&google.accounts.id&&google.accounts.i
 
 function batDau(){
   if(!S.token){ hien("dangNhap"); nutGGWeb(); try{ window.top.postMessage({ hmk:"canDangNhap" },"*"); }catch(e){} return; }
-  goi("khoiDong").then(function(d){ D=d; luuTk(); try{ window.top.postMessage({ hmk:"luuToken", token:S.token },"*"); }catch(e){} try{ var qn=localStorage.getItem("hmk_quan"); if(qn&&D.quan.indexOf(qn)>=0) Q=qn; }catch(e){} an("dangNhap"); hien("app"); veKhung(); thuAnhURL(); }).catch(function(e){ hien("dangNhap"); $("loiDN").textContent=e.message; hien("loiDN"); });
+  goi("khoiDong").then(function(d){ D=d; if(D.tab&&D.tabs&&D.tab.CHAMCONG&&D.tab.CHAMCONG!=="Ẩn"&&!D.tab.SOMMUON){ D.tabs.push(["SOMMUON","⏰","Báo cáo sớm / muộn",1]); D.tab.SOMMUON=D.tab.CHAMCONG; } luuTk(); try{ window.top.postMessage({ hmk:"luuToken", token:S.token },"*"); }catch(e){} try{ var qn=localStorage.getItem("hmk_quan"); if(qn&&D.quan.indexOf(qn)>=0) Q=qn; }catch(e){} an("dangNhap"); hien("app"); veKhung(); thuAnhURL(); }).catch(function(e){ hien("dangNhap"); $("loiDN").textContent=e.message; hien("loiDN"); });
 }
 // 📗 Bảng chọn Google Sheet (chỉ chủ): tab/file của trang đang mở lên đầu, gõ để lọc, bấm ↗ mở tab mới
 var SHEET_IC='<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="#1e8e3e" d="M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><path fill="#8bd3a5" d="M15 2v5h5z"/><path fill="#fff" d="M7.5 10.5h9v7h-9zm1.3 1.3v1.6h2.6v-1.6zm3.9 0v1.6h2.5v-1.6zm-3.9 2.9v1.5h2.6v-1.5zm3.9 0v1.5h2.5v-1.5z"/></svg>';
@@ -955,7 +955,7 @@ function veKhung(){ if(D.chu) $("nutSheet").classList.remove("an"); /* veKhung c
 }
 // Menu trái: nhóm theo công việc; ☰ thu gọn còn icon (máy tính) / mở ngăn kéo (điện thoại)
 // Menu theo trình tự vận hành (giống luồng file ADMIN): ① nhập liệu & tiền vào hằng ngày → ② chi phí NCC (Main pay list → phân loại → đối chiếu → công nợ) → ③ bếp & kho → ④ khách & nhân sự → ⑤ hệ thống
-var MENU_NHOM=[["① Nhập liệu hằng ngày",["NHAP","UPLOAD","DUYET","KETCA","BANK","CASH"]],["② Chi phí nhà cung cấp",["MPL","HDNGAY","PLHD","TIMELINE","DOICHIEU","CONGNO"]],["③ Bếp & kho",["KHO","KIEMTHUC"]],["④ Khách & nhân sự",["DATBAN","CHAMCONG"]],["⑤ Hệ thống",["DANHMUC","PHANQUYEN","NHATKY","HUONGDAN"]]];
+var MENU_NHOM=[["① Nhập liệu hằng ngày",["NHAP","UPLOAD","DUYET","KETCA","BANK","CASH"]],["② Chi phí nhà cung cấp",["MPL","HDNGAY","PLHD","TIMELINE","DOICHIEU","CONGNO"]],["③ Bếp & kho",["KHO","KIEMTHUC"]],["④ Khách & nhân sự",["DATBAN","CHAMCONG","SOMMUON"]],["⑤ Hệ thống",["DANHMUC","PHANQUYEN","NHATKY","HUONGDAN"]]];
 var MAU_IC={NHAP:["#ffb35c","#ff7a1a"],DUYET:["#7cc4ff","#2f7bf6"],KETCA:["#7be0a0","#1fa65a"],KIEMTHUC:["#c7ef7a","#6cb52d"],MPL:["#9db4ff","#5a6cf0"],PLHD:["#ffd36b","#f0a500"],BANK:["#6fd6e8","#1592b8"],CASH:["#9ee59a","#3aa845"],TIMELINE:["#ff9a9a","#e5463b"],CONGNO:["#ffb0d6","#e0408d"],KHO:["#c9b2ff","#7a52e6"],CHAMCONG:["#b6a3ff","#6b4fd8"],DANHMUC:["#d2d6de","#8a93a3"],PHANQUYEN:["#a6abb6","#4c5260"],UPLOAD:["#ffb35c","#ff7a1a"],NHATKY:["#a6abb6","#4c5260"],HUONGDAN:["#9db4ff","#5a6cf0"]};
 // Bộ icon nét trắng trên ô kính (kiểu iOS "liquid glass"), vẽ riêng bằng SVG – viewBox 24
 var ICON_SVG={
@@ -1066,7 +1066,7 @@ function moTab(t){
   var info = D.tabs.filter(function(x){ return x[0]===t; })[0];
   $("tieuDeTrang").innerHTML = info ? (HD_GOP.indexOf(t)>=0?icMac(info)+" Hoá đơn – NCC "+thanhHDNCC(t):icMac(info)+" "+esc(info[2]))+(KY_TAB[t]?'<span id="thanhKy" class="thanhKy khongIn"></span>':'')+'<span class="sp" style="flex:1"></span><span id="nhanQuan"></span>' : ""; veThanhKy(); apSoCot();
   [].forEach.call(document.querySelectorAll("nav button[data-t]"),function(b){ b.classList.toggle("on", b.dataset.t===t||(b.dataset.t==="HDNCC"&&HD_GOP.indexOf(t)>=0)); }); capNhatNhanQuan(); document.body.classList.remove("moMenu"); window.scrollTo(0,0);
-  var fn = { NHAP:veNhap, MPL:veMPL, HDNGAY:veHDNgay, DUYET:veDuyet, BANK:veBank, KETCA:veKetCa, PLHD:vePLHD, CASH:veInCash, TIMELINE:veTimeline, KHO:veKho, KIEMTHUC:veKiemThuc, CONGNO:veCongNo, DOICHIEU:veDoiChieu, HUONGDAN:veHuongDan, UPLOAD:veUpload, NHATKY:veNhatKy, DATBAN:veDatBan, DANHMUC:veDanhMuc, PHANQUYEN:vePQ, CHAMCONG:veChamCong }[t];
+  var fn = { NHAP:veNhap, MPL:veMPL, HDNGAY:veHDNgay, DUYET:veDuyet, BANK:veBank, KETCA:veKetCa, PLHD:vePLHD, CASH:veInCash, TIMELINE:veTimeline, KHO:veKho, KIEMTHUC:veKiemThuc, CONGNO:veCongNo, DOICHIEU:veDoiChieu, HUONGDAN:veHuongDan, UPLOAD:veUpload, NHATKY:veNhatKy, DATBAN:veDatBan, DANHMUC:veDanhMuc, PHANQUYEN:vePQ, CHAMCONG:veChamCong, SOMMUON:veSomMuon }[t];
   if(fn) fn(); else $("noiDung").innerHTML = '<div class="the" style="text-align:center;padding:40px"><div style="font-size:44px">'+info[1]+'</div><h3>'+info[2]+'</h3><p class="nho">🚧 Đang xây dựng – Giai đoạn '+info[3]+'. Chủ duyệt xong giai đoạn trước sẽ làm tiếp.</p></div>';
 }
 function suaDuoc(t){ return D.tab[t]==="Sửa"; }
@@ -2535,6 +2535,7 @@ function veChamCong(k){ if(k) CCTRANG=k;
   var ds=D.chamCong.filter(function(c){ return D.quan.indexOf(c.quan)>=0; });
   if(!ds.length){ $("noiDung").innerHTML='<div class="the"><h3>👥 Chấm công</h3><p class="nho">Chưa có link chấm công trong Cài đặt (LINK_CHAM_CONG).</p></div>'; return; }
   var c=ds.filter(function(x){ return x.quan===Q; })[0]||ds[0], url=CCTRANG==="ql"?c.url+(c.url.indexOf("?")>=0?"&":"?")+"trang=ql":c.url;
+  if(CCMO_TAB){ url+=(url.indexOf("?")>=0?"&":"?")+"tab="+CCMO_TAB; CCMO_TAB=""; }
   $("noiDung").innerHTML='<div class="hang">'+[["ql","🗂 Quản lý"],["cc","🕒 Chấm công"]].map(function(x){ return '<button class="chip'+(x[0]===CCTRANG?' on':'')+'" onclick="veChamCong(\''+x[0]+'\')">'+x[1]+'</button>'; }).join("")+
     '<span class="nho">'+(c.quan==="LẨU"?"🍲 LẨU":"🔥 TÚI")+(Q?"":" · đổi quán ở nút trên cùng")+'</span><span class="sp" style="flex:1"></span><a class="nho" href="'+esc(url)+'" target="_blank">↗ Mở toàn màn hình</a></div>'+
     '<iframe class="khungCC" id="khungCC" allow="clipboard-write"></iframe>';
@@ -2542,7 +2543,8 @@ function veChamCong(k){ if(k) CCTRANG=k;
   var mo=function(tok){ var f=document.getElementById("khungCC"); if(f) f.src=tok?url+(url.indexOf("?")>=0?"&":"?")+"s="+encodeURIComponent(tok):url; };
   if(PHIEN_CC[c.quan]&&PHIEN_CC[c.quan].het>Date.now()) return mo(PHIEN_CC[c.quan].tok);
   goi("phienCC",c.quan).then(function(tok){ if(tok) PHIEN_CC[c.quan]={ tok:tok, het:Date.now()+20*3600000 }; mo(tok); }).catch(function(){ mo(""); }); }
-var PHIEN_CC={};
+var PHIEN_CC={}, CCMO_TAB="";
+function veSomMuon(){ CCMO_TAB="adSomMuon"; veChamCong("ql"); }
 
 // ---------- 📤 UPLOAD CHUNG: Excel / CSV / dán từ Excel → ghép cột → xem trước → ghi ----------
 function boDau(s){ return String(s==null?"":s).normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/đ/g,"d").replace(/Đ/g,"D").toLowerCase().trim(); }
