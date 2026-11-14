@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261114135958";
+var HMK_BAN = "20261114140347";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -2429,8 +2429,12 @@ function taiMPL(){
 }
 function chonHet(v){ [].forEach.call(document.querySelectorAll(".chon"),function(c){ c.checked=v; }); }
 function suaNhanh(id,o){ goi("suaDong",id,o).then(function(){ toast("✅ Đã lưu"); taiMPL(); }).catch(loi); }
+// 📋 Gợi ý tên hàng khi sửa dòng: hàng cùng NCC (đã nhập) lên trước, sau đó danh mục hàng
+function dsGoiYHang(x){ var co={}, ra=[], ncc=String(x[7]||"").toUpperCase(); (MPLDS||[]).forEach(function(r){ var t=String(r[6]||"").trim(); if(t&&!co[t]&&String(r[7]||"").toUpperCase()===ncc){ co[t]=1; ra.push(t); } });
+  ((D.dm&&D.dm.hang)||[]).forEach(function(h){ var t=String(h.ten||"").trim(); if(t&&!co[t]){ co[t]=1; ra.push(t); } });
+  return '<datalist id="dlSuaND">'+ra.slice(0,800).map(function(t){ return '<option value="'+esc(t)+'">'; }).join("")+'</datalist>'; }
 function moSua(i){ var x=MPLDS[i];
-  moHop('<h3>✏️ Sửa dòng – '+esc(x[4])+'</h3><div class="hang"><label style="flex:1">Nội dung chi<input id="sND" value="'+esc(x[6])+'"></label><label>SL<input id="sSL" type="number" step="any" value="'+x[10]+'" oninput="sSuy(\'sl\')"></label><label>Đơn giá<input id="sDG" type="number" step="any" value="'+x[11]+'" oninput="sSuy(\'dg\')"></label><label>Thành tiền<input id="sTT" inputmode="numeric" value="'+(x[12]?Number(x[12]).toLocaleString("vi-VN"):"")+'" oninput="sSuy(\'tt\')" title="Có SL → tự ra đơn giá; có đơn giá → tự ra SL"></label></div>'+
+  moHop('<h3>✏️ Sửa dòng – '+esc(x[4])+'</h3><div class="hang"><label style="flex:1">Nội dung chi<input id="sND" list="dlSuaND" autocomplete="off" value="'+esc(x[6])+'" onfocus="this.select()"></label>'+dsGoiYHang(x)+'<label>SL<input id="sSL" type="number" step="any" value="'+x[10]+'" oninput="sSuy(\'sl\')"></label><label>Đơn giá<input id="sDG" type="number" step="any" value="'+x[11]+'" oninput="sSuy(\'dg\')"></label><label>Thành tiền<input id="sTT" inputmode="numeric" value="'+(x[12]?Number(x[12]).toLocaleString("vi-VN"):"")+'" oninput="sSuy(\'tt\')" title="Có SL → tự ra đơn giá; có đơn giá → tự ra SL"></label></div>'+
   '<div class="hang"><label>Main list<select id="sML">'+D.dm.mainList.map(function(m){return '<option'+(m===x[9]?" selected":"")+'>'+esc(m)+'</option>';}).join("")+'</select></label><label>End cash<select id="sEC">'+(D.dm.endCash.some(function(m){return m.toUpperCase()===String(x[13]).toUpperCase();})?[]:[x[13]]).concat(D.dm.endCash).map(function(m){return '<option'+(String(m).toUpperCase()===String(x[13]).toUpperCase()?" selected":"")+'>'+esc(m)+'</option>';}).join("")+'</select></label>'+
   '<label style="flex:1">Ghi chú<input id="sGC" value="'+esc(x[14])+'"></label></div><p style="text-align:right"><button onclick="dongMo()">Huỷ</button> <button class="c" onclick="luuSua(\''+x[0]+'\')">💾 Lưu</button></p>'); }
 function sSuy(goc){ var r=suy3($("sSL").value,$("sDG").value,soVN($("sTT").value),goc); if(goc!=="sl"&&r.sl) $("sSL").value=r.sl; if(goc!=="dg"&&r.dg) $("sDG").value=r.dg; if(goc!=="tt") $("sTT").value=r.tt?r.tt.toLocaleString("vi-VN"):""; }
