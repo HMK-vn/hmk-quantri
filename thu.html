@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261114152833";
+var HMK_BAN = "20261114153041";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -580,6 +580,8 @@ html.coHop,html.coHop body{overflow:hidden!important;overscroll-behavior:none}.m
 #kcForm .kcDem td{padding:2px 6px!important;line-height:1.15}#kcForm .kcDem td.kcO input{height:28px!important;min-height:0!important;padding:0 6px!important;font-size:14px}#kcForm .kcDem tr:first-child th.thKC{height:auto;padding:5px 4px!important}#kcForm .kcDem td.kcO .nho:empty{display:none}
 .kcDauHang{display:flex;flex-wrap:nowrap;align-items:center;gap:8px;margin-bottom:8px}.kcDauHang .kcMenuPhu{flex:none;margin:0!important}.kcDauHang #kcCa{flex:1 1 auto;min-width:0;margin:0!important;padding:6px 12px!important;overflow:hidden}.kcDauHang #kcCa *{white-space:nowrap}.kcDauHang #kcCa summary,.kcDauHang #kcCa>div:first-child{overflow:hidden;text-overflow:ellipsis}@media(max-width:640px){.kcDauHang{gap:6px}.kcDauHang .locSeg button{font-size:12px!important;padding:4px 8px!important}.kcDauHang #kcCa{padding:4px 8px!important;font-size:12.5px}}.luoi2>*{min-width:0}#kcForm .kcBuoc{min-width:0}#kcForm .kcBuoc .hang{flex-wrap:nowrap}#kcForm .kcBuoc .hang>label{flex:1 1 0;min-width:0}#kcForm .kcBuoc .hang>label>span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#kcForm .kcBuoc .hang input{width:100%!important;min-width:0!important;max-width:100%;box-sizing:border-box}#kcForm table{max-width:100%}
 .kcDauHang{display:flex!important}#kcForm .kcBuoc>.hang{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important}
+.kcNut>button,.kcNut>button.d{width:auto!important;height:auto!important;min-width:0!important;border-radius:14px!important;padding:8px 4px!important}
+#kcForm .kcDS td{padding:4px 8px!important;line-height:1.2}#kcForm .kcDS .kcCT{margin-top:0}
 </style><style>/* 🧾 Hoá đơn – NCC · lưới đối chiếu */
 main{max-width:none!important;width:100%;box-sizing:border-box}.chanTrang{max-width:none!important}
 #mplLoc label,#mplLoc button,#mplLoc .mplNhan,.mplTagLoc{display:inline-flex;align-items:center;gap:5px}#mplLoc .icv.lon,.mplTagLoc .icv.lon{width:22px;height:22px;flex:0 0 auto}.mplTagLoc a{display:inline-flex}.mplTagLoc a .icv.lon{width:16px;height:16px}
