@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzIWPz00WSzB659piig0WYLBOOd_KWUFQa_sBJgrtHDQQ0Luq9hDHdyGJFVU0HtIWbo/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261114150647";
+var HMK_BAN = "20261114151313";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -807,10 +807,10 @@ body .ntInline .ntBang th,body.misa .ntInline .ntBang th{padding:7px 4px!importa
 body .ntInline .ntBang .ntTac button:not(.ntXoa){display:none!important}
 body .ntInline .ntBang td:nth-child(2) input{min-width:8.5em!important}
 }
-/* 🔤 05/11 chủ: chữ trên web (máy tính) cỡ 15. Giữ riêng: tiêu đề, số lớn KPI, huy hiệu, thẻ lưới Đối chiếu; điện thoại giữ cỡ đã tối ưu */
+/* 🔤 05/11 chủ: chữ trên web (máy tính) cỡ 16.5 (14/11 tăng). Giữ riêng: tiêu đề, số lớn KPI, huy hiệu, thẻ lưới Đối chiếu; điện thoại giữ cỡ đã tối ưu */
 @media(min-width:701px){
-body,body.misa,body td:not(.lwBang td),body th:not(.lwBang th),body button:not(.lwBang button):not(.mucNut):not(.hnBut):not(.lsThem):not(.ntMoGon),body input,body select,body textarea,body label,body summary,body li,body p,body small:not(.lsNgay small),body .nho:not(.lwBang .nho),body .bao,body .tag,body .mucTag,body nav#tabs button,body .lsDong,body .lsAi,body .nkDong,body .dczTong,body .dczAn,body .upTieuDe .nho,body .upSo,body .upDang{font-size:15px!important}
-body .ntInline .ntBang th,body.misa .ntInline .ntBang th,body .dczDau .segDCZ button,body .dczDau .locNCCDCZ,body .locHang button,body .locHang input,body .locHang select,body .locHang label,body .thanhKy button,body #thanhKy .segDCZ button,body .dauTrang button,body .dauTrang input[type=date],body .hdNhay a,body .hdThe ol,body .mucThem,body .ntInline #ntND input:not([type=checkbox]):not([type=date]),body .ntInline .ntBang input:not([type=checkbox]),body .ntInline #ntND select,body .ntInline .ntBang td,body.misa .ntInline .ntBang td,body .ntInline .ntBang table,body .vatTich,body .vatTich select,body .kcMenuPhu button,body .lsBang th,body .xlThe span{font-size:15px!important}
+body,body.misa,body td:not(.lwBang td),body th:not(.lwBang th),body button:not(.lwBang button):not(.mucNut):not(.hnBut):not(.lsThem):not(.ntMoGon),body input,body select,body textarea,body label,body summary,body li,body p,body small:not(.lsNgay small),body .nho:not(.lwBang .nho),body .bao,body .tag,body .mucTag,body nav#tabs button,body .lsDong,body .lsAi,body .nkDong,body .dczTong,body .dczAn,body .upTieuDe .nho,body .upSo,body .upDang{font-size:16.5px!important}
+body .ntInline .ntBang th,body.misa .ntInline .ntBang th,body .dczDau .segDCZ button,body .dczDau .locNCCDCZ,body .locHang button,body .locHang input,body .locHang select,body .locHang label,body .thanhKy button,body #thanhKy .segDCZ button,body .dauTrang button,body .dauTrang input[type=date],body .hdNhay a,body .hdThe ol,body .mucThem,body .ntInline #ntND input:not([type=checkbox]):not([type=date]),body .ntInline .ntBang input:not([type=checkbox]),body .ntInline #ntND select,body .ntInline .ntBang td,body.misa .ntInline .ntBang td,body .ntInline .ntBang table,body .vatTich,body .vatTich select,body .kcMenuPhu button,body .lsBang th,body .xlThe span{font-size:15.5px!important}
 }
 </style>
 </head><body class="misa"><script>try{ window.top.postMessage({ hmk:"song" },"*"); }catch(e){}</script>
