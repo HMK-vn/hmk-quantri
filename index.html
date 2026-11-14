@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzIWPz00WSzB659piig0WYLBOOd_KWUFQa_sBJgrtHDQQ0Luq9hDHdyGJFVU0HtIWbo/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261114153659";
+var HMK_BAN = "20261114154554";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -3002,9 +3002,17 @@ var THU_VIEN_XUAT=null;
 function napThuVienXuat(){ if(THU_VIEN_XUAT) return THU_VIEN_XUAT; var nap=function(u){ return new Promise(function(ok,loi){ var s=document.createElement("script"); s.src=u; s.onload=ok; s.onerror=function(){ loi(new Error("Không tải được thư viện xuất file")); }; document.head.appendChild(s); }); };
   THU_VIEN_XUAT=nap("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js").then(function(){ return nap("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"); }); return THU_VIEN_XUAT; }
 function taiFile(url,ten){ try{ var a=document.createElement("a"); a.href=url; a.download=ten; document.body.appendChild(a); a.click(); a.remove(); }catch(e){} }
+// 🖨 Dọn bản sao trước khi xuất PDF/JPEG: bỏ phần đang đóng, ô nhập → chữ, tắt hiệu ứng kính/bóng đổ (html2canvas vẽ sai)
+function kcDonBan(doc){ var v=doc.getElementById("vungIn"); if(!v) return;
+  v.querySelectorAll("details:not([open])").forEach(function(d){ [].slice.call(d.children).forEach(function(c){ if(c.tagName!=="SUMMARY") c.remove(); }); });
+  if(!(KCF.ngoaiMay||[]).some(function(x){ return +x.sl>0; })) v.querySelectorAll(".kcNMHop").forEach(function(d){ d.remove(); });
+  v.querySelectorAll(".kcNMNut").forEach(function(e){ e.remove(); });
+  v.querySelectorAll("input:not([type=checkbox]):not([type=radio]),textarea,select").forEach(function(i){ var d=doc.createElement("div"), so=i.type==="number"||/soTien/.test(i.className);
+    d.className="kcGT"; d.textContent=i.tagName==="SELECT"?((i.selectedOptions&&i.selectedOptions[0])||{}).text||"":i.value; d.style.cssText="box-sizing:border-box;width:100%;min-height:1.2em;padding:0 6px;white-space:pre-wrap;font-weight:"+(so?"600":"400")+";text-align:"+(i.type==="number"?"center":so?"right":"left"); i.replaceWith(d); });
+  var st=doc.createElement("style"); st.textContent="#vungIn,#vungIn *{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;box-shadow:none!important}#vungIn .kcGT{display:block!important}"; doc.head.appendChild(st); }
 function xuatKC(kieu,b){ var vung=$("vungIn"); if(!vung) return; var cu=b.textContent; b.disabled=true; b.innerHTML=gaTai("");
   var ten="KetCa_"+(KCF.quan==="LẨU"?"Lau":"Tui")+"_"+KCF.ngay+"_"+String(KCF.ca).replace(/\s+/g,"");
-  napThuVienXuat().then(function(){ return html2canvas(vung,{scale:2,backgroundColor:"#ffffff",ignoreElements:function(el){ return el.classList&&el.classList.contains("khongIn"); }}); }).then(function(cv){
+  napThuVienXuat().then(function(){ return html2canvas(vung,{scale:2,backgroundColor:"#ffffff",onclone:kcDonBan,ignoreElements:function(el){ return el.classList&&el.classList.contains("khongIn"); }}); }).then(function(cv){
     if(kieu==="jpg"){ taiFile(cv.toDataURL("image/jpeg",0.92),ten+".jpg"); }
     else { var pdf=new window.jspdf.jsPDF({orientation:"p",unit:"mm",format:"a4"}), w=190, h=cv.height*w/cv.width, trang=277, y=0, anh=cv.toDataURL("image/jpeg",0.92);
       // dài hơn 1 trang A4 thì cắt sang trang sau
