@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261114111429";
+var HMK_BAN = "20261114111927";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -1051,7 +1051,7 @@ function gonKPI(){ if(!KY_TAB[TAB]) return; [].forEach.call(document.querySelect
 // 🎨 Emoji đứng đầu nút / tiêu đề / ô thống kê → icon nét tay cùng bộ (đồng bộ toàn trang). Chỉ đổi emoji có trong ICV_EMOJI
 var RE_EMO=null;
 function iconHoa(goc){ RE_EMO=RE_EMO||new RegExp("^\\s*("+Object.keys(ICV_EMOJI).sort(function(a,b){ return b.length-a.length; }).map(function(k){ return k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"); }).join("|")+")\\uFE0F?\\s*");
-  [].forEach.call((goc||document).querySelectorAll("button:not(.khongIc),.icNut,h3,.bkTK>span,label,summary,.kpi small"),function(el){ var n=el.firstChild; while(n&&n.nodeType===3&&!n.nodeValue.trim()) n=n.nextSibling; if(!n||n.nodeType!==3) return;
+  [].forEach.call((goc||document).querySelectorAll("button:not(.khongIc),.icNut,h3,.bkTK>span,label,summary,.kpi small,.kcTom small,.kcDS td:first-child,.kcBank,.kcChiDau>span,.kcDong span,.kcBuoc>.hang>label>span,h3 .nho,.kcTong .bao,.kcTieuDe>span:first-child,.kcDem th"),function(el){ var n=el.firstChild; while(n&&((n.nodeType===3&&!n.nodeValue.trim())||(n.nodeType===1&&n.classList&&n.classList.contains("kcSo")))) n=n.nextSibling; if(!n||n.nodeType!==3) return;
     var m=RE_EMO.exec(n.nodeValue); if(!m) return; var ic=ICV_EMOJI[m[1]]; if(!ic||!ICV[ic]) return; var sp=document.createElement("span"); sp.className="icTu"; sp.innerHTML=icv(ic,1); n.nodeValue=(n.nodeValue.slice(m[0].length)?" "+n.nodeValue.slice(m[0].length):""); el.insertBefore(sp,n); }); }
 var HEN_KY=null; new MutationObserver(function(){ clearTimeout(HEN_KY); HEN_KY=setTimeout(function(){ datThanhKy(); gonKPI(); try{ iconHoa(document.getElementById("noiDung")); }catch(e){} },40); }).observe(document.getElementById("noiDung"),{childList:true,subtree:true});
 // 💬 Chú thích nhanh khi rê chuột: mọi phần tử có title → khung chú thích gọn hiện ngay (thay tooltip mặc định chậm của trình duyệt)
@@ -2117,11 +2117,24 @@ var ICV={
  trung:'<path d="M8.4 3.6c3.8-.1 7.7.1 11.5 0 .2 3.8 0 7.7.1 11.5-3.8.2-7.7 0-11.5.1-.2-3.9-.1-7.7-.1-11.6z" fill="#ffedd5" stroke="#c2410c"/><path d="M5.8 7.9H4c-.2 4.1 0 8.2-.1 12.3 4 .1 8.1 0 12.1.1v-2.1"/>',
  dongHo:'<path d="M12 3c5-.1 9 4 9 9s-4 9-9 9-9-4.1-9-9.1C3.1 7 7 3.1 12 3z" fill="#e0f2fe" stroke="#0369a1"/><path d="M12 7.3V12l3.2 2"/>',
  xoa:'<path d="M6.6 6.5l10.8 11.1M17.5 6.4 6.5 17.6" stroke="#b91c1c"/>',
+ luu:'<path d="M4.2 4.1c4.6-.1 9.2.1 13.8-.1l2 2.1.1 13.8c-5.3.2-10.6-.1-15.9.1z" fill="#e0f2fe" stroke="#0369a1"/><path d="M7.6 4.3v4.6c2.9.1 5.8-.1 8.7 0V4.3"/><path d="M7.2 19.7v-5.6c3.2-.1 6.4.1 9.6 0v5.6"/>',
+ anh:'<path d="M3.6 5.2c5.6-.2 11.2.1 16.8-.1l.1 13.7c-5.6.2-11.3-.1-16.9.1z" fill="#f0fdf4" stroke="#15803d"/><circle cx="8.6" cy="9.4" r="1.6"/><path d="M4 17.4l4.6-4.3 3.2 2.9 3.4-4.1 4.9 5.3"/>',
+ tai:'<path d="M12 3.6c.1 4.6-.1 9.2 0 13.7"/><path d="M7.4 12.9l4.6 4.6 4.6-4.6"/><path d="M4.4 20.3c5.1-.1 10.2.1 15.2-.1"/>',
+ may:'<path d="M3.4 4.6c5.7-.2 11.5.1 17.2-.1l.1 11.2c-5.8.2-11.5-.1-17.3.1z" fill="#eef2ff" stroke="#4338ca"/><path d="M12 15.8v3.6M8.2 19.8c2.6-.1 5.1.1 7.6-.1"/><path d="M6.6 8.6h4.8M6.6 11.6h7.6"/>',
+ chiTien:'<path d="M3.2 7.4c5.9-.2 11.8.1 17.6-.1l.1 9.4c-5.9.2-11.8-.1-17.7.1z" fill="#fef3c7" stroke="#b45309"/><circle cx="12" cy="12" r="2.3"/><path d="M15.6 3.6l3 2.2-3 2.1M18.4 5.8h-5.4"/>',
+ banGiao:'<path d="M4.4 8.2l7.6-3.9 7.6 3.9-.1 9.4-7.5 3.8-7.6-3.9z" fill="#ffedd5" stroke="#c2410c"/><path d="M4.6 8.3l7.4 3.8 7.4-3.8M12 12.2v9"/>',
+ canDoi:'<path d="M12 3.6v16.6M7.2 20.4c3.2-.1 6.4.1 9.6-.1M5 6.6c4.6-1 9.4-1 14 0"/><path d="M5.2 6.8l-2.4 6c1.6 1.6 3.4 1.6 4.9 0z" fill="#e0f2fe" stroke="#0369a1"/><path d="M18.8 6.8l-2.4 6c1.6 1.6 3.4 1.6 4.9 0z" fill="#e0f2fe" stroke="#0369a1"/>',
+ moKhoa:'<path d="M5.2 10.8c4.6-.1 9.2.1 13.7 0l.1 9.4c-4.6.1-9.2-.1-13.8.1z" fill="#dcfce7" stroke="#15803d"/><path d="M8.2 10.6V7.4c0-2.2 1.7-3.8 3.8-3.8 1.7 0 3.1 1 3.6 2.5"/><path d="M12 14.2v2.6"/>',
+ khoa:'<path d="M5.2 10.8c4.6-.1 9.2.1 13.7 0l.1 9.4c-4.6.1-9.2-.1-13.8.1z" fill="#ede9fe" stroke="#6d28d9"/><path d="M8.2 10.6V7.4c0-2.2 1.7-3.8 3.8-3.8s3.8 1.6 3.8 3.8v3.2"/><path d="M12 14.2v2.6"/>',
+ ly:'<path d="M6.4 7.2c3.7-.1 7.5.1 11.2 0l-1.4 13.2c-2.8.1-5.6-.1-8.4.1z" fill="#fde2e2" stroke="#be123c"/><path d="M13.6 7.1l1.6-3.6 2.6-.2"/><path d="M6.9 11.4c3.4.1 6.8-.1 10.2 0"/>',
+ nguoi:'<circle cx="12" cy="8" r="3.6"/><path d="M4.6 20.4c.4-4 3.6-6.6 7.4-6.6s7 2.6 7.4 6.6"/>',
+ xe:'<path d="M2.8 6.2c3.8-.1 7.6.1 11.4 0l.1 10.4c-3.8.1-7.6-.1-11.5.1z" fill="#ffedd5" stroke="#c2410c"/><path d="M14.3 9.4h3.6l3 3.4v3.9h-6.6"/><circle cx="7" cy="17.4" r="1.8"/><circle cx="17.4" cy="17.4" r="1.8"/>',
+ gio:'<path d="M3 4.4h2.4l2.2 10.8c3.6.1 7.3-.1 10.9 0l1.8-7.4c-4.7-.1-9.5.1-14.2 0"/><circle cx="9" cy="19" r="1.4"/><circle cx="17" cy="19" r="1.4"/>',
  chuaXN:'<path d="M12 2.8c5.2-.1 9.3 4 9.2 9.3-.1 5.1-4.2 9.1-9.3 9.1-5.1 0-9.2-4.2-9.1-9.3.1-5 4.1-9.1 9.2-9.1z" stroke-dasharray="2.4 2.2"/><path d="M8.6 12.3l2.3 2.4" stroke="#9ca3af"/><path d="M12 7.3v.1M12 10v6.6" stroke="#6b7280"/>'
 };
 function icv(t,lon){ var v=ICV[t]; return v?'<svg class="icv'+(lon?' lon':'')+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+v+'</svg>':''; }
 // emoji cũ ở ô số → icon vẽ tay tương ứng
-var ICV_EMOJI={"🏦":"bank","💰":"tien","💵":"tien","🔄":"lamMoi","📋":"so","📁":"thuMuc","📂":"thuMuc","🖨":"inA4","✍️":"viet","✍":"viet","🔍":"tim","🔎":"tim","📅":"lich","📆":"thang","🧭":"laBan","🧾":"hoaDon","⚡":"hddt","⚡✓":"hddtCo","⚡✗":"hddtChua","⏳":"cho","🔴":"lech","✔":"xacNhan","✅":"xacNhan","📈":"tyLe","🟢":"khop","🟡":"lechMon","📲":"zalo","🙈":"an","🗓":"luoi","🏪":"ncc","📃":"ds","📌":"ghim","✖":"chuaXN","💳":"quay","💰":"lechTien","📄":"hoaDon"};
+var ICV_EMOJI={"🏦":"bank","💰":"tien","💵":"tien","🔄":"lamMoi","📋":"so","📁":"thuMuc","📂":"thuMuc","🖨":"inA4","✍️":"viet","✍":"viet","🔍":"tim","🔎":"tim","📅":"lich","📆":"thang","🧭":"laBan","🧾":"hoaDon","⚡":"hddt","⚡✓":"hddtCo","⚡✗":"hddtChua","⏳":"cho","🔴":"lech","✔":"xacNhan","✅":"xacNhan","📈":"tyLe","🟢":"khop","🟡":"lechMon","📲":"zalo","🙈":"an","🗓":"luoi","🏪":"ncc","📃":"ds","📌":"ghim","✖":"chuaXN","💳":"quay","💾":"luu","🖼":"anh","🖼️":"anh","⬇️":"tai","⬇":"tai","🖥":"may","🖥️":"may","💸":"chiTien","📦":"banGiao","⚖️":"canDoi","⚖":"canDoi","🔓":"moKhoa","🔐":"khoa","🔒":"khoa","🥤":"ly","👤":"nguoi","🚚":"xe","🛒":"gio","📝":"viet","🧮":"so","💰":"lechTien","📄":"hoaDon"};
 // Tiền rút gọn cho chỗ hẹp: 1.028.200 → 1,03tr · 227.100 → 227k
 function tienGon(v){ v=Number(v)||0; var a=Math.abs(v), s=v<0?"-":""; return a>=1e6?s+(Math.round(a/1e4)/100).toLocaleString("vi-VN")+"tr":a>=1e3?s+Math.round(a/1e3)+"k":s+a; }
 // NCC tích "Không cần đối chiếu" ở Danh mục → tự coi như Zalo = HĐ quầy (ô ≠ tự tích, không ghi gì thêm)
@@ -2810,7 +2823,7 @@ function kcXemAnh(im){ if(!im.src||im.src.length<100) return; moHop('<img src="'
 function veFormKC(){ var t=KCTT, sua=suaDuoc("KETCA");
   $("kcForm").innerHTML='<div class="the" id="vungIn">'+kcTieuDe()+(t.cu?'<span class="tag">đã lưu '+t.cu["Thời điểm"]+'</span>':'<span class="tag">mới</span>')+'</div>'+
   '<div class="kcTom" id="kcTom"></div><div class="luoi2"><div class="kcBuoc"><h3><span class="kcSo">1</span>💵 Đếm tiền</h3>'+bangDem2()+'<h3 style="margin-top:12px">🥤 Bán ngoài máy</h3><table id="kcNM"></table><datalist id="dlNuoc">'+(KCTT.dsNuoc||[]).map(function(x){ return '<option value="'+esc(x.ten)+'">'+VN(x.dg)+' đ</option>'; }).join("")+'</datalist><div class="hang khongIn" style="gap:6px"><select onchange="if(this.value!==\'\'){ var x=KCTT.dsNuoc[+this.value]; KCF.ngoaiMay.push({ten:x.ten,sl:\'\',dg:x.dg}); veNM(); this.value=\'\'; }"><option value="">🥤 + Thêm loại nước…</option>'+(KCTT.dsNuoc||[]).map(function(x,i){ return '<option value="'+i+'">'+esc(x.ten)+' · '+VN(x.dg)+'</option>'; }).join("")+'</select><button onclick="KCF.ngoaiMay.push({ten:\'\',sl:\'\',dg:\'\'});veNM()">➕ Món khác</button></div></div>'+
-  '<div class="kcBuoc"><h3><span class="kcSo">2</span>⚖️ Đối soát</h3><div class="hang"><label>🖥 Doanh thu POS<input type="number" id="kcDT" value="'+esc(KCF.doanhThu)+'" oninput="KCF.doanhThu=this.value;tinhKC()"></label><label>🔓 Tiền đầu ca<input type="number" id="kcDau" value="'+esc(KCF.dauCa)+'"'+(Object.keys(KCF.demDau||{}).length?' readonly title="= tổng cột ① Đầu ca"':'')+' oninput="KCF.dauCa=this.value;tinhKC()"><span class="nho">'+(t.dauCaTu?"= "+esc(t.dauCaTu):"chưa có ca trước")+'</span></label></div>'+
+  '<div class="kcBuoc"><h3><span class="kcSo">2</span>⚖️ Đối soát</h3><div class="hang"><label><span>🖥 Doanh thu POS</span><input type="number" id="kcDT" value="'+esc(KCF.doanhThu)+'" oninput="KCF.doanhThu=this.value;tinhKC()"></label><label><span>🔓 Tiền đầu ca</span><input type="number" id="kcDau" value="'+esc(KCF.dauCa)+'"'+(Object.keys(KCF.demDau||{}).length?' readonly title="= tổng cột ① Đầu ca"':'')+' oninput="KCF.dauCa=this.value;tinhKC()"><span class="nho">'+(t.dauCaTu?"= "+esc(t.dauCaTu):"chưa có ca trước")+'</span></label></div>'+
 
 
   '<div class="kcBank">🏦 Bank '+(KCCA==="Cả ngày"?"trong ngày":KCCA)+' <b>'+VN(t.bank.tien)+'</b> <span class="nho">'+t.bank.so+' GD · Bank Check</span></div>'+
