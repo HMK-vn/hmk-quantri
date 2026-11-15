@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261115124154";
+var HMK_BAN = "20261115125551";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -1455,6 +1455,15 @@ function phimGoiTen(e){ var g=document.getElementById("goiTen"); if(!g||g.style.
 
 // 🔁 Soát lại NỀN (tăng tốc): thẻ đã hiện ngay sau lần đọc 1; ảnh nào còn thẻ lệch tổng thì gửi đọc lại (máy chủ bỏ qua lần 1, dùng kết quả cũ làm mốc),
 // có bản tốt hơn mới thay thẻ của ảnh đó – không đụng thẻ đã ghi / đã sửa tay
+// 🔄 Ảnh chụp nghiêng/ngang (Gà báo tờ cần xoay 90/180/270°): xoay CẢ ẢNH cho chữ đứng thẳng rồi đọc lại ngay – chữ thẳng đọc đúng hơn nhiều.
+// Ảnh gốc được thay bằng bản đã xoay để mọi bước sau (cắt thẻ, soát nền, đọc lại từng tờ) dùng đúng toạ độ.
+function xoayDocLai(a,r){ if(!r||!r.ok||!a.img||a._xoay) return r; var dem={}; (r.ds||[r]).forEach(function(h){ var z=+h.xoay||0; if(z) dem[z]=(dem[z]||0)+(h.dong||[]).length+1; });
+  var dz=+Object.keys(dem).sort(function(x,y){ return dem[y]-dem[x]; })[0]||0; if(!dz) return r;
+  var c=document.createElement("canvas"), W=a.img.naturalWidth||a.img.width, H=a.img.naturalHeight||a.img.height, k=Math.min(1,2000/Math.max(W,H)); c.width=Math.round(W*k); c.height=Math.round(H*k); c.getContext("2d").drawImage(a.img,0,0,c.width,c.height);
+  var o=xoayCanvas(c,dz), d=o.toDataURL("image/jpeg",0.9).split(",")[1];
+  return goi("docAnhAI",{mime:"image/jpeg",data:d,quan:quanHT(),manh:1,goiY:"Ảnh đã được xoay cho chữ đứng thẳng (xoay = 0). Đọc kỹ từng chữ tên hàng và từng chữ số SL, giá, thành tiền; ngày ghi 'Ngày … tháng … năm …'."}).catch(function(){ return null; }).then(function(r2){
+    var n1=(r.ds||[r]).reduce(function(s,h){ return s+(h.dong||[]).length; },0), n2=r2&&r2.ok?(r2.ds||[r2]).reduce(function(s,h){ return s+(h.dong||[]).length; },0):0;
+    if(!r2||!r2.ok||n2<n1*0.6) return r; a.img=o; a.data=d; a._xoay=dz; (r2.ds||[r2]).forEach(function(h){ h.xoay=0; }); r2.daXoay=dz; return r2; }); }
 function soatNen(kqAnh,anhs){ var can=anhs.map(function(a,i){ return i; }).filter(function(i){ return (kqAnh[i]||[]).length&&!kqAnh[i][0].loi&&F.dsAI.some(function(h){ return h.iAnh===i&&!h.loi&&!h.daGhi&&loiThe(h)>0; }); });
   if(!can.length) return; F.dsAI.forEach(function(h){ if(can.indexOf(h.iAnh)>=0&&!h.daGhi) h.soat=1; }); veDsAI(); soatTT("🔁 Đang soát lại nền "+can.length+" ảnh còn lệch tổng – bạn vẫn soát/ghi các thẻ khác bình thường…");
   var xong=0, tot=0; can.forEach(function(i){ var truoc=kqAnh[i].map(function(h){ var x=Object.assign({},h); delete x.anhTo; delete x.goc; delete x.anhTo2; return x; });
@@ -1493,7 +1502,7 @@ function docAI(){ var b=$("nutAI"); b.disabled=true; b.classList.add("dangDoc");
   F.dsAI=anhs.map(function(a){ return { ncc:"", ngay:"", tongGiay:0, dong:[], dang:1, anhTo:a.data }; }); F.hdAI=0; F.luoi=true; apHD(0);
   ttLuc=n>1?'<span class="gaNhoDong">'+gaHTML("mung gaTaiH")+'</span> Đang đọc '+n+' ảnh song song…':'<span class="gaNhoDong">'+gaHTML("mung gaTaiH")+'</span> Đang đọc mọi hoá đơn trong ảnh…';
   var kqAnh=new Array(n), loiN=0;
-  Promise.all(anhs.map(function(a,i){ return goi("docAnhAI",{mime:"image/jpeg",data:a.data,quan:quanHT()}).catch(function(e){ return {ok:false,thongBao:e.message}; }).then(function(r){
+  Promise.all(anhs.map(function(a,i){ return goi("docAnhAI",{mime:"image/jpeg",data:a.data,quan:quanHT()}).catch(function(e){ return {ok:false,thongBao:e.message}; }).then(function(r){ return xoayDocLai(a,r); }).then(function(r){
     xong++; ttLuc="📑 Đã đọc "+xong+"/"+n+" ảnh…"; stA[i].xong=1; stA[i].s=Math.round((Date.now()-stA[i].t0)/1000); stA[i].loi=!r.ok?1:0; stA[i].n=r.ok?(r.ds||[r]).length:0;
     if(!r.ok){ loiN++; kqAnh[i]=[{ ncc:"", ngay:"", tongGiay:0, dong:[], loi:1, ghiChu:r.thongBao||"Lỗi đọc", anhTo:a.data, quaTai:r.quaTai }]; return; }
     kqAnh[i]=(r.ds||[r]).map(function(h){ var x=Object.assign({},h); x.iAnh=i; x.anhTo=(x.khung&&a.img&&catKhung(a.img,x.khung,0,x.xoay))||a.data; x.goc=JSON.parse(JSON.stringify({ ncc:x.ncc, dong:x.dong })); return x; }); kqAnh[i]=gopToCungAnh(kqAnh[i]);
