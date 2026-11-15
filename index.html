@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzIWPz00WSzB659piig0WYLBOOd_KWUFQa_sBJgrtHDQQ0Luq9hDHdyGJFVU0HtIWbo/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261115131507";
+var HMK_BAN = "20261115143057";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -591,6 +591,8 @@ html.coHop,html.coHop body{overflow:hidden!important;overscroll-behavior:none}.m
 @media print{.kcTha,.kcThaSo{display:none!important}}
 .ntTT{margin:6px 0 8px;flex-wrap:wrap}.kcEC .ecNut{font-size:11.5px;padding:1px 7px}
 .ttTren{flex-wrap:nowrap!important;overflow-x:auto;scrollbar-width:none;gap:5px!important}.ttTren::-webkit-scrollbar{display:none}.ttTren .ttChip{flex:none;white-space:nowrap;padding:4px 9px!important;display:inline-flex;align-items:center;gap:3px}.ttTren .ttChip .icv,.ttTren .ttChip svg{width:16px!important;height:16px!important}@media(max-width:400px){.ttTren{justify-content:flex-start}.ttTren .ttChip{font-size:12px!important;padding:4px 7px!important}}
+.nccHop{position:fixed;z-index:100000;background:#fff;border:1px solid #d9d9df;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.18);overflow-y:auto;padding:4px;font-size:14px}.nccHop>div{padding:8px 10px;border-radius:8px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.nccHop>div:hover{background:#f2f2f7}
+.bangL tr.nghiL td{background:#fff3e0!important}.bangL tr.nghiL td:first-child{box-shadow:inset 3px 0 0 #f59e0b}.nghiNut{animation:nhayNghi 1.6s ease-in-out 3}@keyframes nhayNghi{50%{transform:scale(1.25)}}
 </style><style>/* 🧾 Hoá đơn – NCC · lưới đối chiếu */
 main{max-width:none!important;width:100%;box-sizing:border-box}.chanTrang{max-width:none!important}
 #mplLoc label,#mplLoc button,#mplLoc .mplNhan,.mplTagLoc{display:inline-flex;align-items:center;gap:5px}#mplLoc .icv.lon,.mplTagLoc .icv.lon{width:22px;height:22px;flex:0 0 auto}.mplTagLoc a{display:inline-flex}.mplTagLoc a .icv.lon{width:16px;height:16px}
@@ -1466,16 +1468,17 @@ function doanXoay(img){ try{ var W=img.naturalWidth||img.width, H=img.naturalHei
   for(y=0;y<h;y++) for(x=0;x<w;x++){ i=(y*w+x)*4; if((d[i]+d[i+1]+d[i+2])/3<tb*0.72){ R[y]++; C[x]++; } }
   var dao=function(a){ var t=0, n=0; for(var j=1;j<a.length;j++){ t+=Math.abs(a[j]-a[j-1]); n+=a[j]; } return n?t/n:0; }, dr=dao(R), dc=dao(C);
   return dc>dr*1.35&&dc>0.25?1:0; }catch(e){ return 0; } }
-function xoayAnh(img,dz){ var W=img.naturalWidth||img.width, H=img.naturalHeight||img.height, k=Math.min(1,1800/Math.max(W,H)), c=document.createElement("canvas"); c.width=Math.round(W*k); c.height=Math.round(H*k); c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+function xoayAnh(img,dz){ var W=img.naturalWidth||img.width, H=img.naturalHeight||img.height, k=Math.min(1,2200/Math.max(W,H)), c=document.createElement("canvas"); c.width=Math.round(W*k); c.height=Math.round(H*k); c.getContext("2d").drawImage(img,0,0,c.width,c.height);
   var o=xoayCanvas(c,dz); return { c:o, d:o.toDataURL("image/jpeg",0.82).split(",")[1], dz:dz }; }
-function diemDoc(r){ if(!r||!r.ok) return -1e9; return (r.ds||[r]).reduce(function(s,h){ var n=(h.dong||[]).length; return s+n*10-(+h.xoay?n*8+20:0)-(h.lech?Math.min(40,Math.abs(h.lech)/20000):0); },0); }
-function docMotAnh(a){ var mot=function(){ return goi("docAnhAI",{mime:"image/jpeg",data:a.data,quan:quanHT()}).catch(function(e){ return {ok:false,thongBao:e.message}; }).then(function(r){ return xoayDocLai(a,r); }); };
-  if(!a.img||!doanXoay(a.img)) return mot();
-  var bs=[xoayAnh(a.img,90),xoayAnh(a.img,270)];
-  return Promise.all(bs.map(function(b){ return goi("docAnhAI",{mime:"image/jpeg",data:b.d,quan:quanHT()}).catch(function(){ return null; }); })).then(function(rs){
-    var i=diemDoc(rs[0])>=diemDoc(rs[1])?0:1, r=rs[i]; if(!r||!r.ok) return mot();
-    var lech=(r.ds||[r]).filter(function(h){ return +h.xoay; }).length; if(lech>(r.ds||[r]).length/2) return mot(); // đoán sai chiều → đọc ảnh gốc như cũ
-    a.img=bs[i].c; a.data=bs[i].d; a._xoay=bs[i].dz; (r.ds||[r]).forEach(function(h){ h.xoay=0; }); r.daXoay=bs[i].dz; return r; }); }
+function diemDoc(r){ if(!r||!r.ok) return -1e9; return (r.ds||[r]).reduce(function(s,h){ var n=(h.dong||[]).length; return s+n*12+5-(+h.xoay?n*8+20:0)-(h.lech?Math.min(15,Math.abs(h.lech)/50000):0); },0); }
+function docMotAnh(a){ var thuong=function(){ return goi("docAnhAI",{mime:"image/jpeg",data:a.data,quan:quanHT(),nhanh:1}).catch(function(e){ return {ok:false,thongBao:e.message}; }); };
+  if(true||!a.img||!doanXoay(a.img)) return thuong().then(function(r){ return xoayDocLai(a,r); }); // 15/11: tắt đoán ảnh ngang trên máy (nhận nhầm ảnh thẳng có kẻ bảng → đọc thừa, chậm). Gà báo xoay → xoay đúng góc đọc lại 1 lần
+  // nghi ảnh ngang: đọc ảnh gốc + bản xoay 90° + 270° CÙNG LÚC (không chờ nối tiếp) → chọn bản đọc tốt nhất; đoán sai cũng không chậm thêm
+  var bs=[xoayAnh(a.img,90),xoayAnh(a.img,270)], gy="Ảnh chụp ngang đã được xoay lại. Ảnh hay có 2 TỜ đặt cạnh nhau (trái/phải hoặc trên/dưới): đếm số tờ trước, đọc đủ MỌI tờ, mỗi tờ đủ từng dòng.";
+  return Promise.all([thuong()].concat(bs.map(function(b){ return goi("docAnhAI",{mime:"image/jpeg",data:b.d,quan:quanHT(),goiY:gy}).catch(function(){ return null; }); }))).then(function(rs){
+    var i=0; [1,2].forEach(function(k){ if(diemDoc(rs[k])>diemDoc(rs[i])) i=k; }); var r=rs[i];
+    if(!i) return xoayDocLai(a,r);
+    a.img=bs[i-1].c; a.data=bs[i-1].d; a._xoay=bs[i-1].dz; (r.ds||[r]).forEach(function(h){ h.xoay=0; }); r.daXoay=bs[i-1].dz; return r; }); }
 function xoayDocLai(a,r){ if(!r||!r.ok||!a.img||a._xoay) return r; var dem={}; (r.ds||[r]).forEach(function(h){ var z=+h.xoay||0; if(z) dem[z]=(dem[z]||0)+(h.dong||[]).length+1; });
   var dz=+Object.keys(dem).sort(function(x,y){ return dem[y]-dem[x]; })[0]||0; if(!dz) return r;
   var c=document.createElement("canvas"), W=a.img.naturalWidth||a.img.width, H=a.img.naturalHeight||a.img.height, k=Math.min(1,2000/Math.max(W,H)); c.width=Math.round(W*k); c.height=Math.round(H*k); c.getContext("2d").drawImage(a.img,0,0,c.width,c.height);
@@ -1483,8 +1486,24 @@ function xoayDocLai(a,r){ if(!r||!r.ok||!a.img||a._xoay) return r; var dem={}; (
   return goi("docAnhAI",{mime:"image/jpeg",data:d,quan:quanHT(),manh:1,ncc:(r.ds&&r.ds[0]&&r.ds[0].ncc)||r.ncc||"",goiY:"Ảnh đã được xoay cho chữ đứng thẳng (xoay = 0). Đọc kỹ từng chữ tên hàng và từng chữ số SL, giá, thành tiền; ngày ghi 'Ngày … tháng … năm …'."}).catch(function(){ return null; }).then(function(r2){
     var n1=(r.ds||[r]).reduce(function(s,h){ return s+(h.dong||[]).length; },0), n2=r2&&r2.ok?(r2.ds||[r2]).reduce(function(s,h){ return s+(h.dong||[]).length; },0):0;
     if(!r2||!r2.ok||n2<n1*0.6) return r; a.img=o; a.data=d; a._xoay=dz; (r2.ds||[r2]).forEach(function(h){ h.xoay=0; }); r2.daXoay=dz; return r2; }); }
-function soatNen(kqAnh,anhs){ var can=anhs.map(function(a,i){ return i; }).filter(function(i){ return (kqAnh[i]||[]).length&&!kqAnh[i][0].loi&&F.dsAI.some(function(h){ return h.iAnh===i&&!h.loi&&!h.daGhi&&loiThe(h)>0; }); });
-  if(!can.length) return; F.dsAI.forEach(function(h){ if(can.indexOf(h.iAnh)>=0&&!h.daGhi) h.soat=1; }); veDsAI(); soatTT("🔁 Đang soát lại nền "+can.length+" ảnh còn lệch tổng – bạn vẫn soát/ghi các thẻ khác bình thường…");
+
+// 🏷 Danh sách sổ xuống chọn NCC cho MỌI ô NCC (ô có list="dlNCC…"): bấm vào ô là hiện danh sách, gõ để lọc (không dấu cũng được), chạm để chọn.
+// iPhone không hiện datalist rõ ràng nên dùng bảng chọn riêng; chọn xong gửi sự kiện change như gõ tay.
+(function(){ var hop=null, o=null, an=function(){ if(hop){ hop.remove(); hop=null; o=null; } };
+  var ve=function(el){ var q=boDau(el.value||"").trim(), ds=((window.D&&D.dm&&D.dm.ncc)||[]).map(function(n){ return n.ten||n[0]; }).filter(Boolean);
+    var loc=ds.filter(function(t){ return !q||boDau(t).indexOf(q)>=0; }); if(q) loc.sort(function(a,b){ return boDau(a).indexOf(q)-boDau(b).indexOf(q); });
+    if(!hop){ hop=document.createElement("div"); hop.className="nccHop"; document.body.appendChild(hop);
+      hop.addEventListener("mousedown",function(e){ e.preventDefault(); }); hop.addEventListener("click",function(e){ var b=e.target.closest("[data-ncc]"); if(!b||!o) return; var el2=o; el2.value=b.dataset.ncc; an(); el2.dispatchEvent(new Event("input",{bubbles:true})); el2.dispatchEvent(new Event("change",{bubbles:true})); el2.blur(); }); }
+    o=el; hop.innerHTML=(loc.length?loc.slice(0,80).map(function(t){ return '<div data-ncc="'+esc(t)+'">'+esc(t)+'</div>'; }).join(""):'<div class="nho" style="cursor:default">Không có NCC khớp – gõ tên mới rồi bấm ra ngoài</div>');
+    var r=el.getBoundingClientRect(), cao=Math.min(260,innerHeight-r.bottom-12); hop.style.left=Math.max(6,Math.min(r.left,innerWidth-Math.max(r.width,220)-6))+"px"; hop.style.width=Math.max(r.width,220)+"px";
+    if(cao<120){ hop.style.top=""; hop.style.bottom=(innerHeight-r.top+4)+"px"; hop.style.maxHeight=Math.min(260,r.top-12)+"px"; } else { hop.style.bottom=""; hop.style.top=(r.bottom+4)+"px"; hop.style.maxHeight=cao+"px"; } };
+  var laNCC=function(t){ return t&&t.tagName==="INPUT"&&(/^dlNCC/.test(t.getAttribute("list")||"")||t.dataset.dsNcc)&&!t.disabled&&!t.readOnly; };
+  document.addEventListener("focusin",function(e){ if(laNCC(e.target)){ var t=e.target; t.setAttribute("autocomplete","off"); if(t.getAttribute("list")){ t.dataset.dsNcc=1; t.removeAttribute("list"); } ve(t); } });
+  document.addEventListener("input",function(e){ if(laNCC(e.target)&&o===e.target) ve(e.target); });
+  document.addEventListener("focusout",function(e){ if(o&&e.target===o) setTimeout(an,150); });
+  addEventListener("scroll",function(){ if(o&&hop) ve(o); },true); })();
+function soatNen(kqAnh,anhs){ var can=anhs.map(function(a,i){ return i; }).filter(function(i){ return (kqAnh[i]||[]).length&&!kqAnh[i][0].loi&&F.dsAI.some(function(h){ return h.iAnh===i&&!h.loi&&!h.daGhi; }); }); // 🕵️ mọi ảnh đều qua Gà soát (tối đa 3 vòng đọc ⇄ soát), không chỉ thẻ lệch tổng
+  if(!can.length) return; F.dsAI.forEach(function(h){ if(can.indexOf(h.iAnh)>=0&&!h.daGhi) h.soat=1; }); veDsAI(); soatTT("🕵️ Gà đang soát lại "+can.length+" ảnh (đọc ⇄ soát tối đa 3 vòng) – bạn vẫn xem/ghi các thẻ khác bình thường…");
   var xong=0, tot=0; can.forEach(function(i){ var truoc=kqAnh[i].map(function(h){ var x=Object.assign({},h); delete x.anhTo; delete x.goc; delete x.anhTo2; return x; });
     goi("docAnhKhop",{mime:"image/jpeg",data:anhs[i].data,quan:quanHT(),dsTruoc:truoc}).catch(function(){ return {ok:false}; }).then(function(r){ xong++;
       var biSua=F.dsAI.some(function(h){ return h.iAnh===i&&(h.daGhi||h.daSua); });
@@ -1561,7 +1580,7 @@ function boAnhDocSan(id){ hoiOK("Bỏ qua ảnh này (không nhập)?",function(
 // Lưới thẻ (như cột kết quả của Claude Đọc Hoá Đơn): mỗi hoá đơn 1 thẻ kèm ảnh crop, tô lệch tổng; bấm để kiểm tra & ghi
 // Lưới thẻ sửa tại chỗ (giống Claude Đọc Hoá Đơn): ảnh crop, NCC, ngày, từng dòng, Main list, tổng giấy; tô lệch; ✅ Ghi từng thẻ
 function ngayISO(t){ var m=/^(\d{1,2})\/(\d{1,2})\/(\d{4})/.exec(t||""); return m?m[3]+"-"+("0"+m[2]).slice(-2)+"-"+("0"+m[1]).slice(-2):(t||homNay()); }
-function suaL(i,j,k,v){ var h=F.dsAI[i]; h.daSua=1; if(j<0) h[k]=v; else { var d=h.dong[j]; d[k]=v; if(k==="sl"||k==="dg") d.tt=Math.round((Number(d.sl)||0)*(Number(d.dg)||0)); } veDsAI(); }
+function suaL(i,j,k,v){ var h=F.dsAI[i]; h.daSua=1; if(j<0) h[k]=v; else { var d=h.dong[j]; d[k]=v; delete d.nghi; if(k==="sl"||k==="dg") d.tt=Math.round((Number(d.sl)||0)*(Number(d.dg)||0)); } veDsAI(); }
 // 🗂 Thẻ hoá đơn giống trang Claude Đọc Hoá Đơn: ảnh + NCC/ngày + chip trạng thái + bảng sửa; thẻ đã ghi thu gọn 1 dòng; dòng tổng kết theo NCC
 function veLuoiHD(k){ var ds=F.dsAI, cong=function(h){ return (h.dong||[]).reduce(function(a,d){ return a+(Number(d.tt)||0); },0); };
   if(!$("dlNCCw")) document.body.insertAdjacentHTML("beforeend",'<datalist id="dlNCCw">'+D.dm.ncc.map(function(n){ return '<option value="'+esc(n.ten)+'">'; }).join("")+'</datalist>');
@@ -1580,11 +1599,11 @@ function veLuoiHD(k){ var ds=F.dsAI, cong=function(h){ return (h.dong||[]).reduc
       (thieu?'<span class="chipL warn">'+thieu+' thiếu Main list</span>':'')+(suy?'<span class="chipL info" style="cursor:pointer" onclick="toast(\'🧩 Dòng tô vàng = số máy đã tự sửa/suy ra (viết tắt nghìn, chữ số dễ nhầm, giá/tên theo lần mua trước). Bấm 🧩 trên dòng để xem lý do – soát lại trước khi ghi.\',8000)">🧩 '+suy+' số đã tự sửa</span>':'')+(x.daNhap?'<span class="chipL warn" title="Hoá đơn cùng NCC + ngày đã có trong Main pay list – kiểm tra trước khi ghi để tránh trùng">📒 Đã nhập: '+esc(x.daNhap.so)+' · '+soTien(x.daNhap.tong)+'</span>':'')+(x.soTo>1?'<span class="chipL info">📑 '+x.soTo+' tờ</span>':'')+(x.soat?'<span class="chipL info">🔁 đang soát lại…</span>':'')+(x.docLai?'<span class="chipL info">🔍 đã đọc lại</span>':'')+
       (x.nguoiMua&&!new RegExp(quanHT()==="TÚI"?"túi|tui":"lẩu|lau|gà|ga","i").test(x.nguoiMua)?'<span class="chipL warn" title="Kiểm tra quán">👤 Người mua: '+esc(x.nguoiMua)+'</span>':'');
     return '<article class="theL '+mau+'">'+anh+'<div class="noiL">'+
-      '<div class="hang ttL"><b>'+(i+1)+'.</b><input list="dlNCCw" value="'+esc(x.ncc||"")+'" placeholder="Nhà cung cấp" onchange="suaL('+i+',-1,\'ncc\',this.value.trim().toUpperCase())"'+kh+'>'+
+      '<div class="hang ttL"><b>'+(i+1)+'.</b><input list="dlNCCw" autocomplete="off" value="'+esc(x.ncc||"")+'" placeholder="Nhà cung cấp" onchange="suaL('+i+',-1,\'ncc\',this.value.trim().toUpperCase())"'+kh+'>'+
       '<input type="date" value="'+ngayISO(x.ngay)+'" onchange="suaL('+i+',-1,\'ngay\',this.value)"'+kh+'>'+(x.daGhi?'<button type="button" class="xL" title="Thu gọn" onclick="F.dsAI['+i+'].moRong=0;veDsAI()">▴</button>':'')+'</div>'+
       '<div class="chipsL"><span class="chipL soHDL" id="soHDL'+i+'" title="Mã hoá đơn tự tạo như Main pay list">'+(x.daGhi?"":"🔢 "+esc(x.soHDXem||"…"))+'</span><span class="nho">'+(x.dong||[]).length+' mặt hàng · cộng <b>'+soTien(c)+'</b></span>'+chip+'</div>'+
       '<div class="cuonL"><table class="bangL"><tr class="nho"><td>#</td><td>Mặt hàng</td><td>SL</td><td>Đơn giá</td><td>Thành tiền</td><td>Main list</td><td></td></tr>'+(x.dong||[]).map(function(d,j){ var th=tinHang(d.nd); if(!d.ml&&!x.daGhi){ var mk=xepGiam(th.ml); if(mk.length) d.ml=mk[0]; } var sai=d.sl&&d.dg&&Math.abs(d.sl*d.dg-(Number(d.tt)||0))>1000;
-        return '<tr class="'+(sai?'sai':d.suy?'suyL':'')+'" title="'+esc(sai?"SL × đơn giá ≠ thành tiền":d.suy?"🧩 "+d.suy:"")+'"><td class="nho sttL">'+(j+1)+iconNCC(th,x.ncc)+(d.suy&&!sai?'<button type="button" class="suyNut" title="'+esc(d.suy)+'" onclick="toast(\'🧩 Dòng '+(j+1)+': \'+this.title,7000)">🧩</button>':'')+'</td><td>'+(function(){ var kt=x.daGhi?null:kiemTen(d.nd,x.ncc); return '<input class="'+(kt?'nghiSai':'')+'" title="'+(kt?esc(kt.goiY?"Nghi sai chính tả – có phải "+kt.goiY+"?":"Tên chưa có trong danh mục / lịch sử mua"):'')+'" value="'+esc(d.nd)+'" autocomplete="off" oninput="goiTen(this,F.dsAI['+i+'].ncc,function(t){ suaL('+i+','+j+',\'nd\',t); })" onkeydown="phimGoiTen(event)" onblur="anGoiTen()" onchange="suaL('+i+','+j+',\'nd\',this.value.trim().toUpperCase())"'+kh+'>'+(kt&&kt.goiY?'<button type="button" class="goiYTen" onclick="suaL('+i+','+j+',\'nd\',this.dataset.t)" data-t="'+esc(kt.goiY)+'">→ '+esc(kt.goiY)+'?</button>':''); })()+'</td>'+
+        return '<tr class="'+(sai?'sai':d.nghi?'nghiL':d.suy?'suyL':'')+'" title="'+esc(sai?"SL × đơn giá ≠ thành tiền":d.nghi?"🔎 Gà soát nghi: "+d.nghi:d.suy?"🧩 "+d.suy:"")+'"><td class="nho sttL">'+(j+1)+iconNCC(th,x.ncc)+(d.nghi?'<button type="button" class="suyNut nghiNut" title="'+esc(d.nghi)+'" onclick="toast(\'🔎 Dòng '+(j+1)+' – Gà soát nghi: \'+this.title,9000)">🔎</button>':'')+(d.suy&&!sai?'<button type="button" class="suyNut" title="'+esc(d.suy)+'" onclick="toast(\'🧩 Dòng '+(j+1)+': \'+this.title,7000)">🧩</button>':'')+'</td><td>'+(function(){ var kt=x.daGhi?null:kiemTen(d.nd,x.ncc); return '<input class="'+(kt?'nghiSai':'')+'" title="'+(kt?esc(kt.goiY?"Nghi sai chính tả – có phải "+kt.goiY+"?":"Tên chưa có trong danh mục / lịch sử mua"):'')+'" value="'+esc(d.nd)+'" autocomplete="off" oninput="goiTen(this,F.dsAI['+i+'].ncc,function(t){ suaL('+i+','+j+',\'nd\',t); })" onkeydown="phimGoiTen(event)" onblur="anGoiTen()" onchange="suaL('+i+','+j+',\'nd\',this.value.trim().toUpperCase())"'+kh+'>'+(kt&&kt.goiY?'<button type="button" class="goiYTen" onclick="suaL('+i+','+j+',\'nd\',this.dataset.t)" data-t="'+esc(kt.goiY)+'">→ '+esc(kt.goiY)+'?</button>':''); })()+'</td>'+
           '<td class="slL"><input value="'+esc(d.sl)+'" inputmode="decimal" onchange="suaL('+i+','+j+',\'sl\',this.value.trim())"'+kh+'></td>'+
           '<td class="dgL"><input value="'+(d.dg?Number(d.dg).toLocaleString("vi-VN"):"")+'" inputmode="numeric" onchange="suaL('+i+','+j+',\'dg\',soVN(this.value))"'+kh+'></td>'+
           '<td class="ttL2"><b>'+soTien(d.tt)+'</b></td><td><select class="'+(d.ml?'':'thieu')+'" onchange="suaL('+i+','+j+',\'ml\',this.value)"'+kh+'>'+mlOpt(d.ml)+'</select>'+iconChon("Main list",th.ml,d.ml)+'</td>'+
@@ -1599,10 +1618,18 @@ function ghiTheL(i,btn){ var x=F.dsAI[i], dong=(x.dong||[]).filter(function(d){ 
   if(!x.ncc&&dong.length) x.ncc=nccBQ(dong,x.ml); if(!x.ncc) return bao("Chưa có nhà cung cấp"); if(!dong.length) return bao("Chưa có dòng hàng"); if(dong.some(function(d){ return !d.ml; })) return bao("Còn dòng chưa chọn Main list");
   var p={ quan:F.quan||quanHT(), ngay:ngayISO(x.ngay)||F.ngay, ncc:x.ncc, tongGiay:x.tongGiay||"", hddt:"", ec:F.ec||"Chưa TT", ghiChu:x.ghiChu||"", anh:x.tamMa?null:(x.anhTo?{mime:"image/jpeg",data:x.anhTo}:F.anh||null), anhPhu:x.tamMa?[]:(x.anhTo2||[]), vat:(x.vat==null?vatNCC(x.ncc):x.vat), dong:dong.map(function(d){ var v=(x.vat==null?vatNCC(x.ncc):x.vat); return { nd:d.nd, sl:d.sl, dg:dgVAT(d,v), ml:d.ml, gc:gcVAT(d,v,""), ec:F.ec||"Chưa TT" }; }) };
   btn.disabled=true; btn.innerHTML=gaTai("");
-  (x.tamMa?goi("duyetTam",x.tamMa,p):goiKT("luuHoaDon",p)).then(function(r){ if(x.goc) hocTuSua(x.goc,p); x.daGhi=1; x.moRong=0; x.soHD=r.soHD||r.maPhieu||""; veDsAI(); goi("canhBao","").then(capNhatChuong);
+  (x.tamMa?goi("duyetTam",x.tamMa,p):goiKT("luuHoaDon",p)).then(function(r){ if(x.goc) hocTuSua(x.goc,p); dayGaTuClaude(x,p); x.daGhi=1; x.moRong=0; x.soHD=r.soHD||r.maPhieu||""; veDsAI(); goi("canhBao","").then(capNhatChuong);
       if(x.fileId&&F.dsAI.every(function(h){ return h.fileId!==x.fileId||h.daGhi; })) goi("xongDocSan",x.fileId).catch(function(){}); })
     .catch(function(e){ btn.disabled=false; btn.textContent="✅ Ghi lại"; bao(e.message); }); }
-function veDsAI(){ var k=document.getElementById("dsAI"), kq=document.getElementById("ketQua"); if(!k&&(kq||document.getElementById("anhXem"))){ k=document.createElement("div"); k.id="dsAI"; (kq||document.getElementById("anhXem")).appendChild(k); } if(!k) return;
+// 🏷 Tự nhận NCC cho thẻ Gà đọc: (1) tên đọc gần đúng 1 NCC trong danh mục → dùng tên danh mục; (2) chưa có/không khớp → suy từ mặt hàng (lịch sử mua: NCC bán nhiều món trên thẻ nhất)
+function tuNhanNCC(h){ if(!h||h.daGhi||h.daSua||h._nccXet||h.loi||!(h.dong||[]).length) return; h._nccXet=1; var dm=(D.dm.ncc||[]).map(function(n){ return n.ten||n[0]; }).filter(Boolean);
+  if(h.ncc&&dm.some(function(n){ return bo2(n)===bo2(h.ncc); })) return;
+  if(h.ncc){ var gan=dm.map(function(n){ return [n,giongTen(n,h.ncc)]; }).filter(function(x){ return x[1]>=.6; }).sort(function(a,b){ return b[1]-a[1]; });
+    if(gan.length&&(gan.length===1||gan[0][1]>gan[1][1])){ h.ghiChu=[h.ghiChu,"🏷 NCC đọc \""+h.ncc+"\" → "+gan[0][0]].filter(Boolean).join(" · "); h.ncc=gan[0][0]; return; } }
+  var dem={}, coLS=0; h.dong.forEach(function(d){ var o=tinHang(d.nd).ncc, ks=Object.keys(o); if(ks.length) coLS++; ks.forEach(function(n){ dem[n]=(dem[n]||0)+1; }); });
+  var top=Object.keys(dem).sort(function(a,b){ return dem[b]-dem[a]; })[0];
+  if(top&&coLS&&dem[top]>=Math.max(1,Math.ceil(coLS*.6))&&(Object.keys(dem).length===1||dem[top]>dem[Object.keys(dem).sort(function(a,b){ return dem[b]-dem[a]; })[1]])){ h.ghiChu=[h.ghiChu,"🏷 NCC tự suy từ mặt hàng"+(h.ncc?" (giấy ghi \""+h.ncc+"\")":"")].filter(Boolean).join(" · "); h.ncc=top; } }
+function veDsAI(){ (F&&F.dsAI||[]).forEach(tuNhanNCC); var k=document.getElementById("dsAI"), kq=document.getElementById("ketQua"); if(!k&&(kq||document.getElementById("anhXem"))){ k=document.createElement("div"); k.id="dsAI"; (kq||document.getElementById("anhXem")).appendChild(k); } if(!k) return;
   var coDs=(F.dsAI||[]).length, l2=document.querySelector("#noiDung .luoi2");
   if(kq&&k.parentNode!==kq) kq.appendChild(k); document.querySelectorAll("#ketQua > div:not([id]):not(.ketQuaDau)").forEach(function(x){ if(x.querySelector(".luoiDau,.tagHD")) x.remove(); });
   if(l2) l2.style.display=F.tay||(coDs&&!F.luoi)?"":"none"; var rk=document.getElementById("rongKQ"); if(rk) rk.style.display=coDs?"none":"";
@@ -1613,7 +1640,7 @@ function veDsAI(){ var k=document.getElementById("dsAI"), kq=document.getElement
       return '<button type="button" class="tag1'+(i===a?' on':'')+(x.daGhi?' xong':'')+'" onclick="apHD('+i+')" ondragover="event.preventDefault();this.classList.add(\'tha\')" ondragleave="this.classList.remove(\'tha\')" ondrop="thaDongHD(event,'+i+')">'+
         (x.anhTo?'<img src="data:image/jpeg;base64,'+x.anhTo+'">':'')+(x.daGhi?"✅":x.dang?"⏳":x.loi?"⚠️":"📄")+' '+(i+1)+'. '+esc(x.dang?"đang đọc…":x.ncc||"(chưa rõ NCC)")+' <small>'+soTien(c)+(lech?' ⚠️':'')+'</small></button>'; }).join("")+
     '<button type="button" class="tag1" onclick="themToHD()" title="Tạo tờ trống rồi kéo dòng sang để tách">➕</button>'+(ds.length>1?'<button type="button" class="tag1" onclick="F.luoi=true;veDsAI()" title="Xem tất cả thẻ dạng lưới">▦ Tất cả</button>':'')+'</div>'+
-    '<div class="theHD'+(h.anhTo?' theAnh':'')+'">'+(h.anhTo?'<img src="data:image/jpeg;base64,'+h.anhTo+'" onclick="phongAnh(this.src)" title="Ảnh tờ này – bấm để phóng to">':'')+'<div>'+'<div class="hang" style="gap:6px"><b>'+(h.daGhi?"✅":"📄")+' Tờ '+(a+1)+'</b><input value="'+esc(h.ncc||"")+'" placeholder="Nhà cung cấp" onchange="F.dsAI['+a+'].ncc=this.value.trim().toUpperCase();F.ncc=F.dsAI['+a+'].ncc;$(\'fNCC\').value=F.ncc;veDsAI()" style="flex:1;min-width:0"'+(h.daGhi?" disabled":"")+'><span class="nho">'+esc(h.ngay||"")+' · cộng <b>'+soTien(cong(h))+'</b>'+(h.tongGiay?' · giấy '+soTien(h.tongGiay):'')+'</span></div>'+
+    '<div class="theHD'+(h.anhTo?' theAnh':'')+'">'+(h.anhTo?'<img src="data:image/jpeg;base64,'+h.anhTo+'" onclick="phongAnh(this.src)" title="Ảnh tờ này – bấm để phóng to">':'')+'<div>'+'<div class="hang" style="gap:6px"><b>'+(h.daGhi?"✅":"📄")+' Tờ '+(a+1)+'</b><input list="dlNCCw" autocomplete="off" value="'+esc(h.ncc||"")+'" placeholder="Nhà cung cấp" onchange="F.dsAI['+a+'].ncc=this.value.trim().toUpperCase();F.ncc=F.dsAI['+a+'].ncc;$(\'fNCC\').value=F.ncc;veDsAI()" style="flex:1;min-width:0"'+(h.daGhi?" disabled":"")+'><span class="nho">'+esc(h.ngay||"")+' · cộng <b>'+soTien(cong(h))+'</b>'+(h.tongGiay?' · giấy '+soTien(h.tongGiay):'')+'</span></div>'+
     (h.daGhi||ds.length<2||!(h.dong||[]).length?'':'<div class="hang" style="gap:8px;margin:6px 0"><label style="flex-direction:row;align-items:center;gap:4px"><input type="checkbox" onchange="chonHetHD(this.checked)"'+(CHON_HD.length&&CHON_HD.length===h.dong.length?' checked':'')+'> Chọn tất cả</label>'+
       (CHON_HD.length?'<b>'+CHON_HD.length+' dòng đã chọn</b> → <select onchange="chuyenDongHD('+a+',-1,+this.value)"><option value="">↪ chuyển sang tờ…</option>'+ds.map(function(x,t){ return t===a||x.daGhi?'':'<option value="'+t+'">tờ '+(t+1)+' · '+esc(x.ncc||"")+'</option>'; }).join("")+'</select><span class="nho">hoặc kéo 1 dòng đã chọn thả lên thẻ</span>':'<span class="nho">☑ chọn nhiều dòng để chuyển cùng lúc</span>')+'</div>')+
     (h.dong||[]).map(function(d,j){ var on=CHON_HD.indexOf(j)>=0; return '<div class="dongHD'+(on?' chon':'')+'" draggable="'+!h.daGhi+'" ondragstart="event.dataTransfer.setData(\'text\',\''+a+','+j+'\')">'+(h.daGhi||ds.length<2?'':'<input type="checkbox" style="width:auto" onchange="chonDongHD('+j+',this.checked)"'+(on?' checked':'')+'>')+'<span>⠿ '+esc(d.nd)+'</span><span class="nho">'+(d.sl||"")+' × '+soTien(d.dg)+' = <b>'+soTien(d.tt)+'</b></span>'+
@@ -1815,7 +1842,7 @@ function ntLuu(btn){ var dong=NT.dong.filter(function(d){ return d.nd.trim(); })
     vat:NT.vat, dong:dong.map(function(d){ return { nd:d.nd, sl:d.sl, dg:dgVAT(d,NT.vat), ml:d.ml||NT.ml, gc:gcVAT(d,NT.vat,d.gc.replace(/^🧩.*/,"")), ec:NT.ec||F&&F.ec||"Chưa TT" }; }) };
   var x=NT.the!=null&&F&&F.dsAI?F.dsAI[NT.the]:null; if(x&&!x.tamMa){ p.anh=x.anhTo?{mime:"image/jpeg",data:x.anhTo}:null; p.anhPhu=x.anhTo2||[]; }
   btn.disabled=true; btn.innerHTML=gaTai("Đang ghi…");
-  (x&&x.tamMa?goi("duyetTam",x.tamMa,p):goiKT("luuHoaDon",p)).then(function(r){ if(x){ if(x.goc) hocTuSua(x.goc,p); x.daGhi=1; x.soHD=r.soHD||r.maPhieu||""; x.ncc=p.ncc; x.dong=p.dong.map(function(d){ return { nd:d.nd, sl:d.sl, dg:d.dg, tt:ntTT(d), ml:d.ml }; }); }
+  (x&&x.tamMa?goi("duyetTam",x.tamMa,p):goiKT("luuHoaDon",p)).then(function(r){ if(x){ if(x.goc) hocTuSua(x.goc,p); dayGaTuClaude(x,p); x.daGhi=1; x.soHD=r.soHD||r.maPhieu||""; x.ncc=p.ncc; x.dong=p.dong.map(function(d){ return { nd:d.nd, sl:d.sl, dg:d.dg, tt:ntTT(d), ml:d.ml }; }); }
       toast(r.soHD?"✅ Đã ghi "+r.soHD+" – "+dong.length+" dòng":"📤 Đã gửi phiếu chờ duyệt",4000); dongNT(); if(TAB==="NHAP") veDsAI(); if(TAB==="HDNGAY") taiHDNgay(); if(TAB==="DOICHIEU") taiDCZ(); goi("canhBao","").then(capNhatChuong); })
     .catch(function(e){ btn.disabled=false; btn.textContent="💾 Cập nhật vào Main List"; bao(e.message); }); }
 // ✏️ Sửa dạng danh sách ngay dưới dòng hoá đơn: sửa / xoá từng dòng, xoá cả hoá đơn
@@ -2063,14 +2090,56 @@ function tachKhoi(t){ var ds=[], cur=[]; String(t||"").split(/\n/).forEach(funct
 // Ô Claude trong trang: mở trang Claude ở cửa sổ nhỏ bên phải màn hình; dán kết quả vào ô là thành thẻ ngay
 var CLAUDE_DOC="https://claude.ai/artifact/VNPxYBQnsMT66YFdab2Mtr", CL_WIN=null, CL_HEN=null;
 // Máy tính: mở Claude thành cửa sổ nổi bên phải; điện thoại: tab mới. Khi cửa sổ còn mở, 15 giây kiểm tra 1 lần => hoá đơn 📤 Sang web tự hiện thành thẻ
-function moClaudeNoi(){ var w=Math.min(560,Math.round(screen.availWidth*.42)), mt=screen.availWidth>900;
+function moClaudeNoi(){ chepAnhChoClaude(); var w=Math.min(560,Math.round(screen.availWidth*.42)), mt=screen.availWidth>900;
   CL_WIN=window.open(CLAUDE_DOC,"claudeDoc",mt?"popup,width="+w+",height="+screen.availHeight+",left="+(screen.availWidth-w)+",top=0":"");
   if(!CL_WIN) return true;
   clearInterval(CL_HEN); CL_HEN=setInterval(kiemClaudeMoi,15000); ttDoc("🤖 Claude đang mở – đọc xong bấm 📤 Sang web, thẻ sẽ tự hiện ở đây"); return false; }
+// ⚖️ ĐỐI CHIẾU 3 NGUỒN: Gà đọc + Gà soát/đọc lại (2 lượt) và Claude đọc độc lập ở trang riêng → 1 thẻ chính xác nhất.
+// Ghép theo tên hàng (hoặc thành tiền); 2 bên khớp → giữ; lệch → chọn bản SL × giá = thành tiền & làm tổng khớp, ưu tiên Claude (đọc chữ tay tốt hơn); còn nghi thì tô cam 🔎 kèm số của cả 2 bên.
+// 🎓 Claude dạy Gà: khi ghi thẻ đã đối chiếu, những chỗ Claude đọc đúng hơn Gà được gửi vào bộ nhớ Gà (chỉ khi chủ giữ đúng như Claude – chủ sửa khác thì bỏ bài đó)
+function dayGaTuClaude(x,p){ var bai=(x.bai||[]).filter(function(b){ var m=/^TÊN: .+ ⇒ (.+)$/.exec(b); return !m||(p.dong||[]).some(function(d){ return bo2(d.nd)===bo2(m[1]); }); }); x.bai=[];
+  if(bai.length) goi("hocDocAnh",bai.slice(0,15),p.quan).then(function(n){ if(n) toast("🎓 Claude đã dạy Gà "+n+" điều từ hoá đơn này",5000); }).catch(function(){}); }
+function laTenDM(t){ var b=bo2(t); return !!b&&(D.dm.hang||[]).some(function(h){ return bo2(h.ten||h[0])===b; }); }
+function bo2(t){ return boDau(String(t||"")).replace(/[^a-z0-9 ]/g," ").replace(/\s+/g," ").trim(); }
+function giongTen(a,b){ a=bo2(a); b=bo2(b); if(!a||!b) return 0; if(a===b) return 1; if(a.indexOf(b)>=0||b.indexOf(a)>=0) return .85; var A=a.split(" "), B=b.split(" "), n=A.filter(function(w){ return B.indexOf(w)>=0; }).length; return n/Math.max(A.length,B.length); }
+function ttD(d){ return Number(d.tt)||Math.round((Number(d.sl)||0)*(Number(d.dg)||0)); }
+function timTheGa(x){ var tot=-1, diem=2.5; (F.dsAI||[]).forEach(function(h,k){ if(h.tamMa||h.daGhi||h.loi||!(h.dong||[]).length) return; var d=0;
+  if(h.ncc&&x.ncc&&giongTen(h.ncc,x.ncc)>=.85) d+=2; if(h.ngay&&x.ngay&&ngayISO(h.ngay)===ngayISO(x.ngay)) d+=1;
+  var t1=h.tongGiay||h.dong.reduce(function(a,y){ return a+ttD(y); },0), t2=x.tongGiay||(x.dong||[]).reduce(function(a,y){ return a+ttD(y); },0); if(t1&&t2&&Math.abs(t1-t2)<=Math.max(1000,t2*.03)) d+=2;
+  var trung=(x.dong||[]).filter(function(c){ return h.dong.some(function(g){ return giongTen(g.nd,c.nd)>=.6||(ttD(g)&&ttD(g)===ttD(c)); }); }).length; if((x.dong||[]).length&&trung/x.dong.length>=.5) d+=2;
+  if(d>diem){ diem=d; tot=k; } }); return tot; }
+function doiChieu3(g,c){ var dsC=(c.dong||[]).map(function(d){ return Object.assign({},d); }), dsG=(g.dong||[]).map(function(d){ return Object.assign({},d); }), dung=function(d){ return d.sl&&d.dg&&Math.abs(d.sl*d.dg-ttD(d))<=1000; };
+  var bai=[], tongGiay=c.tongGiay||g.tongGiay||0, dungG={}, ra=[], khop=0, lech=0, vn=function(d){ return (d.sl||"?")+" × "+(Number(d.dg)||0).toLocaleString("vi-VN")+" = "+ttD(d).toLocaleString("vi-VN"); };
+  dsC.forEach(function(cd){ var j=-1, b=0; dsG.forEach(function(gd,k){ if(dungG[k]) return; var s=giongTen(gd.nd,cd.nd)+(ttD(gd)&&ttD(gd)===ttD(cd)?.5:0); if(s>b){ b=s; j=k; } });
+    if(j<0||b<.55){ cd.nghi="chỉ Claude đọc thấy dòng này – Gà không có"; ra.push(cd); lech++; return; } dungG[j]=1; var gd=dsG[j];
+    var ten=laTenDM(gd.nd)?gd.nd:laTenDM(cd.nd)?cd.nd:cd.nd||gd.nd;
+    if(bo2(gd.nd)!==bo2(cd.nd)&&laTenDM(cd.nd)&&!laTenDM(gd.nd)) bai.push("TÊN: "+String(gd.nd).toUpperCase()+" ⇒ "+String(cd.nd).toUpperCase()); var cungSo=Math.abs(ttD(gd)-ttD(cd))<=1000&&Number(gd.sl)===Number(cd.sl);
+    if(cungSo){ khop++; ra.push(Object.assign({},cd,{ nd:ten, ml:gd.ml||cd.ml })); return; }
+    var chon=dung(cd)||!dung(gd)?cd:gd; lech++; if(chon===cd) bai.push("SỐ ("+(c.ncc||g.ncc||"")+" · "+String(ten).toUpperCase()+"): Gà đọc SL "+gd.sl+" × "+(Number(gd.dg)||0).toLocaleString("vi-VN")+" = "+ttD(gd).toLocaleString("vi-VN")+" → Claude đọc đúng SL "+cd.sl+" × "+(Number(cd.dg)||0).toLocaleString("vi-VN")+" = "+ttD(cd).toLocaleString("vi-VN")); ra.push(Object.assign({},chon,{ nd:ten, ml:gd.ml||cd.ml, nghi:"Gà đọc "+vn(gd)+" · Claude đọc "+vn(cd)+" → đang lấy "+(chon===cd?"Claude":"Gà") })); });
+  dsG.forEach(function(gd,k){ if(dungG[k]) return; ra.push(Object.assign({},gd,{ nghi:"chỉ Gà đọc thấy dòng này – Claude không có" })); lech++; });
+  var cong=function(ds){ return ds.reduce(function(a,d){ return a+ttD(d); },0); };
+  // tổng giấy quyết định: bản nào cộng đúng tổng giấy thì lấy nguyên bản đó (vẫn giữ dấu 🔎 ở dòng lệch)
+  if(tongGiay&&Math.abs(cong(ra)-tongGiay)>1000){ if(Math.abs(cong(dsC)-tongGiay)<=1000) ra=ra.filter(function(d){ return !/chỉ Gà đọc/.test(d.nghi||""); }).map(function(d){ var cd=dsC.filter(function(x){ return giongTen(x.nd,d.nd)>=.55; })[0]; return cd?Object.assign({},d,{ sl:cd.sl, dg:cd.dg, tt:cd.tt }):d; });
+    else if(Math.abs(cong(dsG)-tongGiay)<=1000) ra=ra.filter(function(d){ return !/chỉ Claude đọc/.test(d.nghi||""); }).map(function(d){ var gd=dsG.filter(function(x){ return giongTen(x.nd,d.nd)>=.55; })[0]; return gd?Object.assign({},d,{ sl:gd.sl, dg:gd.dg, tt:gd.tt }):d; }); }
+  var nccDung=(g.ncc&&(D.dm.ncc||[]).some(function(n){ return bo2(n.ten)===bo2(g.ncc); }))?g.ncc:c.ncc||g.ncc;
+  var ghi=["⚖️ Đối chiếu Gà (2 lượt) + Claude: "+khop+" dòng khớp, "+lech+" dòng lệch"+(lech?" (tô cam 🔎)":"")];
+  if(g.ngay&&c.ngay&&ngayISO(g.ngay)!==ngayISO(c.ngay)) ghi.push("🔎 Ngày: Gà "+g.ngay+" · Claude "+c.ngay);
+  if(g.ncc&&c.ncc&&giongTen(g.ncc,c.ncc)<.85){ ghi.push("🔎 NCC: Gà "+g.ncc+" · Claude "+c.ncc); if(nccDung===c.ncc) bai.push("NCC: "+g.ncc+" ⇒ "+c.ncc); }
+  if(g.ngay&&c.ngay&&ngayISO(g.ngay)!==ngayISO(c.ngay)) bai.push("NGÀY ("+(c.ncc||g.ncc||"")+"): Gà đọc "+g.ngay+" → Claude đọc "+c.ngay+" (chú ý chữ số tháng viết tay)");
+  g.dong=ra; g.ncc=nccDung; g.ngay=c.ngay||g.ngay; g.tongGiay=tongGiay||cong(ra); g.coTong=!!tongGiay; g.tamMa=c.tamMa; g.doiChieu=1; g.ghiChu=ghi.concat(g.ghiChu?[g.ghiChu]:[]).join(" · ");
+  if(!g.anhTo&&c.anhNho) g.anhTo=(c.anhNho||"").split(",")[1]||""; g.bai=bai; g.goc=JSON.parse(JSON.stringify({ ncc:g.ncc, ngay:g.ngay, dong:g.dong })); }
+// 📋 Bấm 🤖 Claude đọc: tự chép ảnh đang đọc vào bộ nhớ tạm → sang trang Claude chỉ cần dán (⌘V / giữ → Dán)
+function chepAnhChoClaude(){ try{ var a=(F.anhs&&F.anhs[0])||(F.anh&&F.anh.data?{data:F.anh.data}:null); if(!a||!a.data||!navigator.clipboard||!window.ClipboardItem) return;
+  var pr=new Promise(function(ok){ var im=new Image(); im.onload=function(){ var c=document.createElement("canvas"); c.width=im.width; c.height=im.height; c.getContext("2d").drawImage(im,0,0); c.toBlob(ok,"image/png"); }; im.src="data:image/jpeg;base64,"+a.data; });
+  navigator.clipboard.write([new ClipboardItem({"image/png":pr})]).then(function(){ toast("📋 Đã chép ảnh – sang trang Claude dán (⌘V) rồi bấm Claude đọc, xong 📤 Sang web: web tự đối chiếu với Gà",7000); }).catch(function(){}); }catch(e){} }
 function kiemClaudeMoi(){ if(TAB!=="NHAP"||!F) return; if(CL_WIN&&CL_WIN.closed){ clearInterval(CL_HEN); CL_WIN=null; }
   goi("dsClaudeWeb",F.quan).then(function(ds){ ds=ds||[]; var co={}; (F.dsAI||[]).forEach(function(h){ if(h.tamMa) co[h.tamMa]=1; });
     var moi=ds.filter(function(x){ return !co[x.tamMa]; }); if(!moi.length) return;
-    if(F.dsAI&&F.dsAI.length&&F.dsAI.some(function(h){ return h.tamMa; })){ moi.forEach(function(x){ F.dsAI.push(theClaude_(x)); }); veDsAI(); ttDoc("📥 Thêm "+moi.length+" hoá đơn từ Claude"); }
+    // ⚖️ Có thẻ Gà đọc chưa ghi → ghép kết quả Claude (đọc độc lập) vào đúng thẻ cùng hoá đơn, đối chiếu từng dòng
+    var ghep=0; if(F.dsAI&&F.dsAI.some(function(h){ return !h.tamMa&&!h.daGhi&&!h.loi&&(h.dong||[]).length; })) moi=moi.filter(function(x){ var k=timTheGa(x); if(k<0) return true; doiChieu3(F.dsAI[k],x); ghep++; return false; });
+    if(ghep){ veDsAI(); ttDoc("⚖️ Đã đối chiếu "+ghep+" hoá đơn: Gà (2 lượt) + Claude – dòng còn lệch tô cam 🔎"); }
+    if(!moi.length) return;
+    if(F.dsAI&&F.dsAI.length&&(ghep||F.dsAI.some(function(h){ return h.tamMa; }))){ moi.forEach(function(x){ F.dsAI.push(theClaude_(x)); }); veDsAI(); ttDoc("📥 Thêm "+moi.length+" hoá đơn từ Claude"); }
     else if(!F.dsAI||!F.dsAI.length){ CLW=moi; moClaudeWeb(); }
     else { CLW=moi; veThanhDocSan(); } }).catch(function(){}); }
 function theClaude_(x){ return { ncc:x.ncc, ngay:x.ngay, tongGiay:x.tongGiay, dong:x.dong, ghiChu:x.ghiChu, tamMa:x.tamMa, anhTo:(x.anhNho||"").split(",")[1]||"", goc:{ ncc:x.ncc, dong:JSON.parse(JSON.stringify(x.dong)) } }; }
