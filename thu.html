@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261115151650";
+var HMK_BAN = "20261115151910";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -595,7 +595,7 @@ html.coHop,html.coHop body{overflow:hidden!important;overscroll-behavior:none}.m
 .bangL tr.nghiL td{background:#fff3e0!important}.bangL tr.nghiL td:first-child{box-shadow:inset 3px 0 0 #f59e0b}.nghiNut{animation:nhayNghi 1.6s ease-in-out 3}@keyframes nhayNghi{50%{transform:scale(1.25)}}
 .tongL{display:inline-flex;align-items:center;gap:4px;padding:2px 4px 2px 9px!important}.tongL input{width:104px;border:1px solid #d9d9df;border-radius:8px;padding:2px 6px;font-size:13px;text-align:right;font-variant-numeric:tabular-nums;background:#fff}
 .nccNut{cursor:pointer}.nccNut .nccBut{font-style:normal;font-size:.8em;opacity:.45;margin-left:2px}.nccNut:hover .nccBut{opacity:1}.nccMenu{position:fixed;z-index:99990;background:#fff;border:1px solid #d9d9df;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.18);padding:10px;width:260px}.nccMenu input{width:100%;box-sizing:border-box}
-.hdBang{width:auto!important;max-width:100%}.hdBang td,.hdBang th{white-space:nowrap;padding:4px 6px!important}.hdBang input.hdO{min-width:44px;max-width:280px}.hdBang select{max-width:220px}.hdNut{display:flex!important;flex-wrap:nowrap;gap:6px;overflow-x:auto;scrollbar-width:none;align-items:center}.hdNut::-webkit-scrollbar{display:none}.hdNut button{flex:none;white-space:nowrap;padding:7px 11px!important}.hdNut .xoaChu{margin-left:auto}@media(max-width:640px){.hdNut button{padding:6px 8px!important;font-size:13px!important}}
+.hdBang{width:auto!important;max-width:100%}.hdBang td,.hdBang th{white-space:nowrap;padding:4px 6px!important}.hdBang input.hdO{min-width:44px;max-width:280px}.hdBang select{max-width:220px}p.hdNut{display:flex!important;flex-wrap:nowrap!important;gap:6px;overflow-x:auto;scrollbar-width:none;align-items:center}.hdNut::-webkit-scrollbar{display:none}.hdNut button{flex:none;white-space:nowrap;padding:6px 9px!important}.hdNut .xoaChu{margin-left:auto}@media(max-width:640px){.hdNut button{padding:6px 8px!important;font-size:13px!important}}
 </style><style>/* 🧾 Hoá đơn – NCC · lưới đối chiếu */
 main{max-width:none!important;width:100%;box-sizing:border-box}.chanTrang{max-width:none!important}
 #mplLoc label,#mplLoc button,#mplLoc .mplNhan,.mplTagLoc{display:inline-flex;align-items:center;gap:5px}#mplLoc .icv.lon,.mplTagLoc .icv.lon{width:22px;height:22px;flex:0 0 auto}.mplTagLoc a{display:inline-flex}.mplTagLoc a .icv.lon{width:16px;height:16px}
