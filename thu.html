@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261115164221";
+var HMK_BAN = "20261115165747";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -599,6 +599,7 @@ html.coHop,html.coHop body{overflow:hidden!important;overscroll-behavior:none}.m
 #tlAnh{pointer-events:none}
 .menuPhuDong{margin:0 0 10px}.locSeg.menuPhu{flex-wrap:wrap;max-width:100%}.locSeg.menuPhu button{height:32px!important;padding:4px 12px!important;font-size:13.5px!important;white-space:nowrap}.locSeg.menuPhu button.on{background:#fff!important;box-shadow:0 1px 3px rgba(0,0,0,.12)!important;font-weight:700}@media(max-width:640px){.locSeg.menuPhu{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.locSeg.menuPhu::-webkit-scrollbar{display:none}.locSeg.menuPhu button{font-size:12.5px!important;padding:4px 9px!important}}
 #noiDung .hang>label:has(>input[type=date]),#noiDung .hang>label:has(>input[type=month]),#noiDung .hang>label:has(>select[id$=Tu]),#noiDung .hang>label:has(>select[id$=Den]){flex-direction:row!important;align-items:center!important;gap:6px!important;flex:0 0 auto!important;font-size:13px;color:#6e6e73;font-weight:500;white-space:nowrap}#noiDung .hang>label>input[type=date],#noiDung .hang>label>input[type=month]{height:34px;padding:0 8px;border-radius:9px;font-size:14px}
+.chanTrang [data-q]{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.chanTrang [data-q] b{display:inline-flex!important;align-items:center}
 </style><style>/* 🧾 Hoá đơn – NCC · lưới đối chiếu */
 main{max-width:none!important;width:100%;box-sizing:border-box}.chanTrang{max-width:none!important}
 #mplLoc label,#mplLoc button,#mplLoc .mplNhan,.mplTagLoc{display:inline-flex;align-items:center;gap:5px}#mplLoc .icv.lon,.mplTagLoc .icv.lon{width:22px;height:22px;flex:0 0 auto}.mplTagLoc a{display:inline-flex}.mplTagLoc a .icv.lon{width:16px;height:16px}
