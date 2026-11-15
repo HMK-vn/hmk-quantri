@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261115150706";
+var HMK_BAN = "20261115151437";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -2267,6 +2267,7 @@ document.addEventListener("click",function(e){ var el=e.target.closest&&e.target
   var o=m.querySelector("input"); setTimeout(function(){ o.focus(); o.select(); },30);
   var lam=function(){ var moi=o.value.trim().toUpperCase(); m.remove(); if(!moi||moi===cu.toUpperCase()) return;
     goi("doiNCCHD",so,moi).then(function(kq){ toast("🏷 "+so+" → "+moi+(kq&&kq.soMoi&&kq.soMoi!==so?" · số mới "+kq.soMoi:""),5000);
+      if(document.getElementById("hTong")&&typeof moHD==="function") moHD(kq&&kq.soMoi||so);
       if(TAB==="MPL") taiMPL(); else if(TAB==="HDNGAY") taiHDNgay(); else if(TAB==="KETCA"&&typeof moKetCa==="function") moKetCa(); else if(TAB==="DOICHIEU"&&typeof veDCZ==="function") veDCZ(); else if(typeof lamMoiHD==="function") lamMoiHD(); }).catch(loi); };
   m.onclick=function(ev){ ev.stopPropagation(); var b=ev.target.closest("button[data-h]"); if(!b) return; if(b.dataset.h==="1") lam(); else m.remove(); };
   o.onkeydown=function(ev){ if(ev.key==="Enter"){ ev.preventDefault(); lam(); } else if(ev.key==="Escape") m.remove(); }; },true);
@@ -2633,7 +2634,7 @@ var HDMO=null;
 // Số hoá đơn trong thông báo / cảnh báo bấm được → mở hoá đơn để sửa
 function linkHD(t){ return esc(t).replace(/([A-ZĐ]{1,12}\.\d{3,9})/g,'<a href="#" class="soHDLink" title="Mở hoá đơn $1 để xem / sửa" onclick="event.stopPropagation();moHD(\'$1\');return false">$1</a>'); }
 function moHD(so){ goi(TAB==="TIMELINE"?"hoaDonTL":"hoaDon",so).then(function(h){ var sua=suaDuoc("MPL"), c=h["Chênh lệch"]; HDMO=h; // sửa chi tiết được ở mọi trang (kể cả Timeline) nếu có quyền Sửa Main pay list
-  moHop('<h3>🧾 Hoá đơn '+esc(so)+' <span class="tag">'+h["Quán"]+'</span> <span style="font-size:20px">'+(h["Trạng thái"]==="✖"?"✖️":h["Trạng thái"]==="✔"?"✅":"")+'</span></h3><div class="luoi2"><div><div class="nho">📅 '+h.DD+'/'+h.MM+'/'+h["Năm"]+' · 🏪 '+esc(h["Nhà Cung Cấp"])+' · Num '+h.Num+'</div>'+
+  moHop('<h3>🧾 Hoá đơn '+esc(so)+' <span class="tag">'+h["Quán"]+'</span> <span style="font-size:20px">'+(h["Trạng thái"]==="✖"?"✖️":h["Trạng thái"]==="✔"?"✅":"")+'</span></h3><div class="luoi2"><div><div class="nho">📅 '+h.DD+'/'+h.MM+'/'+h["Năm"]+' · 🏪 '+nccNut(so,h["Nhà Cung Cấp"])+' · Num '+h.Num+'</div>'+
   '<table style="margin-top:8px"><tr><th>Nội dung</th><th class="so">SL</th><th class="so">Đơn giá</th><th class="so">Tiền</th><th>Main list</th></tr>'+h.dong.map(function(d,j){ return '<tr'+(d.cb?' style="background:#fff5f5"':"")+'>'+(sua?'<td><input class="hdO" id="hN'+j+'" value="'+esc(d.nd)+'" onchange="this.value=this.value.trim().toUpperCase()"></td><td class="so"><input class="hdO so" id="hS'+j+'" inputmode="decimal" value="'+esc(d.sl)+'" oninput="hdTinh('+j+',0,\'sl\')"></td><td class="so"><input class="hdO so" id="hG'+j+'" inputmode="numeric" value="'+(d.dg?Number(d.dg).toLocaleString("vi-VN"):"")+'" oninput="hdTinh('+j+',0,\'dg\')" onblur="hdTinh('+j+',1,\'dg\')"></td><td class="so"><input class="hdO so" id="hT'+j+'" inputmode="numeric" title="Sửa thành tiền: có SL → tự ra đơn giá; có đơn giá → tự ra SL" value="'+(d.tt?Number(d.tt).toLocaleString("vi-VN"):"")+'" oninput="hdTinh('+j+',0,\'tt\')" onblur="hdTinh('+j+',1,\'tt\')"></td>'
     :'<td>'+esc(d.nd)+'</td><td class="so">'+d.sl+'</td><td class="so">'+VN(d.dg)+'</td><td class="so">'+VN(d.tt)+'</td>')+(sua?'<td><select class="hdO" id="hM'+j+'">'+(D.dm.mainList||[]).concat(d.ml&&D.dm.mainList.indexOf(d.ml)<0?[d.ml]:[]).map(function(m){ return '<option'+(m===d.ml?' selected':'')+'>'+esc(m)+'</option>'; }).join("")+'</select></td>':'<td class="nho">'+esc(d.ml)+'</td>')+'</tr>'; }).join("")+
   '<tr><td colspan="3"><b>Tổng số hoá</b></td><td class="so"><b id="hTong">'+VN(h["Tổng số hoá"])+'</b></td><td></td></tr></table>'+(c!==""&&Math.abs(c)>=1000?'<div class="bao loi">🔴 Giấy '+VN(h["Tổng giấy"])+' – lệch '+VN(c)+' đ</div>':"")+
