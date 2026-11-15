@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261115131838";
+var HMK_BAN = "20261115132321";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -1500,8 +1500,8 @@ function xoayDocLai(a,r){ if(!r||!r.ok||!a.img||a._xoay) return r; var dem={}; (
   document.addEventListener("input",function(e){ if(laNCC(e.target)&&o===e.target) ve(e.target); });
   document.addEventListener("focusout",function(e){ if(o&&e.target===o) setTimeout(an,150); });
   addEventListener("scroll",function(){ if(o&&hop) ve(o); },true); })();
-function soatNen(kqAnh,anhs){ var can=anhs.map(function(a,i){ return i; }).filter(function(i){ return (kqAnh[i]||[]).length&&!kqAnh[i][0].loi&&F.dsAI.some(function(h){ return h.iAnh===i&&!h.loi&&!h.daGhi&&loiThe(h)>0; }); });
-  if(!can.length) return; F.dsAI.forEach(function(h){ if(can.indexOf(h.iAnh)>=0&&!h.daGhi) h.soat=1; }); veDsAI(); soatTT("🔁 Đang soát lại nền "+can.length+" ảnh còn lệch tổng – bạn vẫn soát/ghi các thẻ khác bình thường…");
+function soatNen(kqAnh,anhs){ var can=anhs.map(function(a,i){ return i; }).filter(function(i){ return (kqAnh[i]||[]).length&&!kqAnh[i][0].loi&&F.dsAI.some(function(h){ return h.iAnh===i&&!h.loi&&!h.daGhi; }); }); // 🕵️ mọi ảnh đều qua Gà soát (tối đa 3 vòng đọc ⇄ soát), không chỉ thẻ lệch tổng
+  if(!can.length) return; F.dsAI.forEach(function(h){ if(can.indexOf(h.iAnh)>=0&&!h.daGhi) h.soat=1; }); veDsAI(); soatTT("🕵️ Gà đang soát lại "+can.length+" ảnh (đọc ⇄ soát tối đa 3 vòng) – bạn vẫn xem/ghi các thẻ khác bình thường…");
   var xong=0, tot=0; can.forEach(function(i){ var truoc=kqAnh[i].map(function(h){ var x=Object.assign({},h); delete x.anhTo; delete x.goc; delete x.anhTo2; return x; });
     goi("docAnhKhop",{mime:"image/jpeg",data:anhs[i].data,quan:quanHT(),dsTruoc:truoc}).catch(function(){ return {ok:false}; }).then(function(r){ xong++;
       var biSua=F.dsAI.some(function(h){ return h.iAnh===i&&(h.daGhi||h.daSua); });
