@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261115151910";
+var HMK_BAN = "20261115152802";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -596,6 +596,7 @@ html.coHop,html.coHop body{overflow:hidden!important;overscroll-behavior:none}.m
 .tongL{display:inline-flex;align-items:center;gap:4px;padding:2px 4px 2px 9px!important}.tongL input{width:104px;border:1px solid #d9d9df;border-radius:8px;padding:2px 6px;font-size:13px;text-align:right;font-variant-numeric:tabular-nums;background:#fff}
 .nccNut{cursor:pointer}.nccNut .nccBut{font-style:normal;font-size:.8em;opacity:.45;margin-left:2px}.nccNut:hover .nccBut{opacity:1}.nccMenu{position:fixed;z-index:99990;background:#fff;border:1px solid #d9d9df;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.18);padding:10px;width:260px}.nccMenu input{width:100%;box-sizing:border-box}
 .hdBang{width:auto!important;max-width:100%}.hdBang td,.hdBang th{white-space:nowrap;padding:4px 6px!important}.hdBang input.hdO{min-width:44px;max-width:280px}.hdBang select{max-width:220px}p.hdNut{display:flex!important;flex-wrap:nowrap!important;gap:6px;overflow-x:auto;scrollbar-width:none;align-items:center}.hdNut::-webkit-scrollbar{display:none}.hdNut button{flex:none;white-space:nowrap;padding:6px 9px!important}.hdNut .xoaChu{margin-left:auto}@media(max-width:640px){.hdNut button{padding:6px 8px!important;font-size:13px!important}}
+#tlAnh{pointer-events:none}
 </style><style>/* 🧾 Hoá đơn – NCC · lưới đối chiếu */
 main{max-width:none!important;width:100%;box-sizing:border-box}.chanTrang{max-width:none!important}
 #mplLoc label,#mplLoc button,#mplLoc .mplNhan,.mplTagLoc{display:inline-flex;align-items:center;gap:5px}#mplLoc .icv.lon,.mplTagLoc .icv.lon{width:22px;height:22px;flex:0 0 auto}.mplTagLoc a{display:inline-flex}.mplTagLoc a .icv.lon{width:16px;height:16px}
@@ -3252,7 +3253,7 @@ function veLuoiTL(){ var ds=TL.ds.filter(function(h){ return (!TL.lech||h.lech)&
     : '<div class="nho" style="padding:14px">Không có hoá đơn trong khoảng đã chọn.</div>'; }
 function doiTT(so){ var h=TL.ds.filter(function(x){return x.so===so;})[0], moi=h.tt==="✔"?"✖":"✔";
   goi("datTTHD",so,moi).then(function(){ h.tt=moi; veLuoiTL(); toast(moi==="✔"?"✅ Đã xác nhận "+so:"❌ Đánh dấu chưa khớp "+so); }).catch(loi); }
-function hienAnhTL(e,id){ var b=$("tlAnh"); if(!id){ b.style.display="none"; return; } var x=Math.min(e.clientX+16,window.innerWidth-300), y=Math.max(10,Math.min(e.clientY-40,window.innerHeight-330));
+function hienAnhTL(e,id){ var b=$("tlAnh"); if(!id){ b.style.display="none"; return; } var x=e.clientX+16+300>window.innerWidth?Math.max(10,e.clientX-316):e.clientX+16, y=Math.max(10,Math.min(e.clientY-40,window.innerHeight-330)); // không đè lên con trỏ (đè lên → mất hover → ẩn/hiện liên tục)
   b.style.left=x+"px"; b.style.top=y+"px"; b.style.display="block"; b._id=id;
   if(ANHCACHE[id]){ b.innerHTML='<img src="'+ANHCACHE[id]+'" style="max-width:280px;max-height:320px;display:block">'; return; }
   b.innerHTML='<div class="nho" style="padding:10px">'+gaTai("Đang tải ảnh…")+'</div>';
