@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261115125551";
+var HMK_BAN = "20261115125824";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -852,7 +852,7 @@ body .ntInline .ntBang th,body.misa .ntInline .ntBang th,body .dczDau .segDCZ bu
 <div id="gaKhung" class="an"><div class="gaDau"><span id="gaDauAnh" class="gaDong gaDauAnh"></span><div><b>Gà Trợ Lý</b><small id="gaModel">Gemini</small></div><span style="flex:1"></span><button onclick="moGem()" title="Hỏi sâu với Gem (Gemini)">✨</button><button onclick="nhoClaude()" title="Chép câu hỏi gửi Claude (miễn phí, dán vào Claude)">📮</button><button onclick="gaNho()" title="Những điều Gà đã học">🧠</button><button id="gaCD" onclick="gaCaiDat()" title="Cài đặt AI (chủ)">⚙️</button><button onclick="gaXoa()" title="Cuộc trò chuyện mới">🧹</button><button onclick="gaMo(false)" title="Thu nhỏ">✕</button></div>
  <div id="gaTin"></div>
  <div class="gaGoi" id="gaGoi"></div>
- <form class="gaNhap" onsubmit="gaGui();return false"><textarea id="gaO" rows="1" placeholder="Hỏi Gà Trợ Lý…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();gaGui();}"></textarea><label class="nutIcon" title="Gửi ảnh hoá đơn viết tay – Gà mở Nhập hoá đơn và đọc thành thẻ" style="cursor:pointer;flex:none">📷<input type="file" accept="image/*" multiple hidden onchange="gaAnhHD(this)"></label><button class="c" id="gaNut">➤</button></form></div></div>
+ <form class="gaNhap" onsubmit="gaGui();return false"><textarea id="gaO" rows="1" placeholder="Hỏi Gà Trợ Lý…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();gaGui();}"></textarea><label class="nutIcon" title="Gửi ảnh hoá đơn viết tay – Gà mở Nhập hoá đơn và đọc thành thẻ" style="cursor:pointer;flex:none">📷<input type="file" accept="image/*,.heic,.heif" multiple hidden onchange="gaAnhHD(this)"></label><button class="c" id="gaNut">➤</button></form></div></div>
 <div id="mo" class="mo an" onclick="if(event.target===this)dongMo()"><div id="moND"></div></div>
 <div id="toast" class="an"></div>
 <script>
@@ -1293,12 +1293,14 @@ function quetGiay(src){ var W=src.naturalWidth||src.width, H=src.naturalHeight||
   var le=0.05, X0=Math.max(0,(b.x0/w-le))*W, Y0=Math.max(0,(b.y0/h-le))*H, X1=Math.min(1,((b.x1+1)/w+le))*W, Y1=Math.min(1,((b.y1+1)/h+le))*H;
   var o2=document.createElement("canvas"); o2.width=Math.round(X1-X0); o2.height=Math.round(Y1-Y0); var x2=o2.getContext("2d"); x2.filter="contrast(1.12) brightness(1.04)"; x2.drawImage(src,X0,Y0,X1-X0,Y1-Y0,0,0,o2.width,o2.height);
   return o2; }
-function docFileAnh(f,max){ return new Promise(function(ok){ var rd=new FileReader(); rd.onload=function(){ var img=new Image(); img.onload=function(){ var nguon=img, cat=null; if(quetBat()) try{ cat=quetGiay(img); if(cat){ nguon=cat; toast("✂️ Đã tự cắt đúng khung hoá đơn (tắt ở nút ✂️ nếu không muốn)",2500); } }catch(e){}
+function docFileAnh(f,max){ return doiHeic(f).catch(function(){ return f; }).then(function(g){ return docFileAnh0(g,max); }); }
+function docFileAnh0(f,max){ return new Promise(function(ok){ var rd=new FileReader(); rd.onload=function(){ var img=new Image(); img.onload=function(){ var nguon=img, cat=null; if(quetBat()) try{ cat=quetGiay(img); if(cat){ nguon=cat; toast("✂️ Đã tự cắt đúng khung hoá đơn (tắt ở nút ✂️ nếu không muốn)",2500); } }catch(e){}
   var W0=nguon.naturalWidth||nguon.width, H0=nguon.naturalHeight||nguon.height, k=Math.min(1,max/Math.max(W0,H0)), c=document.createElement("canvas"); c.width=W0*k; c.height=H0*k;
   c.getContext("2d").drawImage(nguon,0,0,c.width,c.height); var u=c.toDataURL("image/jpeg",0.85); ok({ url:u, data:u.split(",")[1], img:nguon }); }; img.src=rd.result; }; rd.readAsDataURL(f); }); }
 // Chọn 1 hay nhiều ảnh (mỗi ảnh 1 tờ là nhanh + chuẩn nhất) – xong tự đọc: có khoá Gemini → AI; không → OCR miễn phí
 // Ảnh iPhone HEIC/HEIF: trình duyệt máy tính không đọc được → tự đổi sang JPEG (thư viện heic2any, chỉ tải khi cần)
 var HEIC_LIB=null;
+function anhOK(f){ return !!f&&(/^image\//.test(f.type||"")||laHeic(f)||/\.(jpe?g|png|webp|gif|bmp|tiff?|avif|heic|heif)$/i.test(f.name||"")); }
 function laHeic(f){ return /hei[cf]/i.test(f.type||"")||/\.hei[cf]$/i.test(f.name||""); }
 function doiHeic(f){ if(!laHeic(f)) return Promise.resolve(f);
   HEIC_LIB=HEIC_LIB||new Promise(function(ok,loi){ var s=document.createElement("script"); s.src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"; s.onload=ok; s.onerror=function(){ loi(new Error("Không tải được bộ đổi ảnh HEIC")); }; document.head.appendChild(s); });
@@ -2134,7 +2136,7 @@ function oDanAnh(){ return '<div class="the khongIn danAnh"><div class="hang" st
 var DOCHD=null;
 function moDocHD(ncc){ DOCHD={ ncc:ncc||"", chay:0 };
   moHop('<h3>'+gaHTML("gaMini")+' Đọc hoá đơn NCC (Zalo)</h3><div class="vungDan" id="vungDan" tabindex="0" onclick="this.focus()" ondragover="event.preventDefault();this.classList.add(\'keo\')" ondragleave="this.classList.remove(\'keo\')" ondrop="event.preventDefault();this.classList.remove(\'keo\');danFiles(event.dataTransfer.files)">'+
-    '<div style="font-size:30px">📋</div><b>Nhấn ⌘V / Ctrl+V để dán ảnh hoá đơn</b><div class="nho">Dán 1 hay nhiều ảnh, 1 ảnh có nhiều tờ cũng được – Gà tự tách. Hoặc kéo thả / <label class="lienKet">chọn ảnh<input type="file" accept="image/*" multiple hidden onchange="danFiles(this.files)"></label></div></div>'+
+    '<div style="font-size:30px">📋</div><b>Nhấn ⌘V / Ctrl+V để dán ảnh hoá đơn</b><div class="nho">Dán 1 hay nhiều ảnh, 1 ảnh có nhiều tờ cũng được – Gà tự tách. Hoặc kéo thả / <label class="lienKet">chọn ảnh<input type="file" accept="image/*,.heic,.heif" multiple hidden onchange="danFiles(this.files)"></label></div></div>'+
     (ncc?'<div class="nho" style="margin-top:4px">Gợi ý NCC: <b>'+esc(ncc)+'</b> (chỉ dùng khi ảnh không đọc được tên NCC)</div>':'')+
     '<div id="dhKQ" class="dhKQ"></div><p style="text-align:right;margin:8px 0 0"><button onclick="dongMo();taiDCZ()">Xong</button></p>');
   setTimeout(function(){ var v=$("vungDan"); if(v) v.focus(); },50); }
@@ -2142,7 +2144,7 @@ function moDocHD(ncc){ DOCHD={ ncc:ncc||"", chay:0 };
 function catKhungURL(img,k,xoay){ var W=img.naturalWidth||img.width, H=img.naturalHeight||img.height, l=20, y0=Math.max(0,k[0]-l)*H/1000, x0=Math.max(0,k[1]-l)*W/1000, y1=Math.min(1000,k[2]+l)*H/1000, x1=Math.min(1000,k[3]+l)*W/1000;
   var c=document.createElement("canvas"), s=Math.min(1,1800/Math.max(x1-x0,y1-y0)); c.width=Math.round((x1-x0)*s); c.height=Math.round((y1-y0)*s);
   c.getContext("2d").drawImage(img,x0,y0,x1-x0,y1-y0,0,0,c.width,c.height); return xoayCanvas(c,xoay).toDataURL("image/jpeg",0.88); }
-function danFiles(fs){ fs=[].slice.call(fs||[]).filter(function(f){ return /^image\//.test(f.type); }); if(!fs.length) return toast("Không có ảnh để dán");
+function danFiles(fs){ fs=[].slice.call(fs||[]).filter(anhOK); if(!fs.length) return toast("Không có ảnh để dán");
   if(!$("dhKQ")) moDocHD(); var q=Q||(QS||[])[0]||"", kq=$("dhKQ"), nam=new Date().getFullYear();
   fs.forEach(function(f){ var o=document.createElement("div"); o.className="dhThe"; o.innerHTML=gaTai("Gà đang đọc ảnh…"); kq.appendChild(o); DOCHD.chay++;
     docFileAnh(f,2000).then(function(a){ return goi("docAnhZalo",q,"image/jpeg",a.data,DOCHD.ncc).then(function(r){
@@ -2156,7 +2158,7 @@ function danFiles(fs){ fs=[].slice.call(fs||[]).filter(function(f){ return /^ima
     .catch(function(e){ o.innerHTML='<div class="bao loi">⚠️ '+esc(e.message||e)+'</div>'; })
     .then(function(){ if(--DOCHD.chay===0){ DCZXEM="luoi"; if($("dzKQ")) taiDCZ(); toast("✅ Đã đọc & xếp hoá đơn vào ô đối chiếu"); } }); }); }
 // ⌘V ở trang Đối chiếu (trừ khi đang gõ chữ) → mở cửa sổ Đọc HĐ và đọc luôn
-document.addEventListener("paste",function(e){ if(TAB!=="DOICHIEU") return; var fs=[].filter.call((e.clipboardData&&e.clipboardData.files)||[],function(f){ return /^image\//.test(f.type); });
+document.addEventListener("paste",function(e){ if(TAB!=="DOICHIEU") return; var fs=[].filter.call((e.clipboardData&&e.clipboardData.files)||[],anhOK);
   if(!fs.length) return; e.preventDefault(); danFiles(fs); });
 // Ô lưới chưa có HĐ NCC: 🐔 Đọc HĐ → mở cửa sổ dán, gợi ý sẵn NCC của ô
 function danChoO(ncc){ moDocHD(ncc); }
@@ -2984,9 +2986,9 @@ function veFormKC(){ var t=KCTT, sua=suaDuoc("KETCA");
 
 
   ''+
-  '<div id="kcTong" style="margin-top:10px"></div><label class="nho">📝 Ghi chú<textarea rows="2" style="width:100%" oninput="KCF.ghiChu=this.value" onpaste="kcDanGC(event)" placeholder="Ghi chú… (dán ⌘V ảnh vào đây được)">'+esc(KCF.ghiChu)+'</textarea></label><div class="kcGCHang"><div class="kcGCAnh" id="kcGCAnh"></div>'+(sua?'<label class="kcGCNut khongIn" title="Chèn ảnh vào ghi chú (chụp / chọn / dán)"><input type="file" accept="image/*" multiple hidden onchange="kcThemGC(this.files);this.value=\'\'">📎 Chèn ảnh</label>':'')+'</div>'+
+  '<div id="kcTong" style="margin-top:10px"></div><label class="nho">📝 Ghi chú<textarea rows="2" style="width:100%" oninput="KCF.ghiChu=this.value" onpaste="kcDanGC(event)" placeholder="Ghi chú… (dán ⌘V ảnh vào đây được)">'+esc(KCF.ghiChu)+'</textarea></label><div class="kcGCHang"><div class="kcGCAnh" id="kcGCAnh"></div>'+(sua?'<label class="kcGCNut khongIn" title="Chèn ảnh vào ghi chú (chụp / chọn / dán)"><input type="file" accept="image/*,.heic,.heif" multiple hidden onchange="kcThemGC(this.files);this.value=\'\'">📎 Chèn ảnh</label>':'')+'</div>'+
   '<div class="khongIn kcNut">'+(sua?'<button class="kcLuu" onclick="luuKC(this)" title="Lưu báo cáo kết ca">💾 Lưu</button>':"")+'<button onclick="xuatKC(\'pdf\',this)" title="Tải báo cáo dạng PDF (A4)">📄 PDF</button><button onclick="xuatKC(\'jpg\',this)" title="Tải ảnh JPEG để gửi Zalo">🖼 JPEG</button><button onclick="window.print()" title="In đầy đủ: đếm tiền, đối soát, chi trong ngày kèm ảnh">🖨 In</button>'+(sua&&KCF.id?'<button class="d kcXoa" onclick="xoaKC()" title="Xoá báo cáo kết ca này">🗑 Xoá</button>':"")+'</div></div></div>'+
-  '<div class="kcBuoc kcRong"><h3><span class="kcSo">3</span>🧾 Chi trong ngày <span class="nho">💸 Két trừ tiền két</span><button class="khongIn kcTatAnh" onclick="kcXemTatCa()" title="Xem toàn bộ ảnh hoá đơn trong ngày">🖼 Tất cả ảnh</button><button class="khongIn kcTaiAnh" onclick="kcTaiTatCa(this)" title="Tải tất cả ảnh hoá đơn trong ngày (1 file .zip)">⬇️ Tải</button></h3>'+'<div class="kcChiHai"><div class="kcThaHang">'+(sua?'<label class="kcTha khongIn" id="kcTha" ondragover="event.preventDefault();this.classList.add(\'keo\')" ondragleave="this.classList.remove(\'keo\')" ondrop="event.preventDefault();this.classList.remove(\'keo\');kcUpAnh(event.dataTransfer.files)"><input type="file" accept="image/*" multiple hidden onchange="kcUpAnh(this.files);this.value=\'\'"><span class="kcThaIc">📎</span><span><b>Ảnh hoá đơn cuối ngày</b><br><span class="nho">Chọn / chụp, kéo thả, dán ⌘V – lưu vào HD CASHIER '+KCNGAY.split("-").reverse().join("/")+'</span></span><span id="kcThaTT" class="kcThaTT"></span></label>':'')+'<div class="kcThaLuoi" id="kcThaLuoi"></div></div>'+kcChiNgay(t.chiKet)+'</div>'+'</div>'+
+  '<div class="kcBuoc kcRong"><h3><span class="kcSo">3</span>🧾 Chi trong ngày <span class="nho">💸 Két trừ tiền két</span><button class="khongIn kcTatAnh" onclick="kcXemTatCa()" title="Xem toàn bộ ảnh hoá đơn trong ngày">🖼 Tất cả ảnh</button><button class="khongIn kcTaiAnh" onclick="kcTaiTatCa(this)" title="Tải tất cả ảnh hoá đơn trong ngày (1 file .zip)">⬇️ Tải</button></h3>'+'<div class="kcChiHai"><div class="kcThaHang">'+(sua?'<label class="kcTha khongIn" id="kcTha" ondragover="event.preventDefault();this.classList.add(\'keo\')" ondragleave="this.classList.remove(\'keo\')" ondrop="event.preventDefault();this.classList.remove(\'keo\');kcUpAnh(event.dataTransfer.files)"><input type="file" accept="image/*,.heic,.heif" multiple hidden onchange="kcUpAnh(this.files);this.value=\'\'"><span class="kcThaIc">📎</span><span><b>Ảnh hoá đơn cuối ngày</b><br><span class="nho">Chọn / chụp, kéo thả, dán ⌘V – lưu vào HD CASHIER '+KCNGAY.split("-").reverse().join("/")+'</span></span><span id="kcThaTT" class="kcThaTT"></span></label>':'')+'<div class="kcThaLuoi" id="kcThaLuoi"></div></div>'+kcChiNgay(t.chiKet)+'</div>'+'</div>'+
   '<div class="chuKy"><div>Thu ngân<br><br><br></div><div>Quản lý<br><br><br></div></div></div>';
   (function(){ var t=$("kcTom"), l=t&&t.nextElementSibling; if(l&&l.classList.contains("luoi2")) l.after(t); })();
   veNM(); tinhKC(); kcTaiAnh(); veThaLuoi(); kcTaiDSAnhTM(); veGCAnh(); }
