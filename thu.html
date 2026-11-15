@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261115144847";
+var HMK_BAN = "20261115145117";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -1610,7 +1610,7 @@ function veLuoiHD(k){ var ds=F.dsAI, cong=function(h){ return (h.dong||[]).reduc
           '<td class="ttL2"><b>'+soTien(d.tt)+'</b></td><td><select class="'+(d.ml?'':'thieu')+'" onchange="suaL('+i+','+j+',\'ml\',this.value)"'+kh+'>'+mlOpt(d.ml)+'</select>'+iconChon("Main list",th.ml,d.ml)+'</td>'+
           '<td>'+(x.daGhi?'':'<button type="button" class="xL" title="Xoá dòng" onclick="F.dsAI['+i+'].dong.splice('+j+',1);veDsAI()">✕</button>')+'</td></tr>'; }).join("")+'</table></div>'+
       '<div class="hang chanL">'+(x.daGhi?'':'<button type="button" onclick="F.dsAI['+i+'].dong.push({nd:\'\',sl:\'1\',dg:0,tt:0,ml:\'\'});veDsAI()">＋ Dòng</button>')+
-        (x.daGhi?'':'<span class="nho" title="Giá đọc được là giá CHƯA thuế – khi ghi tự cộng thuế (dòng nào khác chọn ở bảng nhập chi tiết)">🧾 '+vatTich(x.vat==null?vatNCC(x.ncc):x.vat,'F.dsAI['+i+'].vat=__V')+'</span>')+'<span class="nho">Giấy <input value="'+(x.tongGiay?Number(x.tongGiay).toLocaleString("vi-VN"):"")+'" inputmode="numeric" class="tgL" onchange="suaL('+i+',-1,\'tongGiay\',soVN(this.value))"'+kh+'></span>'+
+        (x.daGhi?'':'<span class="nho" title="Giá đọc được là giá CHƯA thuế – khi ghi tự cộng thuế (dòng nào khác chọn ở bảng nhập chi tiết)">🧾 '+vatTich(x.vat==null?vatNCC(x.ncc):x.vat,'F.dsAI['+i+'].vat=__V')+'</span>')+''+
         (x.daGhi?'<span class="nho">✅ Đã ghi'+(x.soHD?' '+esc(x.soHD):'')+'</span>':'<button type="button" title="Cắt lại ảnh của thẻ – vùng cắt = 1 hoá đơn, tự đọc lại" onclick="moCatThe('+i+')">✂️</button>'+(ds.length>1?'<select class="gopL" title="Gộp thẻ này với thẻ khác thành 1 hoá đơn" onchange="gopTheTay('+i+',this.value)"><option value="">🔗 Gộp với…</option>'+ds.map(function(y,m){ return m===i||y.daGhi||y.dang?'':'<option value="'+m+'">'+(m+1)+'. '+esc(y.ncc||"(chưa rõ)")+' · '+soTien(cong(y))+'</option>'; }).join("")+'</select>':'')+'<button type="button" class="c" onclick="ghiTheL('+i+',this)">✅ Ghi</button><button type="button" title="Sửa trong pop-up nhập hoá đơn" onclick="moNhapTay('+i+');ntSan()">✏️</button>')+'</div>'+
       '<div class="nho" id="kqL'+i+'"></div></div></article>'; }).join("")+'</div>'; setTimeout(soHDThe,0); }
 // Ghi 1 thẻ: thẻ từ Claude (có phiếu tạm) → duyệt phiếu; thẻ Gemini đọc → ghi thẳng hoá đơn (kèm ảnh tờ đó)
