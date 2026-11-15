@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261115142019";
+var HMK_BAN = "20261115142650";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -1471,7 +1471,7 @@ function doanXoay(img){ try{ var W=img.naturalWidth||img.width, H=img.naturalHei
 function xoayAnh(img,dz){ var W=img.naturalWidth||img.width, H=img.naturalHeight||img.height, k=Math.min(1,2200/Math.max(W,H)), c=document.createElement("canvas"); c.width=Math.round(W*k); c.height=Math.round(H*k); c.getContext("2d").drawImage(img,0,0,c.width,c.height);
   var o=xoayCanvas(c,dz); return { c:o, d:o.toDataURL("image/jpeg",0.82).split(",")[1], dz:dz }; }
 function diemDoc(r){ if(!r||!r.ok) return -1e9; return (r.ds||[r]).reduce(function(s,h){ var n=(h.dong||[]).length; return s+n*12+5-(+h.xoay?n*8+20:0)-(h.lech?Math.min(15,Math.abs(h.lech)/50000):0); },0); }
-function docMotAnh(a){ var thuong=function(){ return goi("docAnhAI",{mime:"image/jpeg",data:a.data,quan:quanHT()}).catch(function(e){ return {ok:false,thongBao:e.message}; }); };
+function docMotAnh(a){ var thuong=function(){ return goi("docAnhAI",{mime:"image/jpeg",data:a.data,quan:quanHT(),nhanh:1}).catch(function(e){ return {ok:false,thongBao:e.message}; }); };
   if(true||!a.img||!doanXoay(a.img)) return thuong().then(function(r){ return xoayDocLai(a,r); }); // 15/11: tắt đoán ảnh ngang trên máy (nhận nhầm ảnh thẳng có kẻ bảng → đọc thừa, chậm). Gà báo xoay → xoay đúng góc đọc lại 1 lần
   // nghi ảnh ngang: đọc ảnh gốc + bản xoay 90° + 270° CÙNG LÚC (không chờ nối tiếp) → chọn bản đọc tốt nhất; đoán sai cũng không chậm thêm
   var bs=[xoayAnh(a.img,90),xoayAnh(a.img,270)], gy="Ảnh chụp ngang đã được xoay lại. Ảnh hay có 2 TỜ đặt cạnh nhau (trái/phải hoặc trên/dưới): đếm số tờ trước, đọc đủ MỌI tờ, mỗi tờ đủ từng dòng.";
@@ -1621,7 +1621,15 @@ function ghiTheL(i,btn){ var x=F.dsAI[i], dong=(x.dong||[]).filter(function(d){ 
   (x.tamMa?goi("duyetTam",x.tamMa,p):goiKT("luuHoaDon",p)).then(function(r){ if(x.goc) hocTuSua(x.goc,p); dayGaTuClaude(x,p); x.daGhi=1; x.moRong=0; x.soHD=r.soHD||r.maPhieu||""; veDsAI(); goi("canhBao","").then(capNhatChuong);
       if(x.fileId&&F.dsAI.every(function(h){ return h.fileId!==x.fileId||h.daGhi; })) goi("xongDocSan",x.fileId).catch(function(){}); })
     .catch(function(e){ btn.disabled=false; btn.textContent="✅ Ghi lại"; bao(e.message); }); }
-function veDsAI(){ var k=document.getElementById("dsAI"), kq=document.getElementById("ketQua"); if(!k&&(kq||document.getElementById("anhXem"))){ k=document.createElement("div"); k.id="dsAI"; (kq||document.getElementById("anhXem")).appendChild(k); } if(!k) return;
+// 🏷 Tự nhận NCC cho thẻ Gà đọc: (1) tên đọc gần đúng 1 NCC trong danh mục → dùng tên danh mục; (2) chưa có/không khớp → suy từ mặt hàng (lịch sử mua: NCC bán nhiều món trên thẻ nhất)
+function tuNhanNCC(h){ if(!h||h.daGhi||h.daSua||h._nccXet||h.loi||!(h.dong||[]).length) return; h._nccXet=1; var dm=(D.dm.ncc||[]).map(function(n){ return n.ten||n[0]; }).filter(Boolean);
+  if(h.ncc&&dm.some(function(n){ return bo2(n)===bo2(h.ncc); })) return;
+  if(h.ncc){ var gan=dm.map(function(n){ return [n,giongTen(n,h.ncc)]; }).filter(function(x){ return x[1]>=.6; }).sort(function(a,b){ return b[1]-a[1]; });
+    if(gan.length&&(gan.length===1||gan[0][1]>gan[1][1])){ h.ghiChu=[h.ghiChu,"🏷 NCC đọc \""+h.ncc+"\" → "+gan[0][0]].filter(Boolean).join(" · "); h.ncc=gan[0][0]; return; } }
+  var dem={}, coLS=0; h.dong.forEach(function(d){ var o=tinHang(d.nd).ncc, ks=Object.keys(o); if(ks.length) coLS++; ks.forEach(function(n){ dem[n]=(dem[n]||0)+1; }); });
+  var top=Object.keys(dem).sort(function(a,b){ return dem[b]-dem[a]; })[0];
+  if(top&&coLS&&dem[top]>=Math.max(1,Math.ceil(coLS*.6))&&(Object.keys(dem).length===1||dem[top]>dem[Object.keys(dem).sort(function(a,b){ return dem[b]-dem[a]; })[1]])){ h.ghiChu=[h.ghiChu,"🏷 NCC tự suy từ mặt hàng"+(h.ncc?" (giấy ghi \""+h.ncc+"\")":"")].filter(Boolean).join(" · "); h.ncc=top; } }
+function veDsAI(){ (F&&F.dsAI||[]).forEach(tuNhanNCC); var k=document.getElementById("dsAI"), kq=document.getElementById("ketQua"); if(!k&&(kq||document.getElementById("anhXem"))){ k=document.createElement("div"); k.id="dsAI"; (kq||document.getElementById("anhXem")).appendChild(k); } if(!k) return;
   var coDs=(F.dsAI||[]).length, l2=document.querySelector("#noiDung .luoi2");
   if(kq&&k.parentNode!==kq) kq.appendChild(k); document.querySelectorAll("#ketQua > div:not([id]):not(.ketQuaDau)").forEach(function(x){ if(x.querySelector(".luoiDau,.tagHD")) x.remove(); });
   if(l2) l2.style.display=F.tay||(coDs&&!F.luoi)?"":"none"; var rk=document.getElementById("rongKQ"); if(rk) rk.style.display=coDs?"none":"";
