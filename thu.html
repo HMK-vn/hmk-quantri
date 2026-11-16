@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261116104031";
+var HMK_BAN = "20261116104448";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -601,6 +601,7 @@ html.coHop,html.coHop body{overflow:hidden!important;overscroll-behavior:none}.m
 #noiDung .hang>label:has(>input[type=date]),#noiDung .hang>label:has(>input[type=month]),#noiDung .hang>label:has(>select[id$=Tu]),#noiDung .hang>label:has(>select[id$=Den]){flex-direction:row!important;align-items:center!important;gap:6px!important;flex:0 0 auto!important;font-size:13px;color:#6e6e73;font-weight:500;white-space:nowrap}#noiDung .hang>label>input[type=date],#noiDung .hang>label>input[type=month]{height:34px;padding:0 8px;border-radius:9px;font-size:14px}
 .chanTrang [data-q]{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.chanTrang [data-q] b{display:inline-flex!important;align-items:center}
 .bangL tr.tronL td{background:#fff8db!important}.bangL tr.tronL td.ttL,.bangL tr.tronL td:nth-child(5){box-shadow:inset 0 0 0 2px #f2c94c;border-radius:6px}
+.nhapTrai{container-type:inline-size}@container (max-width:440px){.nhapTrai .ttTren{gap:3px!important;justify-content:flex-start}.nhapTrai .ttTren .ttChip{font-size:11.5px!important;padding:3px 6px!important;gap:2px!important}.nhapTrai .ttTren .ttChip .icv,.nhapTrai .ttTren .ttChip svg{width:13px!important;height:13px!important}.nhapTrai .nhapPhu{display:flex!important;flex-wrap:wrap!important;gap:4px!important;overflow:visible!important}.nhapTrai .nhapPhu>*{flex:0 0 auto;white-space:nowrap;font-size:12px!important;padding:3px 7px!important}.nhapTrai .nhapPhu .icv,.nhapTrai .nhapPhu svg,.nhapTrai .nhapPhu img{width:15px!important;height:15px!important}}
 </style><style>/* 🧾 Hoá đơn – NCC · lưới đối chiếu */
 main{max-width:none!important;width:100%;box-sizing:border-box}.chanTrang{max-width:none!important}
 #mplLoc label,#mplLoc button,#mplLoc .mplNhan,.mplTagLoc{display:inline-flex;align-items:center;gap:5px}#mplLoc .icv.lon,.mplTagLoc .icv.lon{width:22px;height:22px;flex:0 0 auto}.mplTagLoc a{display:inline-flex}.mplTagLoc a .icv.lon{width:16px;height:16px}
