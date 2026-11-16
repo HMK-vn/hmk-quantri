@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzIWPz00WSzB659piig0WYLBOOd_KWUFQa_sBJgrtHDQQ0Luq9hDHdyGJFVU0HtIWbo/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261115165747";
+var HMK_BAN = "20261116103803";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -1412,7 +1412,9 @@ function xongCat(){ if(!CAT||!CAT.box||CAT.box[2]-CAT.box[0]<20||CAT.box[3]-CAT.
     ttDoc("✅ Đã đọc lại vùng cắt: "+h.dong.length+" dòng",100); veDsAI(); }).catch(function(e){ h.dang=0; ttDoc("⚠️ "+esc(e.message)); veDsAI(); }); }
 // 📑 Các tờ chụp cạnh nhau trong CÙNG 1 ảnh (2, 3 tờ…) = 1 hoá đơn nhiều tờ: gộp dòng hàng + ảnh từng tờ; chỉ tách khi 2 tờ ghi rõ 2 NCC khác nhau
 function gopToCungAnh(ds){ if(!ds||ds.length<2) return ds; var cong=function(d){ return (d||[]).reduce(function(t,x){ return t+(Number(x.tt)||0); },0); }, k=function(t){ return bo(t||"").replace(/[^a-z0-9]/g,""); }, out=[];
-  ds.forEach(function(h){ var a=out.filter(function(o){ return !k(o.ncc)||!k(h.ncc)||k(o.ncc)===k(h.ncc); })[0];
+  var nccDM=function(t){ return (D.dm.ncc||[]).some(function(n){ return k(n.ten||n[0])===k(t); }); }, ngK=function(t){ return typeof ngayISO==="function"?ngayISO(t||""):String(t||""); };
+  // 2+ tờ chụp CÙNG 1 ảnh = mặc định 1 hoá đơn ghi nhiều tờ (không đủ chỗ ghi) – chỉ tách khi 2 tờ ghi rõ 2 NCC khác nhau (đều có trong danh mục) hoặc khác ngày
+  ds.forEach(function(h){ var a=out.filter(function(o){ var khacNCC=k(o.ncc)&&k(h.ncc)&&k(o.ncc)!==k(h.ncc)&&(typeof giongTen!=="function"||giongTen(o.ncc,h.ncc)<.6)&&nccDM(o.ncc)&&nccDM(h.ncc), khacNgay=o.ngay&&h.ngay&&ngK(o.ngay)!==ngK(h.ngay); return !khacNCC&&!khacNgay; })[0];
     if(!a){ h._tuTong=!!(+h.tongGiay&&Math.abs(+h.tongGiay-cong(h.dong))<1000); out.push(h); return; }
     a.dong=(a.dong||[]).concat(h.dong||[]); a.anhTo2=(a.anhTo2||[]).concat(h.anhTo?[h.anhTo]:[],h.anhTo2||[]); a.trang=(a.trang||[{iAnh:a.iAnh,khung:a.khung}]).concat([{iAnh:h.iAnh,khung:h.khung}]);
     a.ncc=a.ncc||h.ncc; a.ngay=a.ngay||h.ngay; a.ghiChu=a.ghiChu||h.ghiChu; var tA=+a.tongGiay||0, tH=+h.tongGiay||0; a.tongGiay=a._tuTong&&tH&&Math.abs(tH-cong(h.dong))<1000?tA+tH:Math.max(tA,tH); a._tuTong=a._tuTong&&tH&&Math.abs(tH-cong(h.dong))<1000; // mỗi tờ có tổng riêng → cộng; chỉ tờ cuối có tổng → lấy số lớn
