@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzIWPz00WSzB659piig0WYLBOOd_KWUFQa_sBJgrtHDQQ0Luq9hDHdyGJFVU0HtIWbo/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261116104912";
+var HMK_BAN = "20261124101440";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -602,6 +602,7 @@ html.coHop,html.coHop body{overflow:hidden!important;overscroll-behavior:none}.m
 .chanTrang [data-q]{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.chanTrang [data-q] b{display:inline-flex!important;align-items:center}
 .bangL tr.tronL td{background:#fff8db!important}.bangL tr.tronL td.ttL,.bangL tr.tronL td:nth-child(5){box-shadow:inset 0 0 0 2px #f2c94c;border-radius:6px}
 .nhapTrai{container-type:inline-size}@container (max-width:440px){.nhapTrai .ttTren{gap:3px!important;justify-content:flex-start}.nhapTrai .ttTren .ttChip{font-size:11.5px!important;padding:3px 6px!important;gap:2px!important}.nhapTrai .ttTren .ttChip .icv,.nhapTrai .ttTren .ttChip svg{width:13px!important;height:13px!important}.nhapTrai .nhapPhu{display:flex!important;flex-wrap:wrap!important;gap:4px!important;overflow:visible!important}.nhapTrai .nhapPhu>*{flex:0 0 auto;white-space:nowrap;font-size:12px!important;padding:3px 7px!important}.nhapTrai .nhapPhu .icv,.nhapTrai .nhapPhu svg,.nhapTrai .nhapPhu img{width:15px!important;height:15px!important}}
+#kcSoDu{margin:6px 0 4px}.sdHang{display:flex;flex-wrap:wrap;align-items:center;gap:6px}.sdNhan{font-size:13px;color:#6e6e73;font-weight:600}.sdO{display:inline-flex!important;flex-direction:row!important;align-items:center;gap:3px;font-size:14px;flex:1 1 120px!important;min-width:0}.sdO input{width:100%;min-width:0;height:32px;padding:0 8px;text-align:right;border-radius:9px;font-variant-numeric:tabular-nums}.sdKQ{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;margin-top:6px;padding:6px 10px;border-radius:10px;font-size:12.5px;color:#4b4b52}.sdKQ b{color:#1d1d1f}.sdOK{background:#e8f6ec}.sdLech{background:#fff1e6}.sdKet{margin-left:auto;font-weight:700}.sdLech .sdKet b{color:#c2410c}.sdGY{margin-top:4px;font-size:12.5px;background:#fffaf5;border:1px dashed #f3c99a;border-radius:10px;padding:4px 10px}.sdGY summary{cursor:pointer;font-weight:600}.sdGY ol{margin:4px 0 2px;padding-left:18px}.sdGY li{margin:3px 0;line-height:1.35}.sdGoi{margin-top:4px}
 </style><style>/* 🧾 Hoá đơn – NCC · lưới đối chiếu */
 main{max-width:none!important;width:100%;box-sizing:border-box}.chanTrang{max-width:none!important}
 #mplLoc label,#mplLoc button,#mplLoc .mplNhan,.mplTagLoc{display:inline-flex;align-items:center;gap:5px}#mplLoc .icv.lon,.mplTagLoc .icv.lon{width:22px;height:22px;flex:0 0 auto}.mplTagLoc a{display:inline-flex}.mplTagLoc a .icv.lon{width:16px;height:16px}
@@ -3101,6 +3102,49 @@ function kcXemAnh(im){ if(!im.src||im.src.length<100) return; moHop('<img src="'
 // 💰 Ô tiền có dấu chấm ngăn nghìn (9.245.000) – lưu số trơn
 function tienO(v){ var n=String(v==null?"":v).replace(/\D/g,""); return n?VN(+n):""; }
 function docTien(el){ var dau=el.value.length-el.selectionStart, n=el.value.replace(/\D/g,""); el.value=n?VN(+n):""; try{ var p=Math.max(0,el.value.length-dau); el.setSelectionRange(p,p); }catch(e){} return n; }
+// 🏦 SỐ DƯ NGÂN HÀNG: nhập số dư cuối ngày hôm trước & cuối hôm nay (xem trên app ngân hàng) → tiền vào thực = cuối − đầu,
+// so với Bank Check (− các hoá đơn trả bằng chuyển khoản) và gợi ý thông minh vì sao lệch (ghi nhầm CK ↔ tiền mặt, trùng, sót, phí, gõ sai số…)
+function sdSo(v){ return Number(String(v==null?"":v).replace(/\D/g,""))||0; }
+function veSoDu(){ var el=$("kcSoDu"); if(!el||!KCF) return; var sd=KCTT.soDu||{}, cu=KCTT.cu||{};
+  if(KCF.sdDau==null) KCF.sdDau=cu["Số dư bank đầu"]!==""&&cu["Số dư bank đầu"]!=null?cu["Số dư bank đầu"]:(sd.truoc||"");
+  if(KCF.sdCuoi==null) KCF.sdCuoi=cu["Số dư bank cuối"]!==""&&cu["Số dư bank cuối"]!=null?cu["Số dư bank cuối"]:"";
+  var dis=suaDuoc("KETCA")?"":" disabled";
+  el.innerHTML='<div class="sdHang"><span class="sdNhan" title="Số dư tài khoản ngân hàng (xem trên app ngân hàng)">🏦 Số dư</span>'+
+    '<label class="sdO" title="Số dư cuối ngày hôm trước'+(sd.truocTu?" (tự lấy từ kết ca "+sd.truocTu+")":"")+'">⬅<input inputmode="numeric" placeholder="cuối hôm trước" value="'+tienO(KCF.sdDau)+'" oninput="KCF.sdDau=docTien(this);tinhKC()"'+dis+'></label>'+
+    '<label class="sdO" title="Số dư cuối ngày hôm nay">➡<input inputmode="numeric" placeholder="cuối hôm nay" value="'+tienO(KCF.sdCuoi)+'" oninput="KCF.sdCuoi=docTien(this);tinhKC()"'+dis+'></label></div><div id="kcSDkq"></div>';
+  veSoDuKQ(); }
+function veSoDuKQ(){ var el=$("kcSDkq"); if(!el||!KCF) return; var dau=sdSo(KCF.sdDau), cuoi=sdSo(KCF.sdCuoi), sd=KCTT.soDu||{ds:[],tong:0};
+  if(!KCF.sdDau&&KCF.sdDau!==0||!KCF.sdCuoi){ el.innerHTML='<div class="nho sdGoi">Nhập 2 số dư để đối chiếu tiền vào tài khoản với Bank Check'+(sd.ds&&sd.ds.length?' ('+sd.ds.length+' GD · '+VN(sd.tong)+')':'')+'.</div>'; return; }
+  var bc=sd.tong||0, chiBank=((KCTT.chiKet&&KCTT.chiKet.tatCa)||[]).filter(function(g){ return /bank|ck|chuyen/i.test(boDau(g.ec||"")); }).reduce(function(a,g){ return a+(+g.tong||0); },0);
+  var tang=cuoi-dau, ky=bc-chiBank, lech=tang-ky, gy=goiYLechBank(lech,sd.ds||[],chiBank,dau,cuoi,bc), ok=Math.abs(lech)<=1000;
+  el.innerHTML='<div class="sdKQ '+(ok?'sdOK':'sdLech')+'"><span title="Số dư cuối − số dư đầu">📈 Vào TK <b>'+VN(tang)+'</b></span><span title="Tổng Bank Check trong ngày">🧾 Bank Check <b>'+VN(bc)+'</b></span>'+(chiBank?'<span title="Hoá đơn trả bằng chuyển khoản hôm nay (tiền ra khỏi tài khoản)">💸 Chi CK <b>−'+VN(chiBank)+'</b></span>':'')+
+    '<span class="sdKet">'+(ok?'✅ Khớp':'⚠️ Lệch <b>'+(lech>0?'+':'')+VN(lech)+'</b>')+'</span></div>'+
+    (ok?'':'<details class="sdGY" open><summary>🔎 Gợi ý kiểm tra ('+gy.length+')</summary><ol>'+gy.map(function(x){ return '<li>'+x+'</li>'; }).join("")+'</ol></details>'); }
+function goiYLechBank(lech,ds,chiBank,dau,cuoi,bc){ var a=Math.abs(lech), g=[], vn=function(x){ return '<b>'+VN(x)+'</b>'; }, gio=function(x){ var m=/\.(\d{2})(\d{2})/.exec(String(x.tc||"")); return m?' lúc '+m[1]+':'+m[2]:''; };
+  var bang=ds.filter(function(x){ return Math.abs(x.t-a)<=1000; });
+  var dem={}; ds.forEach(function(x){ dem[x.t]=(dem[x.t]||0)+1; }); var trung=Object.keys(dem).filter(function(t){ return dem[t]>1&&Math.abs(+t-a)<=1000; });
+  var cap=null; for(var i=0;i<ds.length&&!cap;i++) for(var j=i+1;j<ds.length;j++) if(Math.abs(ds[i].t+ds[j].t-a)<=1000){ cap=[ds[i],ds[j]]; break; }
+  // nhập số dư sai (thừa/thiếu 1 số 0, gõ đảo chữ số)
+  [[cuoi*10,"cuối"],[Math.round(cuoi/10),"cuối"],[dau*10,"đầu"],[Math.round(dau/10),"đầu"]].forEach(function(x){ var t=x[1]==="cuối"?x[0]-dau:cuoi-x[0]; if(dau>100000&&cuoi>100000&&Math.abs(t-(bc-chiBank))<=1000) g.push('✏️ Số dư '+x[1]+' ngày có thể <b>thừa/thiếu 1 số 0</b> – kiểm tra lại số vừa nhập.'); });
+  if(a>=9000&&a%9000===0) g.push('✏️ Lệch chia hết cho 9 ('+vn(a)+') – hay gặp khi <b>gõ đảo 2 chữ số</b> ở số dư hoặc 1 giao dịch Bank Check.');
+  if(lech<0){
+    trung.forEach(function(t){ g.push('🔁 Bank Check có <b>'+dem[t]+' giao dịch '+VN(+t)+'</b> trùng nhau – có thể nhập 2 lần.'); });
+    bang.forEach(function(x){ g.push('💳 Giao dịch '+vn(x.t)+gio(x)+(x.gc?' ('+esc(x.gc)+')':'')+' đúng bằng số lệch: khách có thể <b>trả tiền mặt nhưng thu ngân ghi chuyển khoản</b>, hoặc CK chưa về / bị huỷ – soát lại tiền mặt trong két (sẽ dư '+VN(a)+').'); });
+    if(cap) g.push('➕ Hai giao dịch '+vn(cap[0].t)+gio(cap[0])+' + '+vn(cap[1].t)+gio(cap[1])+' = số lệch – có thể cả 2 là tiền mặt bị ghi CK.');
+    g.push('💵 Có khách trả <b>tiền mặt</b> nhưng ghi là chuyển khoản → tiền mặt đếm được sẽ <b>dư '+VN(a)+'</b> so với dự kiến. Đối chiếu với dòng Tiền mặt.');
+    g.push('💸 Có khoản <b>chuyển tiền ra</b> chưa ghi hoá đơn (trả NCC bằng CK, rút tiền, chuyển cho nhân viên) – xem lịch sử giao dịch trên app ngân hàng.');
+    if(a<=60000) g.push('🏦 Lệch nhỏ ('+vn(a)+'): có thể là <b>phí ngân hàng / SMS / phí thường niên</b>.');
+    g.push('🕛 Giao dịch cuối ngày (sau 23h) có thể ngân hàng <b>ghi sang ngày mai</b> – xem giao dịch Bank Check gần nửa đêm.');
+  } else {
+    bang.forEach(function(x){ g.push('🔁 Số lệch bằng giao dịch '+vn(x.t)+gio(x)+' – kiểm tra giao dịch này có <b>bị nhập trùng ở ngày khác</b> không.'); });
+    g.push('💳 Có khách <b>chuyển khoản nhưng thu ngân ghi tiền mặt</b> → tiền mặt đếm được sẽ <b>thiếu '+VN(a)+'</b>. Tìm trên POS hoá đơn tiền mặt ≈ '+VN(a)+' và hỏi lại thu ngân.');
+    g.push('📝 Bank Check <b>chưa nhập đủ</b> giao dịch – so danh sách giao dịch trên app ngân hàng với Bank Check ('+ds.length+' GD).');
+    if(chiBank) g.push('💸 Hoá đơn ghi trả CK ('+vn(chiBank)+') có thể <b>chưa chuyển thật</b> hoặc chuyển từ tài khoản khác'+(Math.abs(a-chiBank)<=1000?' – <b>đúng bằng số lệch</b>':'')+'.');
+    g.push('💰 Có tiền <b>chuyển vào không phải doanh thu</b> (chủ nộp quỹ, NCC hoàn tiền, khách đặt cọc bàn) – ghi chú lại.');
+    g.push('🕛 Giao dịch tối hôm qua (sau 23h) ngân hàng có thể <b>ghi vào hôm nay</b> – kiểm tra Bank Check ngày hôm trước.');
+  }
+  if(ds.length&&!bang.length&&!cap) g.push('🧮 Không có giao dịch Bank Check nào đúng bằng số lệch – nhiều khả năng do tổng của nhiều khoản hoặc khoản ngoài doanh thu.');
+  return g.filter(function(x,i){ return g.indexOf(x)===i; }); }
 function veFormKC(){ var t=KCTT, sua=suaDuoc("KETCA");
   $("kcForm").innerHTML='<div class="the" id="vungIn">'+kcTieuDe()+(t.cu?'<span class="tag">đã lưu '+t.cu["Thời điểm"]+'</span>':'<span class="tag">mới</span>')+'</div>'+
   '<div class="kcTom" id="kcTom"></div><div class="luoi2"><div class="kcBuoc"><h3><span class="kcSo">1</span>💵 Đếm tiền'+kcTichHTML()+'</h3>'+bangDem2()+'<details class="kcNMHop"'+((KCF.ngoaiMay||[]).some(function(x){ return +x.sl>0; })?' open':'')+'><summary><h3 style="margin:12px 0 6px">🥤 Bán ngoài máy <span class="nho" id="kcNMTong"></span></h3><span class="kcNMNut khongIn" onclick="event.preventDefault();this.closest(\'details\').open=true"><select onchange="if(this.value!==\'\'){ var x=KCTT.dsNuoc[+this.value]; KCF.ngoaiMay.push({ten:x.ten,sl:\'\',dg:x.dg}); veNM(); this.value=\'\'; }"><option value="">🥤 Nước…</option>'+(KCTT.dsNuoc||[]).map(function(x,i){ return '<option value="'+i+'">'+esc(x.ten)+' · '+VN(x.dg)+'</option>'; }).join("")+'</select><button onclick="KCF.ngoaiMay.push({ten:\'\',sl:\'\',dg:\'\'});veNM()" title="Thêm món khác">➕ Khác</button></span></summary><table id="kcNM"></table><datalist id="dlNuoc">'+(KCTT.dsNuoc||[]).map(function(x){ return '<option value="'+esc(x.ten)+'">'+VN(x.dg)+' đ</option>'; }).join("")+'</datalist></details></div>'+
@@ -3108,12 +3152,12 @@ function veFormKC(){ var t=KCTT, sua=suaDuoc("KETCA");
 
 
   ''+
-  '<div id="kcTong" style="margin-top:10px"></div><label class="nho">📝 Ghi chú<textarea rows="2" style="width:100%" oninput="KCF.ghiChu=this.value" onpaste="kcDanGC(event)" placeholder="Ghi chú… (dán ⌘V ảnh vào đây được)">'+esc(KCF.ghiChu)+'</textarea></label><div class="kcGCHang"><div class="kcGCAnh" id="kcGCAnh"></div>'+(sua?'<label class="kcGCNut khongIn" title="Chèn ảnh vào ghi chú (chụp / chọn / dán)"><input type="file" accept="image/*,.heic,.heif" multiple hidden onchange="kcThemGC(this.files);this.value=\'\'">📎 Chèn ảnh</label>':'')+'</div>'+
+  '<div id="kcTong" style="margin-top:10px"></div><div id="kcSoDu"></div><label class="nho">📝 Ghi chú<textarea rows="2" style="width:100%" oninput="KCF.ghiChu=this.value" onpaste="kcDanGC(event)" placeholder="Ghi chú… (dán ⌘V ảnh vào đây được)">'+esc(KCF.ghiChu)+'</textarea></label><div class="kcGCHang"><div class="kcGCAnh" id="kcGCAnh"></div>'+(sua?'<label class="kcGCNut khongIn" title="Chèn ảnh vào ghi chú (chụp / chọn / dán)"><input type="file" accept="image/*,.heic,.heif" multiple hidden onchange="kcThemGC(this.files);this.value=\'\'">📎 Chèn ảnh</label>':'')+'</div>'+
   '<div class="khongIn kcNut">'+(sua?'<button class="kcLuu" onclick="luuKC(this)" title="Lưu báo cáo kết ca">💾 Lưu</button>':"")+'<button onclick="xuatKC(\'pdf\',this)" title="Tải báo cáo dạng PDF (A4)">📄 PDF</button><button onclick="xuatKC(\'jpg\',this)" title="Tải ảnh JPEG để gửi Zalo">🖼 JPEG</button><button onclick="window.print()" title="In đầy đủ: đếm tiền, đối soát, chi trong ngày kèm ảnh">🖨 In</button>'+(sua&&KCF.id?'<button class="d kcXoa" onclick="xoaKC()" title="Xoá báo cáo kết ca này">🗑 Xoá</button>':"")+'</div></div></div>'+
   '<div class="kcBuoc kcRong"><h3><span class="kcSo">3</span>🧾 Chi trong ngày <span class="nho">💸 Két trừ tiền két</span><button class="khongIn kcTatAnh" onclick="kcXemTatCa()" title="Xem toàn bộ ảnh hoá đơn trong ngày">🖼 Tất cả ảnh</button><button class="khongIn kcTaiAnh" onclick="kcTaiTatCa(this)" title="Tải tất cả ảnh hoá đơn trong ngày (1 file .zip)">⬇️ Tải</button></h3>'+'<div class="kcChiHai"><div class="kcThaHang">'+(sua?'<label class="kcTha khongIn" id="kcTha" ondragover="event.preventDefault();this.classList.add(\'keo\')" ondragleave="this.classList.remove(\'keo\')" ondrop="event.preventDefault();this.classList.remove(\'keo\');kcUpAnh(event.dataTransfer.files)"><input type="file" accept="image/*,.heic,.heif" multiple hidden onchange="kcUpAnh(this.files);this.value=\'\'"><span class="kcThaIc">📎</span><span><b>Ảnh hoá đơn cuối ngày</b><br><span class="nho">Chọn / chụp, kéo thả, dán ⌘V – lưu vào HD CASHIER '+KCNGAY.split("-").reverse().join("/")+'</span></span><span id="kcThaTT" class="kcThaTT"></span></label>':'')+'<div class="kcThaLuoi" id="kcThaLuoi"></div></div>'+kcChiNgay(t.chiKet)+'</div>'+'</div>'+
   '<div class="chuKy"><div>Thu ngân<br><br><br></div><div>Quản lý<br><br><br></div></div></div>';
   (function(){ var t=$("kcTom"), l=t&&t.nextElementSibling; if(l&&l.classList.contains("luoi2")) l.after(t); })();
-  veNM(); tinhKC(); kcTaiAnh(); veThaLuoi(); kcTaiDSAnhTM(); veGCAnh(); }
+  veSoDu(); veNM(); tinhKC(); kcTaiAnh(); veThaLuoi(); kcTaiDSAnhTM(); veGCAnh(); }
 // 📝 Ảnh trong Ghi chú kết ca: 📎 chọn/chụp hoặc dán ⌘V vào ô ghi chú → nén → lưu Drive (thư mục "Ghi chú kết ca" của ngày) → tự lưu báo cáo
 function veGCAnh(){ var el=$("kcGCAnh"); if(!el||!KCF) return; var sua=suaDuoc("KETCA"); el.innerHTML=(KCF.anhGC||[]).map(function(id,i){ return '<span class="kcGCThe"><img class="kcChiAnh" data-anh="'+esc(id)+'" alt="" onclick="kcXemAnh(this)">'+(sua?'<button class="khongIn" title="Bỏ ảnh này khỏi ghi chú" onclick="KCF.anhGC.splice('+i+',1);veGCAnh();clearTimeout(KC_HEN);KC_HEN=setTimeout(kcTuLuu,1500)">✕</button>':'')+'</span>'; }).join("");
   el.querySelectorAll("img[data-anh]").forEach(function(im){ var id=im.getAttribute("data-anh"); goi("anhKC",id,KCQ,KCNGAY).then(function(a){ im.src="data:"+a.mime+";base64,"+a.data; }).catch(function(){ im.alt="⚠️"; }); }); }
@@ -3134,6 +3178,7 @@ function tinhKC(){ var tong=function(key){ var s=0; KCTT.menhGia.forEach(functio
   var dt=+KCF.doanhThu||0, dau=+KCF.dauCa||0, bank=KCTT.bank.tien, chi=KCTT.chiKet.tong, chenh=dt?bank+(thu-dau-nhap)+chi-(dt+nm):null;
   var o=function(ic,t,v,lop){ return '<div class="'+(lop||'')+'"><small>'+ic+' '+t+'</small><b>'+v+'</b></div>'; };
   var dg=document.getElementById("kcDong"); if(dg){ var tm=thu-dau-nhap; dg.innerHTML='<span title="Đầu ca">①<b>'+tr(dau)+'</b></span><i>+</i><span title="Nhập thêm">②<b>'+tr(nhap)+'</b></span><i>+</i><span class="kcTm" title="Tiền mặt bán được">💵<b>'+(thu?tr(tm):'—')+'</b></span><i>=</i><span class="kcCuoi" title="Trong két cuối ca">③<b>'+tr(thu)+'</b></span><i>=</i>'+(kcTrua()?'':'<span class="kcGiu" title="Để lại két">④<b>'+tr(giu)+'</b></span><i>+</i>')+'<span class="kcBG" title="Bàn giao">📦<b>'+tr(bgD)+'</b></span>'; }
+  if(typeof veSoDuKQ==="function") veSoDuKQ();
   $("kcTom").innerHTML=o("🖥","Doanh thu",dt?tr(dt):"—")+o("🏦","Bank",tr(bank))+o("💵","Tiền mặt",tr(thu-dau-nhap))+o("💸","Chi két",tr(chi))+o("📦","Bàn giao",tr(thu-giu))+
     o(chenh===null?"⏳":Math.abs(chenh)<1000?"✅":"🔴","Chênh lệch",chenh===null?"–":(chenh>0?"+":"")+tr(chenh),chenh===null?"kcCho":Math.abs(chenh)<1000?"kcKhop":"kcLech");
   var SO=innerWidth<641?tr:VN; $("kcTong").innerHTML='<table class="kcDS"><tr><td>🏦 Bank <span class="nho">'+(KCTT.bank.so?'×'+KCTT.bank.so+' GD':'')+'</span></td><td class="so">'+SO(bank)+'</td></tr><tr><td>💵 Tiền mặt bán được<span class="nho kcCT">= ③ − ① − ②</span></td><td class="so">'+SO(thu-dau-nhap)+'</td></tr><tr><td>💸 Chi từ két</td><td class="so">'+SO(chi)+'</td></tr>'+
