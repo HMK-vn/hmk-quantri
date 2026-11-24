@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261124111649";
+var HMK_BAN = "20261124113905";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -2963,9 +2963,10 @@ function chuyenCaTN(btn){ var v=$("caChuyenO").value; if(!v) return toast("Chọ
   hoiMo("Chuyển ca cho <b>"+esc(p[1])+"</b> ("+esc(p[0])+")?",function(){ btn.disabled=true; btn.innerHTML=gaTai("Đang chuyển…"); goi("nhanCa",KCQ,p[0],p[1]).then(function(r){ r._luc=Date.now(); CATN=r; veCaTN(); veBannerCa(); toast("✅ Đã chuyển ca cho "+p[1]); gaMung(); }).catch(function(e){ btn.disabled=false; btn.textContent="Chuyển ca"; toast("⚠️ "+e.message,5000); }); }); }
 // 🧮 Kết ca có 2 menu phụ: Lập kết ca · Lịch sử ca (mỗi ngày 1 hàng, mỗi ca thu ngân 1 cột, bấm ô để xem / sửa)
 var KCXEM="lap", KCLS={ thang:"", ds:null };
-function kcMenuPhu(){ return '<div class="kcMenuPhu khongIn"><span class="locSeg"><button class="'+(KCXEM==="lap"?"on":"")+'" onclick="KCXEM=\'lap\';veKetCa()">'+icv("so",1)+' Lập kết ca</button><button class="'+(KCXEM==="ls"?"on":"")+'" onclick="KCXEM=\'ls\';veKetCa()">'+icv("lich",1)+' Lịch sử ca</button><button class="'+(KCXEM==="tq"?"on":"")+'" onclick="KCXEM=\'tq\';veKetCa()">📊 Tổng quan</button></span> <span class="nho" id="kcTuLuu"></span></div>'; }
+function kcMenuPhu(){ return '<div class="kcMenuPhu khongIn"><span class="locSeg"><button class="'+(KCXEM==="lap"?"on":"")+'" onclick="KCXEM=\'lap\';veKetCa()">'+icv("so",1)+' Lập kết ca</button><button class="'+(KCXEM==="ls"?"on":"")+'" onclick="KCXEM=\'ls\';veKetCa()">'+icv("lich",1)+' Lịch sử ca</button>'+(D.chu?'<button class="'+(KCXEM==="tq"?"on":"")+'" onclick="KCXEM=\'tq\';veKetCa()">📊 Tổng quan</button>':'')+'</span> <span class="nho" id="kcTuLuu"></span></div>'; }
 function veKetCa(giuQ){ if(KC_HEN) kcTuLuu(); if(!giuQ) KCQ=quanHT(); KCNGAY=KCNGAY||homNay();
   if(KCXEM==="ls") return veLichSuCa();
+  if(KCXEM==="tq"&&!D.chu) KCXEM="lap"; /* 📊 Tổng quan chỉ chủ xem, thu ngân không có quyền */
   if(KCXEM==="tq") return veTongQuanKC();
   $("noiDung").innerHTML='<div class="kcDauHang khongIn">'+kcMenuPhu()+'<div id="kcCa" class="the khongIn"></div></div><div id="kcForm"></div>';
   moKetCa(); veCaTN(); taiCaTN(); }
