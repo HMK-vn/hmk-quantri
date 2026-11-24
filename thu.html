@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261124125716";
+var HMK_BAN = "20261124130756";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -2301,7 +2301,7 @@ document.addEventListener("click",function(e){ var el=e.target.closest&&e.target
       if(DCZ&&DCZ.dong) DCZ.dong.forEach(function(d){ if(d.tn&&d.tn.so===so) d.tn.ec=ec; });
       if(TAB==="DOICHIEU"&&DCZ) veDCZ(); else if(TAB==="MPL") taiMPL(); else if(TAB==="HDNGAY") taiHDNgay(); else if(TAB==="KETCA"&&typeof moKetCa==="function") moKetCa(); else if(typeof lamMoiHD==="function") lamMoiHD(); }).catch(loi); }; },true);
 // ✏️ Bộ icon nét vẽ tay (SVG, cỡ vừa ~22px) – nhìn là hiểu: dùng cho ô số, nút lọc, cách xem ở Hoá đơn – NCC / Timeline / Đối chiếu
-var ICV={
+var ICV={bieuDo:'<path d="M4 20h16"/><rect x="5.5" y="11" width="3" height="7" rx=".6"/><rect x="10.5" y="6" width="3" height="12" rx=".6"/><rect x="15.5" y="13" width="3" height="5" rx=".6"/><path d="M5 8.5l5-3.5 4 3 5-4"/>',
  bank:'<path d="M3.4 9.3 12 3.6l8.6 5.7c-5.7.1-11.5-.1-17.2 0z" fill="#e0f2fe" stroke="#0369a1"/><path d="M5.6 10.6v7.2M9.9 10.6v7.2M14.1 10.6v7.2M18.4 10.6v7.2M3.6 19.6c5.6-.1 11.2.1 16.8 0"/>',
  tien:'<path d="M9.1 6.6c-1-1.1-1.4-2.4-.6-3.1 1.1.4 2.3.4 3.5 0 1.2.4 2.4.4 3.5 0 .8.7.4 2-.6 3.1"/><path d="M8.8 6.8c-3.5 2.3-5.4 6-4.6 9.4.7 3 3.7 4.7 7.8 4.7s7.1-1.7 7.8-4.7c.8-3.4-1.1-7.1-4.6-9.4z" fill="#fef3c7" stroke="#b45309"/><path d="M12 10v7.4M14.1 11.4c-1.2-1-4.4-.9-4.3.8.1 1.8 4.3 1 4.4 2.9.1 1.7-3.2 1.8-4.5.8" stroke="#b45309"/>',
  lamMoi:'<path d="M19.6 8.6c-1.4-3-4.3-4.9-7.6-4.9-4.4 0-8 3.6-8.1 8"/><path d="M19.9 3.9l-.2 4.8-4.7-.3"/><path d="M4.4 15.4c1.4 3 4.3 4.9 7.6 4.9 4.4 0 8-3.6 8.1-8"/><path d="M4.1 20.1l.2-4.8 4.7.3"/>',
@@ -2963,7 +2963,7 @@ function chuyenCaTN(btn){ var v=$("caChuyenO").value; if(!v) return toast("Chọ
   hoiMo("Chuyển ca cho <b>"+esc(p[1])+"</b> ("+esc(p[0])+")?",function(){ btn.disabled=true; btn.innerHTML=gaTai("Đang chuyển…"); goi("nhanCa",KCQ,p[0],p[1]).then(function(r){ r._luc=Date.now(); CATN=r; veCaTN(); veBannerCa(); toast("✅ Đã chuyển ca cho "+p[1]); gaMung(); }).catch(function(e){ btn.disabled=false; btn.textContent="Chuyển ca"; toast("⚠️ "+e.message,5000); }); }); }
 // 🧮 Kết ca có 2 menu phụ: Lập kết ca · Lịch sử ca (mỗi ngày 1 hàng, mỗi ca thu ngân 1 cột, bấm ô để xem / sửa)
 var KCXEM="lap", KCLS={ thang:"", ds:null };
-function kcMenuPhu(){ return '<div class="kcMenuPhu khongIn"><span class="locSeg"><button class="'+(KCXEM==="lap"?"on":"")+'" onclick="KCXEM=\'lap\';veKetCa()">'+icv("so",1)+' Lập kết ca</button><button class="'+(KCXEM==="ls"?"on":"")+'" onclick="KCXEM=\'ls\';veKetCa()">'+icv("lich",1)+' Lịch sử ca</button>'+(D.chu?'<button class="'+(KCXEM==="tq"?"on":"")+'" onclick="KCXEM=\'tq\';veKetCa()">📊 Tổng quan</button>':'')+'</span> <span class="nho" id="kcTuLuu"></span></div>'; }
+function kcMenuPhu(){ return '<div class="kcMenuPhu khongIn"><span class="locSeg"><button class="'+(KCXEM==="lap"?"on":"")+'" onclick="KCXEM=\'lap\';veKetCa()">'+icv("so",1)+' Lập kết ca</button><button class="'+(KCXEM==="ls"?"on":"")+'" onclick="KCXEM=\'ls\';veKetCa()">'+icv("lich",1)+' Lịch sử ca</button>'+(D.chu?'<button class="'+(KCXEM==="tq"?"on":"")+'" onclick="KCXEM=\'tq\';veKetCa()">'+icv("bieuDo",1)+' Tổng quan</button>':'')+'</span> <span class="nho" id="kcTuLuu"></span></div>'; }
 function veKetCa(giuQ){ if(KC_HEN) kcTuLuu(); if(!giuQ) KCQ=quanHT(); KCNGAY=KCNGAY||homNay();
   if(KCXEM==="ls") return veLichSuCa();
   if(KCXEM==="tq"&&!D.chu) KCXEM="lap"; /* 📊 Tổng quan chỉ chủ xem, thu ngân không có quyền */
