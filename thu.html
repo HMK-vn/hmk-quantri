@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261124111423";
+var HMK_BAN = "20261124111649";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -3663,14 +3663,14 @@ try{ window.top.postMessage({ hmk:"song" },"*"); }catch(e){}
 <script>/* 🐔 Gà tự tìm chỗ trống: luôn giữ nguyên kích thước, nằm trong khung màn hình, né chữ / nút / ô nhập */
 (function(){ var h, BO=/^(BUTTON|INPUT|TEXTAREA|SELECT|A|IMG|SVG|PATH|CANVAS|VIDEO|LABEL|TD|TH|B|STRONG|I|EM|SMALL|SPAN|P|H1|H2|H3|H4|LI|SUMMARY|OPTION)$/;
   function coChu(el){ for(var n=el.firstChild;n;n=n.nextSibling) if(n.nodeType===3&&n.textContent.trim()) return true; return false; }
-  function vuong(x,y,w,ht){ for(var i=0;i<3;i++) for(var j=0;j<3;j++){ var px=x+6+(w-12)*i/2, py=y+6+(ht-12)*j/2, ds=document.elementsFromPoint(px,py);
+  function vuong(x,y,w,ht){ for(var i=0;i<4;i++) for(var j=0;j<4;j++){ var px=x+2+(w-4)*i/3, py=y+2+(ht-4)*j/3, ds=document.elementsFromPoint(px,py);
       for(var k=0;k<ds.length;k++){ var e=ds[k]; if(e.closest&&e.closest("#gaBong,#gaKhung,#tbMac")) continue; if(e===document.body||e===document.documentElement) break; if(BO.test(e.tagName.toUpperCase())||coChu(e)) return true; break; } } return false; }
   function tim(){ var b=document.getElementById("gaBong"); if(!b||b.classList.contains("keo")||getComputedStyle(b).display==="none") return; var k=document.getElementById("gaKhung"); if(k&&getComputedStyle(k).display!=="none"&&k.offsetParent) return;
     var w=b.offsetWidth||44, ht=b.offsetHeight||44, r=b.getBoundingClientRect(), m=8, W=innerWidth, H=innerHeight;
     var x0=Math.max(m,Math.min(W-w-m,r.left)), y0=Math.max(m+56,Math.min(H-ht-m-12,r.top));
     if(!vuong(x0,y0,w,ht)&&(x0!==r.left||y0!==r.top)===false) return;
-    var xs=[W-w-m,m,W-w-m-56,m+56], best=null;
-    for(var xi=0;xi<xs.length&&!best;xi++) for(var y=H-ht-m-12;y>=70;y-=22){ if(!vuong(xs[xi],y,w,ht)){ best=[xs[xi],y]; break; } }
+    var xs=[W-w-m,m], best=null; for(var xx=W-w-m-40;xx>m+30;xx-=40) xs.push(xx);
+    for(var xi=0;xi<xs.length&&!best;xi++) for(var y=H-ht-m-12;y>=70;y-=14){ if(!vuong(xs[xi],y,w,ht)){ best=[xs[xi],y]; break; } }
     if(!best) best=[x0,y0];
     if(Math.abs(best[0]-r.left)<2&&Math.abs(best[1]-r.top)<2) return;
     b.classList.add("gaChay"); b.style.left=best[0]+"px"; b.style.top=best[1]+"px"; b.style.right="auto"; b.style.bottom="auto"; setTimeout(function(){ b.classList.remove("gaChay"); },400); }
