@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261125151306";
+var HMK_BAN = "20261125151521";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -3045,7 +3045,7 @@ function kcTieuDe(){ var nay=KCNGAY===homNay();
     '<span class="chiIn">'+KCNGAY.split("-").reverse().join("/")+'</span>'+
     '<span class="kcIcNut khongIn"><button class="icon" onclick="window.print()" title="In báo cáo kết ca ngày này">🖨</button><button class="icon" onclick="kcMoTM(KCQ,KCNGAY,this)" title="Mở thư mục ảnh hoá đơn của ngày này">📂</button></span>'+
     '<label class="kcTachCa khongIn" title="Bình thường 1 thu ngân lập 1 báo cáo Ca full. Tích khi có 2 thu ngân để tách Ca trưa / Ca tối"><input type="checkbox"'+(KCCA!=="Cả ngày"?' checked':'')+' onchange="kcTachCa(this.checked)"> Tách ca</label>'+
-    (KCCA!=="Cả ngày"?'<select class="kcChon" onchange="KCCA=this.value;moKetCa()">'+kcDsCa().map(function(c){ return '<option value="'+esc(c)+'"'+(c===KCCA?" selected":"")+'>'+c+'</option>'; }).join("")+'</select><input class="kcThuNgan" placeholder="👤 Tên thu ngân" value="'+esc((KCF&&KCF.ngay===KCNGAY&&KCF.ca===KCCA&&KCF.thuNgan)||"")+'" oninput="KCF.thuNgan=this.value">'+kcNutCaToi():'<span class="chiIn">Ca full</span>'); }
+    (KCCA!=="Cả ngày"?'<select class="kcChon" onchange="KCCA=this.value;moKetCa()">'+kcDsCa().map(function(c){ return '<option value="'+esc(c)+'"'+(c===KCCA?" selected":"")+'>'+esc(caHT(c))+'</option>'; }).join("")+'</select><input class="kcThuNgan" placeholder="👤 Tên thu ngân" value="'+esc((KCF&&KCF.ngay===KCNGAY&&KCF.ca===KCCA&&KCF.thuNgan)||"")+'" oninput="KCF.thuNgan=this.value">'+kcNutCaToi():'<span class="chiIn">Ca full</span>'); }
 // 🌙 Nút chuyển / mở ca tối: ca trưa bấm → bàn giao (ghi giờ vào sheet Bàn giao ca = mốc chia Bank) → mở ca tối với đầu ca = tiền ca trưa bàn giao
 function kcDsCa(){ var t=caTNCua(KCQ), ds=(t&&t.phan||[]).map(function(c){ return c.ca; }).filter(Boolean); return ds.length>1?ds:["Ca trưa","Ca tối"]; }
 function kcCaSau(){ var ds=kcDsCa(), i=ds.indexOf(KCCA); return i>=0&&i<ds.length-1?ds[i+1]:""; }
@@ -3071,6 +3071,7 @@ function moKetCaCu(q,n,m,d,ca){ KCNGAY=n+"-"+("0"+m).slice(-2)+"-"+("0"+d).slice
 var KC_LUOT=0;
 var KC_GIU_FULL=false;
 function kcApTT(t,q,ng,ca,cu){ /* 25/11 chủ: ngày đã tách ca → tải lại vẫn mở đúng ca đang làm, không quay về Ca full */
+  if(ca==="Cả ngày"&&t.coCa&&!KC_GIU_FULL&&!CATN){ goi("caThuNgan","").then(function(r){ r._luc=Date.now(); CATN=r; try{ veCaTN(); veBannerCa(); }catch(e){} moKetCa(); }).catch(function(){ CATN={ds:[]}; moKetCa(); }); return; }
   if(ca==="Cả ngày"&&t.coCa&&!KC_GIU_FULL){ var ds=kcDsCa(), dt=(caTNCua(q)||{}).dangTruc, c2=(ng===homNay()&&dt&&ds.indexOf(dt.ca)>=0)?dt.ca:ds[0]; KCCA=c2; return moKetCa(); }
   KCTT=t; var c=t.cu;
     KCF={ id:c?c.ID:"", quan:q, ngay:ng, ca:ca, doanhThu:c?c["Doanh thu máy"]:"", dauCa:(c&&!t.caSau)?c["Tiền đầu ca"]:t.dauCa, demThu:c?(c["Đếm thu (JSON)"]||{}):{}, demGiu:c?(c["Đếm giữ két (JSON)"]||{}):{}, demNhap:c?(c["Đếm nhập két (JSON)"]||{}):{},
