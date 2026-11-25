@@ -7,7 +7,7 @@
 // Chạy thẳng trên GitHub: thay google.script.run bằng gọi cổng JSON (doPost) của Apps Script – không khung Google nên mọi trình duyệt vào được
 var HMK_WEB = true, QS_ = new URLSearchParams(location.search), HMK_API = "https://script.google.com/macros/s/AKfycbzJqJ67d2tCxVXAmqjOehBlZp8wXL5b3p93OTIqv0R08_qjAKox1o_FGiLBAZ5nQw_Z/exec";
 // Bản dựng: trình duyệt (nhất là Safari) giữ bản cũ trong bộ nhớ đệm => hỏi GitHub bản mới nhất, khác thì tự tải lại 1 lần
-var HMK_BAN = "20261124130756";
+var HMK_BAN = "20261125141542";
 fetch(location.pathname + "?ban=" + Date.now(), { cache: "no-store" }).then(function(r){ return r.text(); }).then(function(t){
   var m = /HMK_BAN = "([^"]+)"/.exec(t); if (!m || m[1] === HMK_BAN) return;
   try { if (sessionStorage.getItem("hmk_taiLai") === m[1]) return; sessionStorage.setItem("hmk_taiLai", m[1]); } catch (e) {}
@@ -3081,7 +3081,7 @@ document.addEventListener("keydown",function(e){ var t=e.target; if(!t||t.tagNam
   if(dich){ e.preventDefault(); dich.focus(); dich.select&&dich.select(); } });
 // Gộp 2 bảng đếm (thu vào két + giữ lại két) thành 1 bảng gọn: mỗi mệnh giá 1 dòng, 2 ô số tờ cạnh nhau
 // 💵 Bảng đếm theo dòng tiền: ① Đầu ca → ② Nhập thêm → ③ Bàn giao (+ ④ Để lại két ở ca cuối ngày). Đếm thu cuối ca = ③ + ④
-function kcTrua(){ return !KCTT.caSau&&KCCA!=="Cả ngày"; } // ca đầu ngày: bàn giao hết cho ca sau, không để lại két
+function kcTrua(){ return KCCA!=="Cả ngày"&&!KCTT.caCuoi&&!(KCTT.caCuoi===undefined&&KCTT.caSau); } // 25/11: chỉ CA CUỐI NGÀY (ca chiều/tối) giữ tiền để lại két cuối ngày; các ca trước bàn giao hết cho ca sau
 function demTruKC(a,b){ var k={}; Object.keys(a||{}).forEach(function(m){ var v=(+a[m]||0)-(+(b||{})[m]||0); if(v>0) k[m]=v; }); return k; }
 function demCong(a,b){ var k=Object.assign({},a||{}); Object.keys(b||{}).forEach(function(m){ k[m]=(+k[m]||0)+(+b[m]||0); }); return k; }
 function tongDemKC(o){ return KCTT.menhGia.reduce(function(s,m){ return s+m*(+(o||{})[m]||0); },0); }
